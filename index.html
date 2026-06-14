@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>marshymellow</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #192127;
+      --muted: #5d6b75;
+      --paper: #fff9f1;
+      --cream: #fff3df;
+      --mint: #d6f3e2;
+      --berry: #b73463;
+      --cocoa: #5f3a2f;
+      --sky: #d9ecff;
+      --line: rgba(25, 33, 39, 0.14);
+      --shadow: 0 18px 42px rgba(48, 36, 28, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .site-header {
+      align-items: center;
+      background: rgba(255, 249, 241, 0.88);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      padding: 18px clamp(18px, 5vw, 64px);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      color: var(--berry);
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      font-weight: 900;
+      letter-spacing: 0;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      font-size: 0.95rem;
+      font-weight: 800;
+      padding: 9px 14px;
+      text-decoration: none;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      background: var(--mint);
+      border-color: rgba(25, 33, 39, 0.25);
+      transform: translateY(-1px);
+    }
+
+    main {
+      overflow: hidden;
+    }
+
+    .hero {
+      align-items: center;
+      display: grid;
+      gap: clamp(24px, 5vw, 56px);
+      grid-template-columns: minmax(0, 0.95fr) minmax(280px, 1.05fr);
+      min-height: calc(100vh - 78px);
+      padding: clamp(28px, 6vw, 72px) clamp(18px, 5vw, 64px);
+    }
+
+    .hero-copy {
+      max-width: 640px;
+    }
+
+    .eyebrow {
+      color: var(--cocoa);
+      font-size: 0.82rem;
+      font-weight: 900;
+      margin: 0 0 12px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      color: var(--berry);
+      font-size: clamp(3rem, 12vw, 8.8rem);
+      line-height: 0.9;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.32rem);
+      margin: 24px 0 0;
+      max-width: 52ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      align-items: center;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      display: inline-flex;
+      font-weight: 900;
+      justify-content: center;
+      min-height: 46px;
+      padding: 11px 18px;
+      text-decoration: none;
+      transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .button.primary {
+      background: var(--ink);
+      color: white;
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-2px);
+    }
+
+    .button.secondary:hover,
+    .button.secondary:focus-visible {
+      background: var(--sky);
+    }
+
+    button.button {
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .hero-photo {
+      aspect-ratio: 4 / 5;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      max-height: 680px;
+      min-height: 360px;
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+    }
+
+    .hero-photo img {
+      height: 100%;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .hero-photo span {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(25, 33, 39, 0.15);
+      border-radius: 999px;
+      bottom: 18px;
+      color: var(--cocoa);
+      font-weight: 900;
+      left: 18px;
+      padding: 9px 14px;
+      position: absolute;
+    }
+
+    .section {
+      padding: clamp(42px, 7vw, 84px) clamp(18px, 5vw, 64px);
+    }
+
+    .section.mint {
+      background: var(--mint);
+    }
+
+    .section.sky {
+      background: var(--sky);
+    }
+
+    .section-header {
+      align-items: end;
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      margin: 0 auto 24px;
+      max-width: 1120px;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 5vw, 4.2rem);
+      line-height: 1;
+      margin: 0;
+    }
+
+    .section-header p {
+      color: var(--muted);
+      margin: 0;
+      max-width: 38ch;
+    }
+
+    .gallery {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin: 0 auto;
+      max-width: 1120px;
+    }
+
+    .picture-card {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(25, 33, 39, 0.08);
+      overflow: hidden;
+    }
+
+    .picture-card img {
+      aspect-ratio: 4 / 3;
+      display: block;
+      height: auto;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .picture-card p {
+      color: var(--cocoa);
+      font-weight: 900;
+      margin: 0;
+      padding: 14px 16px 16px;
+    }
+
+    .tos {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1.2fr);
+      margin: 0 auto;
+      max-width: 1120px;
+    }
+
+    .tos-text {
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(25, 33, 39, 0.12);
+      border-radius: 8px;
+      padding: clamp(18px, 3vw, 28px);
+    }
+
+    .tos-text h2 {
+      color: var(--berry);
+    }
+
+    .tos-text ol {
+      color: var(--muted);
+      margin: 20px 0 0;
+      padding-left: 22px;
+    }
+
+    .tos-text li + li {
+      margin-top: 10px;
+    }
+
+    .approval-form {
+      border-top: 1px solid rgba(25, 33, 39, 0.14);
+      margin-top: 24px;
+      padding-top: 22px;
+    }
+
+    .approval-form label {
+      color: var(--ink);
+      display: block;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .approval-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .approval-row input {
+      background: white;
+      border: 2px solid rgba(25, 33, 39, 0.2);
+      border-radius: 999px;
+      color: var(--ink);
+      flex: 1;
+      font: inherit;
+      min-height: 46px;
+      min-width: 0;
+      padding: 10px 16px;
+    }
+
+    .approval-row input:focus {
+      border-color: var(--berry);
+      outline: 3px solid rgba(183, 52, 99, 0.18);
+    }
+
+    .approval-note,
+    .approval-status {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 10px 0 0;
+    }
+
+    .approval-status {
+      color: var(--berry);
+      font-weight: 900;
+      min-height: 1.4em;
+    }
+
+    .tos-image {
+      border-radius: 8px;
+      min-height: 360px;
+      overflow: hidden;
+    }
+
+    .tos-image img {
+      height: 100%;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .site-footer {
+      align-items: center;
+      background: var(--ink);
+      color: white;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 22px clamp(18px, 5vw, 64px);
+    }
+
+    .site-footer a {
+      color: white;
+      font-weight: 800;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    @media (max-width: 840px) {
+      .hero,
+      .tos {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .hero-photo {
+        min-height: 300px;
+      }
+
+      .section-header {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .nav-links a,
+      .button {
+        font-size: 0.92rem;
+      }
+
+      .approval-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home">marshymellow</a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#pictures">Pictures</a>
+      <a href="#tos">TOS</a>
+      <a href="approved.html">Approved</a>
+    </nav>
+  </header>
+
+  <main id="home">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Soft, sweet, and a little dramatic</p>
+        <h1 id="hero-title">marshymellow</h1>
+        <p class="tagline">
+          A tiny website for fluffy snacks, cozy pictures, and the official marshymellow rules.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#pictures">See pictures</a>
+          <a class="button secondary" href="#tos">Read TOS</a>
+        </div>
+      </div>
+
+      <div class="hero-photo">
+        <img src="https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80" alt="Toasted marshmallows beside a warm fire">
+        <span>freshly fluffed</span>
+      </div>
+    </section>
+
+    <section class="section mint" id="pictures" aria-labelledby="pictures-title">
+      <div class="section-header">
+        <h2 id="pictures-title">Pictures</h2>
+        <p>Soft scenes, snack-table energy, and plenty of room for more marshymellow moments.</p>
+      </div>
+
+      <div class="gallery">
+        <article class="picture-card">
+          <img src="https://images.unsplash.com/photo-1608479319013-3c9b772a1376?auto=format&fit=crop&w=900&q=80" alt="Marshmallows stacked in a bowl">
+          <p>Pillow pile</p>
+        </article>
+        <article class="picture-card">
+          <img src="https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&w=900&q=80" alt="Marshmallows floating on hot chocolate">
+          <p>Cocoa cloud</p>
+        </article>
+        <article class="picture-card">
+          <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=80" alt="Sweet dessert topped with marshmallow">
+          <p>Sweet finish</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section sky" id="tos" aria-labelledby="tos-title">
+      <div class="tos">
+        <div class="tos-text">
+          <h2 id="tos-title">TOS</h2>
+          <ol>
+            <li>Be kind to the marshymellow and everyone visiting the site.</li>
+            <li>Pictures are for cozy vibes, snack inspiration, and harmless admiration.</li>
+            <li>No stealing the softness, claiming the fluff, or starting crumb-based arguments.</li>
+            <li>By staying here, you agree that marshymellow is spelled exactly this way.</li>
+          </ol>
+
+          <form class="approval-form" id="approval-form">
+            <label for="approval-name">Approve the TOS with your name</label>
+            <div class="approval-row">
+              <input id="approval-name" name="approval-name" type="text" maxlength="40" autocomplete="name" placeholder="Your name" required>
+              <button class="button primary" type="submit">Submit</button>
+            </div>
+            <p class="approval-note">Only type your own name. Submitted names show on the approved list in this browser.</p>
+            <p class="approval-status" id="approval-status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="tos-image">
+          <img src="https://images.unsplash.com/photo-1514517220030-2193f206f5f1?auto=format&fit=crop&w=1100&q=80" alt="Campfire with marshmallows on roasting sticks">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>marshymellow forever</span>
+    <a href="approved.html">View approved list</a>
+  </footer>
+
+  <script>
+    const approvalForm = document.querySelector("#approval-form");
+    const approvalName = document.querySelector("#approval-name");
+    const approvalStatus = document.querySelector("#approval-status");
+    const storageKey = "marshymellowApprovals";
+
+    function getApprovals() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveApprovals(approvals) {
+      localStorage.setItem(storageKey, JSON.stringify(approvals));
+    }
+
+    approvalForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const name = approvalName.value.trim().replace(/\s+/g, " ");
+
+      if (!name) {
+        approvalStatus.textContent = "Please type your name first.";
+        return;
+      }
+
+      const approvals = getApprovals();
+      const alreadyApproved = approvals.some((approval) => approval.name.toLowerCase() === name.toLowerCase());
+
+      if (alreadyApproved) {
+        approvalStatus.textContent = `${name} is already on the approved list.`;
+        approvalName.value = "";
+        return;
+      }
+
+      approvals.push({
+        name,
+        approvedAt: new Date().toISOString()
+      });
+
+      saveApprovals(approvals);
+      approvalStatus.textContent = `${name} approved the TOS.`;
+      approvalName.value = "";
+    });
+  </script>
+</body>
+</html>

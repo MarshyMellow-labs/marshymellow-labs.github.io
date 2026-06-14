@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>marshymellow approved list</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #192127;
+      --muted: #5d6b75;
+      --paper: #fff9f1;
+      --mint: #d6f3e2;
+      --berry: #b73463;
+      --line: rgba(25, 33, 39, 0.14);
+      --shadow: 0 18px 42px rgba(48, 36, 28, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      align-items: center;
+      background: rgba(255, 249, 241, 0.88);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      padding: 18px clamp(18px, 5vw, 64px);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      color: var(--berry);
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      font-weight: 900;
+      letter-spacing: 0;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .nav-links a,
+    .button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      font-size: 0.95rem;
+      font-weight: 800;
+      padding: 9px 14px;
+      text-decoration: none;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible,
+    .button:hover,
+    .button:focus-visible {
+      background: var(--mint);
+      border-color: rgba(25, 33, 39, 0.25);
+      transform: translateY(-1px);
+    }
+
+    main {
+      padding: clamp(36px, 8vw, 86px) clamp(18px, 5vw, 64px);
+    }
+
+    .approved-shell {
+      margin: 0 auto;
+      max-width: 900px;
+    }
+
+    h1 {
+      color: var(--berry);
+      font-size: clamp(2.7rem, 9vw, 6.8rem);
+      line-height: 0.92;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .intro {
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      margin: 18px 0 28px;
+      max-width: 58ch;
+    }
+
+    .approved-panel {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .approved-summary {
+      align-items: center;
+      background: var(--mint);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 18px;
+    }
+
+    .approved-summary strong {
+      color: var(--ink);
+      font-size: 1.1rem;
+    }
+
+    .approved-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .approved-list li {
+      align-items: center;
+      border-top: 1px solid var(--line);
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      padding: 16px 18px;
+    }
+
+    .approved-list span:first-child {
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .approved-list time {
+      color: var(--muted);
+      font-size: 0.92rem;
+      white-space: nowrap;
+    }
+
+    .empty-message {
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      margin: 0;
+      padding: 20px 18px;
+    }
+
+    .site-footer {
+      align-items: center;
+      background: var(--ink);
+      color: white;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 22px clamp(18px, 5vw, 64px);
+    }
+
+    .site-footer a {
+      color: white;
+      font-weight: 800;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    @media (max-width: 560px) {
+      .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .approved-list li {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .approved-list time {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="calculator.html">marshymellow</a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="calculator.html#pictures">Pictures</a>
+      <a href="calculator.html#tos">TOS</a>
+      <a href="approved.html">Approved</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="approved-shell" aria-labelledby="approved-title">
+      <h1 id="approved-title">Approved the TOS</h1>
+      <p class="intro">Names appear here after someone submits the approval form on the marshymellow TOS page.</p>
+
+      <div class="approved-panel">
+        <div class="approved-summary">
+          <strong id="approval-count">0 approvals</strong>
+          <a class="button" href="calculator.html#tos">Approve TOS</a>
+        </div>
+        <ul class="approved-list" id="approved-list"></ul>
+        <p class="empty-message" id="empty-message">No one has approved the TOS in this browser yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>marshymellow forever</span>
+    <a href="calculator.html">Back home</a>
+  </footer>
+
+  <script>
+    const storageKey = "marshymellowApprovals";
+    const approvedList = document.querySelector("#approved-list");
+    const approvalCount = document.querySelector("#approval-count");
+    const emptyMessage = document.querySelector("#empty-message");
+
+    function getApprovals() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "Approved";
+      }
+
+      return date.toLocaleString([], {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+    }
+
+    function renderApprovals() {
+      const approvals = getApprovals();
+
+      approvalCount.textContent = `${approvals.length} ${approvals.length === 1 ? "approval" : "approvals"}`;
+      emptyMessage.hidden = approvals.length > 0;
+      approvedList.replaceChildren();
+
+      approvals.forEach((approval) => {
+        const item = document.createElement("li");
+        const name = document.createElement("span");
+        const time = document.createElement("time");
+
+        name.textContent = approval.name;
+        time.textContent = formatDate(approval.approvedAt);
+        time.dateTime = approval.approvedAt || "";
+
+        item.append(name, time);
+        approvedList.append(item);
+      });
+    }
+
+    renderApprovals();
+  </script>
+</body>
+</html>
