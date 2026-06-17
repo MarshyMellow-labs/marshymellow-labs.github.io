@@ -1,22 +1,55 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>marshymellow</title>
+  <link rel="icon" href="assets/marshy-logo.png">
   <style>
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Medium.ttf") format("truetype");
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Semibold.ttf") format("truetype");
+      font-weight: 800;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Bold.ttf") format("truetype");
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
       color-scheme: light;
-      --ink: #192127;
-      --muted: #5d6b75;
-      --paper: #fff9f1;
-      --cream: #fff3df;
-      --mint: #d6f3e2;
-      --berry: #b73463;
-      --cocoa: #5f3a2f;
-      --sky: #d9ecff;
-      --line: rgba(25, 33, 39, 0.14);
-      --shadow: 0 18px 42px rgba(48, 36, 28, 0.16);
+      --ink: #372840;
+      --muted: #746579;
+      --paper: #eaf8ff;
+      --cream: #fff2ad;
+      --mint: #fff0a8;
+      --berry: #ff6fae;
+      --cocoa: #6d5aa8;
+      --sky: #bfe9ff;
+      --line: rgba(255, 111, 174, 0.24);
+      --shadow: 0 18px 42px rgba(255, 111, 174, 0.18);
     }
 
     * {
@@ -28,9 +61,11 @@
     }
 
     body {
-      background: var(--paper);
+      background:
+        linear-gradient(145deg, #cbeeff 0%, #eaf8ff 38%, #fff2b8 70%, #ffd6eb 100%),
+        var(--paper);
       color: var(--ink);
-      font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: "gg sans", "gg sans Normal", Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.5;
       margin: 0;
     }
@@ -41,7 +76,7 @@
 
     .site-header {
       align-items: center;
-      background: rgba(255, 249, 241, 0.88);
+      background: linear-gradient(90deg, rgba(211, 241, 255, 0.94), rgba(255, 236, 249, 0.92));
       border-bottom: 1px solid var(--line);
       display: flex;
       gap: 18px;
@@ -54,12 +89,27 @@
     }
 
     .brand {
+      align-items: center;
       color: var(--berry);
+      display: inline-flex;
       font-size: clamp(1.2rem, 4vw, 1.7rem);
       font-weight: 900;
+      min-height: 64px;
       letter-spacing: 0;
       text-decoration: none;
       white-space: nowrap;
+    }
+
+    .brand-logo {
+      display: block;
+      height: 64px;
+      max-width: min(48vw, 420px);
+      object-fit: contain;
+      width: auto;
+    }
+
+    .brand-text {
+      display: none;
     }
 
     .nav-links {
@@ -71,7 +121,8 @@
     }
 
     .nav-links a {
-      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.34);
+      border: 1px solid rgba(255, 111, 174, 0.2);
       border-radius: 999px;
       color: var(--ink);
       font-size: 0.95rem;
@@ -83,7 +134,7 @@
 
     .nav-links a:hover,
     .nav-links a:focus-visible {
-      background: var(--mint);
+      background: rgba(255, 242, 173, 0.92);
       border-color: rgba(25, 33, 39, 0.25);
       transform: translateY(-1px);
     }
@@ -94,6 +145,9 @@
 
     .hero {
       align-items: center;
+      background:
+        linear-gradient(135deg, rgba(213, 243, 255, 0.88), rgba(255, 255, 255, 0.52) 48%, rgba(255, 218, 238, 0.68)),
+        linear-gradient(35deg, rgba(255, 242, 173, 0.42), transparent 48%);
       display: grid;
       gap: clamp(24px, 5vw, 56px);
       grid-template-columns: minmax(0, 0.95fr) minmax(280px, 1.05fr);
@@ -115,10 +169,31 @@
 
     h1 {
       color: var(--berry);
-      font-size: clamp(3rem, 12vw, 8.8rem);
-      line-height: 0.9;
+      font-size: clamp(3.1rem, 7.2vw, 7rem);
+      line-height: 0.95;
       margin: 0;
-      overflow-wrap: anywhere;
+      overflow-wrap: normal;
+      text-shadow: 3px 3px 0 rgba(255, 242, 173, 0.95);
+    }
+
+    .hero-logo {
+      display: block;
+      margin-bottom: 26px;
+      max-width: min(100%, 760px);
+      width: 100%;
+    }
+
+    .hero-logo[hidden] {
+      display: none;
+    }
+
+    .sr-only {
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      position: absolute;
+      width: 1px;
+      clip: rect(0 0 0 0);
     }
 
     .tagline {
@@ -149,12 +224,14 @@
     }
 
     .button.primary {
-      background: var(--ink);
-      color: white;
+      background: var(--berry);
+      border-color: var(--berry);
+      color: var(--ink);
+      box-shadow: 0 8px 18px rgba(255, 111, 174, 0.24);
     }
 
     .button.secondary {
-      background: transparent;
+      background: rgba(255, 255, 255, 0.44);
       color: var(--ink);
     }
 
@@ -176,6 +253,7 @@
     .hero-photo {
       aspect-ratio: 4 / 5;
       border-radius: 8px;
+      border: 3px solid rgba(255, 255, 255, 0.82);
       box-shadow: var(--shadow);
       max-height: 680px;
       min-height: 360px;
@@ -191,7 +269,7 @@
     }
 
     .hero-photo span {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(25, 33, 39, 0.15);
       border-radius: 999px;
       bottom: 18px;
@@ -207,11 +285,11 @@
     }
 
     .section.mint {
-      background: var(--mint);
+      background: linear-gradient(135deg, #d8f2ff, #ffffff 46%, #fff2b8);
     }
 
     .section.sky {
-      background: var(--sky);
+      background: linear-gradient(135deg, #cceeff, #f7fcff 48%, #ffddeb);
     }
 
     .section-header {
@@ -224,6 +302,7 @@
     }
 
     h2 {
+      color: var(--cocoa);
       font-size: clamp(2rem, 5vw, 4.2rem);
       line-height: 1;
       margin: 0;
@@ -235,17 +314,32 @@
       max-width: 38ch;
     }
 
+    .section-title-image {
+      display: block;
+      height: auto;
+      max-width: 100%;
+      width: clamp(220px, 28vw, 360px);
+    }
+
+    .pictures-title-image {
+      width: clamp(260px, 34vw, 430px);
+    }
+
+    .tos-title-image {
+      width: clamp(150px, 18vw, 240px);
+    }
+
     .gallery {
       display: grid;
       gap: 18px;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       margin: 0 auto;
       max-width: 1120px;
     }
 
     .picture-card {
-      background: white;
-      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.82);
       border-radius: 8px;
       box-shadow: 0 10px 28px rgba(25, 33, 39, 0.08);
       overflow: hidden;
@@ -253,6 +347,7 @@
 
     .picture-card img {
       aspect-ratio: 4 / 3;
+      cursor: zoom-in;
       display: block;
       height: auto;
       object-fit: cover;
@@ -266,17 +361,54 @@
       padding: 14px 16px 16px;
     }
 
-    .tos {
+    .picture-card time {
+      color: var(--muted);
+      display: block;
+      font-size: 0.86rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .about-grid {
       display: grid;
-      gap: 24px;
-      grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1.2fr);
+      gap: 18px;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 0.64fr);
+      margin: 0 auto;
+      max-width: 1120px;
+    }
+
+    .about-copy,
+    .about-note {
+      background: rgba(255, 255, 255, 0.78);
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(25, 33, 39, 0.08);
+      padding: clamp(18px, 3vw, 28px);
+    }
+
+    .about-copy p,
+    .about-note p {
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      margin: 14px 0 0;
+    }
+
+    .about-note strong {
+      color: var(--berry);
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .tos {
+      display: block;
       margin: 0 auto;
       max-width: 1120px;
     }
 
     .tos-text {
-      background: rgba(255, 255, 255, 0.62);
-      border: 1px solid rgba(25, 33, 39, 0.12);
+      background: rgba(255, 255, 255, 0.78);
+      border: 2px solid rgba(255, 255, 255, 0.82);
       border-radius: 8px;
       padding: clamp(18px, 3vw, 28px);
     }
@@ -285,14 +417,35 @@
       color: var(--berry);
     }
 
-    .tos-text ol {
+    .tos-intro,
+    .tos-source {
       color: var(--muted);
-      margin: 20px 0 0;
-      padding-left: 22px;
+      margin: 14px 0 0;
     }
 
-    .tos-text li + li {
-      margin-top: 10px;
+    .tos-source a {
+      color: var(--berry);
+      font-weight: 900;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    .tos-document {
+      background: white;
+      border: 2px solid rgba(255, 111, 174, 0.18);
+      border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(25, 33, 39, 0.08);
+      margin-top: 22px;
+      overflow: hidden;
+    }
+
+    .tos-frame {
+      background: white;
+      border: 0;
+      display: block;
+      height: min(72vh, 760px);
+      min-height: 520px;
+      width: 100%;
     }
 
     .approval-form {
@@ -314,7 +467,7 @@
     }
 
     .approval-row input {
-      background: white;
+      background: #fffcff;
       border: 2px solid rgba(25, 33, 39, 0.2);
       border-radius: 999px;
       color: var(--ink);
@@ -327,7 +480,7 @@
 
     .approval-row input:focus {
       border-color: var(--berry);
-      outline: 3px solid rgba(183, 52, 99, 0.18);
+      outline: 3px solid rgba(255, 111, 174, 0.2);
     }
 
     .approval-note,
@@ -355,9 +508,74 @@
       width: 100%;
     }
 
+    .image-viewer {
+      align-items: center;
+      background: rgba(55, 40, 64, 0.76);
+      display: flex;
+      inset: 0;
+      justify-content: center;
+      padding: 24px;
+      position: fixed;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+
+    .image-viewer[hidden] {
+      display: none;
+    }
+
+    .image-viewer img {
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      max-height: 86vh;
+      max-width: min(1100px, 92vw);
+      object-fit: contain;
+    }
+
+    .image-viewer button {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 111, 174, 0.22);
+      border-radius: 999px;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 900;
+      min-height: 42px;
+      padding: 8px 14px;
+      position: absolute;
+    }
+
+    .image-viewer-close {
+      right: 22px;
+      top: 22px;
+    }
+
+    .image-viewer-nav {
+      font-size: 2rem;
+      height: 58px;
+      padding: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 58px;
+    }
+
+    .image-viewer-nav:hover,
+    .image-viewer-nav:focus-visible {
+      background: var(--cream);
+    }
+
+    .image-viewer-prev {
+      left: 22px;
+    }
+
+    .image-viewer-next {
+      right: 22px;
+    }
+
     .site-footer {
       align-items: center;
-      background: var(--ink);
+      background: #5f4a98;
       color: white;
       display: flex;
       flex-wrap: wrap;
@@ -373,9 +591,18 @@
       text-underline-offset: 4px;
     }
 
+    .footer-copy {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ai-credit {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
     @media (max-width: 840px) {
-      .hero,
-      .tos {
+      .hero {
         grid-template-columns: 1fr;
       }
 
@@ -393,6 +620,10 @@
       }
 
       .gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .about-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -412,6 +643,23 @@
         font-size: 0.92rem;
       }
 
+      .brand {
+        min-height: 52px;
+      }
+
+      .brand-logo {
+        height: 52px;
+        max-width: 72vw;
+      }
+
+      h1 {
+        font-size: clamp(2.65rem, 15vw, 4.6rem);
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+
       .approval-row {
         align-items: stretch;
         flex-direction: column;
@@ -421,11 +669,17 @@
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="#home">marshymellow</a>
+    <a class="brand" href="index.html" aria-label="MarshyMellow home">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
+      <span class="brand-text">marshymellow</span>
+    </a>
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="#pictures">Pictures</a>
-      <a href="#tos">TOS</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#pictures">Pictures</a>
+      <a href="index.html#tos">TOS</a>
       <a href="approved.html">Approved</a>
+      <a href="donate.html">Pay Tribute</a>
+      <a href="snake.html">Snake</a>
     </nav>
   </header>
 
@@ -433,124 +687,423 @@
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="eyebrow">Soft, sweet, and a little dramatic</p>
-        <h1 id="hero-title">marshymellow</h1>
+        <img class="hero-logo" src="assets/marshy-logo.png" alt="MarshyMellow" onerror="this.hidden=true;">
+        <h1 class="sr-only" id="hero-title">MarshyMellow</h1>
         <p class="tagline">
-          A tiny website for fluffy snacks, cozy pictures, and the official marshymellow rules.
+          Welcome to MarshyMellow's website you are now trapped here.
         </p>
         <div class="hero-actions">
-          <a class="button primary" href="#pictures">See pictures</a>
-          <a class="button secondary" href="#tos">Read TOS</a>
+          <a class="button primary" href="index.html#pictures">See pictures</a>
+          <a class="button secondary" href="index.html#tos">Read TOS</a>
         </div>
       </div>
 
       <div class="hero-photo">
-        <img src="https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80" alt="Toasted marshmallows beside a warm fire">
+        <img src="assets/marshy-hero.png" alt="Two VRChat avatars close together" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80';">
         <span>freshly fluffed</span>
+      </div>
+    </section>
+
+    <section class="section sky" id="about" aria-labelledby="about-title">
+      <div class="about-grid">
+        <div class="about-copy">
+          <h2 id="about-title">About</h2>
+          <p>This website was made for fun, for friends, and for keeping MarshyMellow things in one place. It is a home for pictures, the TOS, silly extras, and whatever else gets added later.</p>
+          <p>More pages, games, gallery bits, or other nonsense may appear in the future when the paperwork department feels motivated.</p>
+        </div>
+        <aside class="about-note" aria-label="Contact">
+          <strong>Discord</strong>
+          <p>marshymellow</p>
+        </aside>
       </div>
     </section>
 
     <section class="section mint" id="pictures" aria-labelledby="pictures-title">
       <div class="section-header">
-        <h2 id="pictures-title">Pictures</h2>
+        <h2 id="pictures-title">
+          <img class="section-title-image pictures-title-image" src="assets/pictures-title.png" alt="Pictures!">
+        </h2>
         <p>Soft scenes, snack-table energy, and plenty of room for more marshymellow moments.</p>
       </div>
 
-      <div class="gallery">
-        <article class="picture-card">
-          <img src="https://images.unsplash.com/photo-1608479319013-3c9b772a1376?auto=format&fit=crop&w=900&q=80" alt="Marshmallows stacked in a bowl">
-          <p>Pillow pile</p>
-        </article>
-        <article class="picture-card">
-          <img src="https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&w=900&q=80" alt="Marshmallows floating on hot chocolate">
-          <p>Cocoa cloud</p>
-        </article>
-        <article class="picture-card">
-          <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=80" alt="Sweet dessert topped with marshmallow">
-          <p>Sweet finish</p>
-        </article>
-      </div>
+      <div class="gallery" id="gallery"></div>
     </section>
 
     <section class="section sky" id="tos" aria-labelledby="tos-title">
       <div class="tos">
         <div class="tos-text">
-          <h2 id="tos-title">TOS</h2>
-          <ol>
-            <li>Be kind to the marshymellow and everyone visiting the site.</li>
-            <li>Pictures are for cozy vibes, snack inspiration, and harmless admiration.</li>
-            <li>No stealing the softness, claiming the fluff, or starting crumb-based arguments.</li>
-            <li>By staying here, you agree that marshymellow is spelled exactly this way.</li>
-          </ol>
+          <h2 id="tos-title">
+            <img class="section-title-image tos-title-image" src="assets/tos-title.png" alt="TOS">
+          </h2>
+          <p class="tos-intro">Read the full MarshyMellow Terms of Service below before submitting your name.</p>
+          <p class="tos-source">
+            Source:
+            <a href="https://docs.google.com/document/d/e/2PACX-1vTXw3rH1CLQKezdKK2GpDgzpOkfj9oQa_0GBFTElUKv9aUqqE_i60ktq_vsk0uuE1p0ZUoOFQ4xadDO/pub" target="_blank" rel="noopener">Open the published Google Doc</a>
+          </p>
+
+          <div class="tos-document">
+            <iframe class="tos-frame" title="MarshyMellow Terms of Service" src="https://docs.google.com/document/d/e/2PACX-1vTXw3rH1CLQKezdKK2GpDgzpOkfj9oQa_0GBFTElUKv9aUqqE_i60ktq_vsk0uuE1p0ZUoOFQ4xadDO/pub?embedded=true"></iframe>
+          </div>
 
           <form class="approval-form" id="approval-form">
             <label for="approval-name">Approve the TOS with your name</label>
             <div class="approval-row">
-              <input id="approval-name" name="approval-name" type="text" maxlength="40" autocomplete="name" placeholder="Your name" required>
+              <input id="approval-name" name="approval-name" type="text" maxlength="32" autocomplete="name" placeholder="Your name" required>
               <button class="button primary" type="submit">Submit</button>
             </div>
-            <p class="approval-note">Only type your own name. Submitted names show on the approved list in this browser.</p>
+            <p class="approval-note">Use 2-32 characters. Unicode names are welcome, but links and spam are blocked.</p>
             <p class="approval-status" id="approval-status" aria-live="polite"></p>
           </form>
         </div>
 
-        <div class="tos-image">
-          <img src="https://images.unsplash.com/photo-1514517220030-2193f206f5f1?auto=format&fit=crop&w=1100&q=80" alt="Campfire with marshmallows on roasting sticks">
-        </div>
       </div>
     </section>
   </main>
 
+  <div class="image-viewer" id="image-viewer" hidden>
+    <button class="image-viewer-close" type="button" id="image-viewer-close">Close</button>
+    <button class="image-viewer-nav image-viewer-prev" type="button" id="image-viewer-prev" aria-label="Previous picture">&lsaquo;</button>
+    <img id="image-viewer-img" alt="">
+    <button class="image-viewer-nav image-viewer-next" type="button" id="image-viewer-next" aria-label="Next picture">&rsaquo;</button>
+  </div>
+
   <footer class="site-footer">
-    <span>marshymellow forever</span>
-    <a href="approved.html">View approved list</a>
+    <div class="footer-copy">
+      <span>MarshyMellow &#9825; &trade; 2026</span>
+      <span class="ai-credit">Made with AI bullshittery.</span>
+      <span class="ai-credit">Discord: marshymellow</span>
+    </div>
+    <a href="donate.html">Pay Tribute</a>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const approvalForm = document.querySelector("#approval-form");
     const approvalName = document.querySelector("#approval-name");
     const approvalStatus = document.querySelector("#approval-status");
-    const storageKey = "marshymellowApprovals";
+    const gallery = document.querySelector("#gallery");
+    const imageViewer = document.querySelector("#image-viewer");
+    const imageViewerImg = document.querySelector("#image-viewer-img");
+    const imageViewerClose = document.querySelector("#image-viewer-close");
+    const imageViewerPrev = document.querySelector("#image-viewer-prev");
+    const imageViewerNext = document.querySelector("#image-viewer-next");
+    let currentImageIndex = 0;
+    const APPROVAL_RATE_KEY = "marshymellowApprovalRate";
+    const APPROVAL_SHORT_WINDOW_MS = 10 * 60 * 1000;
+    const APPROVAL_SHORT_LIMIT = 2;
+    const APPROVAL_LONG_WINDOW_MS = 60 * 60 * 1000;
+    const APPROVAL_LONG_LIMIT = 10;
+    const APPROVAL_PENALTY_MS = 2 * 60 * 60 * 1000;
+    const APPROVAL_FINGERPRINT_KEY = "marshymellowApprovalFingerprint";
 
-    function getApprovals() {
+    function getGalleryImages() {
+      return Array.from(gallery.querySelectorAll(".picture-card img"));
+    }
+
+    function showImageAt(index) {
+      const images = getGalleryImages();
+
+      if (!images.length) {
+        return;
+      }
+
+      currentImageIndex = (index + images.length) % images.length;
+      const image = images[currentImageIndex];
+      imageViewerImg.src = image.dataset.fullSrc || image.currentSrc || image.src;
+      imageViewerImg.alt = image.alt;
+    }
+
+    function openImageViewer(image) {
+      const images = getGalleryImages();
+      const index = images.indexOf(image);
+
+      showImageAt(index >= 0 ? index : 0);
+      imageViewer.hidden = false;
+      imageViewerClose.focus();
+    }
+
+    function closeImageViewer() {
+      imageViewer.hidden = true;
+      imageViewerImg.removeAttribute("src");
+    }
+
+    function showNextImage() {
+      showImageAt(currentImageIndex + 1);
+    }
+
+    function showPreviousImage() {
+      showImageAt(currentImageIndex - 1);
+    }
+
+    gallery.addEventListener("click", (event) => {
+      const image = event.target.closest(".picture-card img");
+
+      if (image) {
+        openImageViewer(image);
+      }
+    });
+
+    imageViewerClose.addEventListener("click", closeImageViewer);
+    imageViewerPrev.addEventListener("click", showPreviousImage);
+    imageViewerNext.addEventListener("click", showNextImage);
+
+    imageViewer.addEventListener("click", (event) => {
+      if (event.target === imageViewer) {
+        closeImageViewer();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !imageViewer.hidden) {
+        closeImageViewer();
+      }
+
+      if (event.key === "ArrowLeft" && !imageViewer.hidden) {
+        showPreviousImage();
+      }
+
+      if (event.key === "ArrowRight" && !imageViewer.hidden) {
+        showNextImage();
+      }
+    });
+
+    function normalizeName(value) {
+      return value.trim().replace(/\s+/g, " ");
+    }
+
+    function getNameError(name) {
+      if (name.length < 2) {
+        return "Name must be at least 2 characters.";
+      }
+
+      if (name.length > 32) {
+        return "Name must be 32 characters or fewer.";
+      }
+
+      if (/https?:\/\/|www\.|\.com|\.gg|discord\.gg/i.test(name)) {
+        return "Links are not allowed in names.";
+      }
+
+      if (/[\u0000-\u001f\u007f]/.test(name)) {
+        return "Control characters are not allowed.";
+      }
+
+      if (/[<>()[\]{}|\\]/.test(name)) {
+        return "That name uses symbols that are not allowed.";
+      }
+
+      if (/(.)\1{5,}/iu.test(name.replace(/\s/g, ""))) {
+        return "Name has too many repeated characters.";
+      }
+
+      if (/admin|owner|moderator|support/i.test(name)) {
+        return "Please do not use staff-style names.";
+      }
+
+      return "";
+    }
+
+    function readApprovalRateState() {
       try {
-        return JSON.parse(localStorage.getItem(storageKey)) || [];
+        const state = JSON.parse(localStorage.getItem(APPROVAL_RATE_KEY)) || {};
+        return {
+          attempts: Array.isArray(state.attempts) ? state.attempts : [],
+          blockedUntil: Number(state.blockedUntil) || 0
+        };
       } catch {
-        return [];
+        return { attempts: [], blockedUntil: 0 };
       }
     }
 
-    function saveApprovals(approvals) {
-      localStorage.setItem(storageKey, JSON.stringify(approvals));
+    function saveApprovalRateState(state) {
+      localStorage.setItem(APPROVAL_RATE_KEY, JSON.stringify(state));
     }
 
-    approvalForm.addEventListener("submit", (event) => {
+    function formatWaitTime(milliseconds) {
+      const minutes = Math.ceil(milliseconds / 60000);
+
+      if (minutes >= 60) {
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        return remainingMinutes ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+      }
+
+      return `${minutes}m`;
+    }
+
+    function checkApprovalCooldown() {
+      const now = Date.now();
+      const state = readApprovalRateState();
+      state.attempts = state.attempts.filter((time) => now - time < APPROVAL_LONG_WINDOW_MS);
+
+      if (state.blockedUntil > now) {
+        saveApprovalRateState(state);
+        return `Too many TOS submissions. Try again in ${formatWaitTime(state.blockedUntil - now)}.`;
+      }
+
+      if (state.attempts.length >= APPROVAL_LONG_LIMIT) {
+        state.blockedUntil = now + APPROVAL_PENALTY_MS;
+        saveApprovalRateState(state);
+        return "Too many TOS submissions in one hour. Cooldown increased to 2 hours.";
+      }
+
+      const shortAttempts = state.attempts.filter((time) => now - time < APPROVAL_SHORT_WINDOW_MS);
+
+      if (shortAttempts.length >= APPROVAL_SHORT_LIMIT) {
+        const oldestShortAttempt = Math.min(...shortAttempts);
+        const waitTime = APPROVAL_SHORT_WINDOW_MS - (now - oldestShortAttempt);
+        saveApprovalRateState(state);
+        return `You can submit 2 TOS names every 10 minutes. Try again in ${formatWaitTime(waitTime)}.`;
+      }
+
+      saveApprovalRateState(state);
+      return "";
+    }
+
+    function recordApprovalAttempt() {
+      const now = Date.now();
+      const state = readApprovalRateState();
+      state.attempts = state.attempts
+        .filter((time) => now - time < APPROVAL_LONG_WINDOW_MS)
+        .concat(now);
+
+      if (state.attempts.length >= APPROVAL_LONG_LIMIT) {
+        state.blockedUntil = now + APPROVAL_PENALTY_MS;
+      }
+
+      saveApprovalRateState(state);
+    }
+
+    function getApprovalFingerprint() {
+      let fingerprint = localStorage.getItem(APPROVAL_FINGERPRINT_KEY);
+
+      if (!fingerprint) {
+        fingerprint = crypto.randomUUID
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        localStorage.setItem(APPROVAL_FINGERPRINT_KEY, fingerprint);
+      }
+
+      return fingerprint;
+    }
+
+    function formatImageDate(value) {
+      if (!value) {
+        return "";
+      }
+
+      return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(new Date(value));
+    }
+
+    function renderUploadedImages(images) {
+      gallery.querySelectorAll("[data-uploaded-image]").forEach((card) => card.remove());
+
+      images.forEach((image) => {
+        const article = document.createElement("article");
+        const img = document.createElement("img");
+        const caption = document.createElement("p");
+        const uploadedAt = document.createElement("time");
+        const { data: fullImage } = db.storage.from("gallery").getPublicUrl(image.image_path);
+        const { data: thumbnail } = db.storage.from("gallery").getPublicUrl(image.thumbnail_path || image.image_path);
+
+        article.className = "picture-card";
+        article.dataset.uploadedImage = "true";
+        img.src = thumbnail.publicUrl;
+        img.dataset.fullSrc = fullImage.publicUrl;
+        img.alt = image.title;
+        img.loading = "lazy";
+        caption.textContent = image.title;
+        uploadedAt.dateTime = image.created_at;
+        uploadedAt.textContent = `Uploaded ${formatImageDate(image.created_at)}`;
+        img.onerror = () => {
+          caption.textContent = `${image.title} - image is not public yet`;
+        };
+
+        caption.append(uploadedAt);
+        article.append(img, caption);
+        gallery.append(article);
+      });
+    }
+
+    async function loadGalleryImages() {
+      const { data, error } = await db
+        .from("gallery_images")
+        .select("title, image_path, thumbnail_path, created_at")
+        .order("created_at", { ascending: false });
+
+      if (!error) {
+        renderUploadedImages(data || []);
+      }
+    }
+
+    db
+      .channel("gallery-image-updates")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "gallery_images" },
+        loadGalleryImages
+      )
+      .subscribe();
+
+    loadGalleryImages();
+    setInterval(loadGalleryImages, 30000);
+
+    approvalForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const name = approvalName.value.trim().replace(/\s+/g, " ");
+      const name = normalizeName(approvalName.value);
+      const submitButton = approvalForm.querySelector("button");
+      const nameError = getNameError(name);
 
-      if (!name) {
-        approvalStatus.textContent = "Please type your name first.";
+      if (nameError) {
+        approvalStatus.textContent = nameError;
         return;
       }
 
-      const approvals = getApprovals();
-      const alreadyApproved = approvals.some((approval) => approval.name.toLowerCase() === name.toLowerCase());
+      const cooldownError = checkApprovalCooldown();
 
-      if (alreadyApproved) {
+      if (cooldownError) {
+        approvalStatus.textContent = cooldownError;
+        return;
+      }
+
+      recordApprovalAttempt();
+      submitButton.disabled = true;
+      approvalStatus.textContent = "Saving approval...";
+
+      const { error } = await db
+        .rpc("submit_tos_approval", {
+          approval_name: name,
+          visitor_fingerprint: getApprovalFingerprint()
+        });
+
+      submitButton.disabled = false;
+
+      if (error && error.code === "23505") {
         approvalStatus.textContent = `${name} is already on the approved list.`;
         approvalName.value = "";
+        window.location.href = "approved.html";
         return;
       }
 
-      approvals.push({
-        name,
-        approvedAt: new Date().toISOString()
-      });
+      if (error) {
+        approvalStatus.textContent = error.message.includes("too_many_approvals")
+          ? "Too many TOS submissions in one hour. Try again in 2 hours."
+          : "Could not save approval. Check the name and try again.";
+        return;
+      }
 
-      saveApprovals(approvals);
       approvalStatus.textContent = `${name} approved the TOS.`;
       approvalName.value = "";
+      window.location.href = "approved.html";
     });
   </script>
 </body>
 </html>
+

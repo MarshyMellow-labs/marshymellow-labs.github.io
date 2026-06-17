@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>marshymellow admin</title>
+  <link rel="icon" href="assets/marshy-logo.png">
+  <style>
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Semibold.ttf") format("truetype");
+      font-weight: 800;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: light;
+      --ink: #372840;
+      --muted: #746579;
+      --paper: #eaf8ff;
+      --berry: #ff6fae;
+      --cream: #fff2ad;
+      --line: rgba(255, 111, 174, 0.24);
+      --shadow: 0 18px 42px rgba(255, 111, 174, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background:
+        linear-gradient(145deg, #cbeeff 0%, #eaf8ff 38%, #fff2b8 70%, #ffd6eb 100%),
+        var(--paper);
+      color: var(--ink);
+      font-family: "gg sans", "gg sans Normal", Inter, "Segoe UI", system-ui, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      align-items: center;
+      background: linear-gradient(90deg, rgba(211, 241, 255, 0.94), rgba(255, 236, 249, 0.92));
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      padding: 18px clamp(18px, 5vw, 64px);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      align-items: center;
+      color: var(--berry);
+      display: inline-flex;
+      font-size: 1.4rem;
+      font-weight: 900;
+      min-height: 56px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .brand-logo {
+      display: block;
+      height: 56px;
+      max-width: min(48vw, 360px);
+      object-fit: contain;
+      width: auto;
+    }
+
+    .brand-text {
+      display: none;
+    }
+
+    main {
+      padding: clamp(32px, 7vw, 76px) clamp(18px, 5vw, 64px);
+    }
+
+    .admin-shell {
+      display: grid;
+      gap: 22px;
+      margin: 0 auto;
+      max-width: 980px;
+    }
+
+    h1 {
+      color: var(--berry);
+      font-size: clamp(2.6rem, 7vw, 5.6rem);
+      line-height: 0.96;
+      margin: 0;
+      text-shadow: 3px 3px 0 rgba(255, 242, 173, 0.95);
+    }
+
+    .intro {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin: 10px 0 0;
+      max-width: 62ch;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3vw, 26px);
+    }
+
+    .panel[hidden] {
+      display: none;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      color: var(--ink);
+      display: grid;
+      font-weight: 900;
+      gap: 8px;
+    }
+
+    input {
+      background: #fffcff;
+      border: 2px solid rgba(255, 111, 174, 0.2);
+      border-radius: 999px;
+      color: var(--ink);
+      font: inherit;
+      min-height: 46px;
+      padding: 10px 16px;
+    }
+
+    input:focus {
+      border-color: var(--berry);
+      outline: 3px solid rgba(255, 111, 174, 0.2);
+    }
+
+    .drop-zone {
+      align-items: center;
+      background: rgba(191, 233, 255, 0.38);
+      border: 2px dashed rgba(255, 111, 174, 0.62);
+      border-radius: 8px;
+      cursor: pointer;
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+      min-height: 170px;
+      padding: 24px;
+      text-align: center;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .drop-zone input {
+      display: none;
+    }
+
+    .drop-zone strong {
+      color: var(--berry);
+      font-size: 1.22rem;
+    }
+
+    .drop-zone span {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .drop-zone.is-dragover {
+      background: rgba(255, 242, 173, 0.72);
+      border-color: var(--berry);
+      transform: translateY(-1px);
+    }
+
+    .selected-file {
+      color: var(--ink);
+      font-weight: 900;
+      margin: 4px 0 0;
+      min-height: 1.4em;
+      overflow-wrap: anywhere;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    button,
+    .button {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.44);
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      font: inherit;
+      font-weight: 900;
+      justify-content: center;
+      min-height: 46px;
+      padding: 11px 18px;
+      text-decoration: none;
+    }
+
+    button.primary {
+      background: var(--berry);
+      border-color: var(--berry);
+      box-shadow: 0 8px 18px rgba(255, 111, 174, 0.24);
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.64;
+    }
+
+    .status {
+      color: var(--muted);
+      font-weight: 800;
+      min-height: 1.5em;
+    }
+
+    .admin-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .admin-section {
+      border-top: 1px solid rgba(25, 33, 39, 0.12);
+      margin-top: 24px;
+      padding-top: 22px;
+    }
+
+    .admin-section h2 {
+      color: var(--berry);
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      line-height: 1;
+      margin: 0;
+      text-shadow: 2px 2px 0 rgba(255, 242, 173, 0.95);
+    }
+
+    .admin-card {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 96px 1fr auto;
+      padding: 10px;
+    }
+
+    .admin-card img {
+      aspect-ratio: 4 / 3;
+      border-radius: 6px;
+      object-fit: cover;
+      width: 96px;
+    }
+
+    .admin-card strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+
+    .admin-card small {
+      color: var(--muted);
+    }
+
+    .admin-card.approval-card {
+      grid-template-columns: 1fr auto;
+    }
+
+    @media (max-width: 620px) {
+      .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .admin-card {
+        align-items: start;
+        grid-template-columns: 1fr;
+      }
+
+      .admin-card img {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="MarshyMellow home">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
+      <span class="brand-text">marshymellow</span>
+    </a>
+    <a class="button" href="index.html">Back to site</a>
+  </header>
+
+  <main>
+    <section class="admin-shell" aria-labelledby="admin-title">
+      <div>
+        <h1 id="admin-title">Gallery Admin</h1>
+        <p class="intro">Log in with your Supabase account, upload a picture, and it will appear on the public gallery.</p>
+      </div>
+
+      <section class="panel" id="login-panel">
+        <form id="login-form">
+          <label>
+            Email
+            <input id="login-email" type="email" autocomplete="email" required>
+          </label>
+          <label>
+            Password
+            <input id="login-password" type="password" autocomplete="current-password" required>
+          </label>
+          <div class="actions">
+            <button class="primary" type="submit">Log in</button>
+          </div>
+          <p class="status" id="login-status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="panel" id="upload-panel" hidden>
+        <form id="upload-form">
+          <label>
+            Picture title
+            <input id="image-title" type="text" maxlength="80" placeholder="Marshy and friends" required>
+          </label>
+          <label class="drop-zone" id="drop-zone">
+            <input id="image-file" type="file" accept="image/*">
+            <strong>Drop picture here</strong>
+            <span>or click to choose one</span>
+            <p class="selected-file" id="selected-file">No picture selected</p>
+          </label>
+          <div class="actions">
+            <button class="primary" type="submit">Upload picture</button>
+            <button type="button" id="logout-button">Log out</button>
+          </div>
+          <p class="status" id="upload-status" aria-live="polite"></p>
+        </form>
+
+        <section class="admin-section" aria-labelledby="gallery-admin-title">
+          <h2 id="gallery-admin-title">Gallery images</h2>
+          <div class="admin-list" id="admin-list"></div>
+        </section>
+
+        <section class="admin-section" aria-labelledby="approval-admin-title">
+          <h2 id="approval-admin-title">TOS approvals</h2>
+          <p class="status" id="approval-admin-status" aria-live="polite"></p>
+          <div class="admin-list" id="approval-admin-list"></div>
+        </section>
+
+        <section class="admin-section" aria-labelledby="snake-admin-title">
+          <h2 id="snake-admin-title">Snake scores</h2>
+          <p class="status" id="snake-admin-status" aria-live="polite"></p>
+          <div class="admin-list" id="snake-admin-list"></div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const loginPanel = document.querySelector("#login-panel");
+    const uploadPanel = document.querySelector("#upload-panel");
+    const loginForm = document.querySelector("#login-form");
+    const uploadForm = document.querySelector("#upload-form");
+    const loginStatus = document.querySelector("#login-status");
+    const uploadStatus = document.querySelector("#upload-status");
+    const adminList = document.querySelector("#admin-list");
+    const approvalAdminStatus = document.querySelector("#approval-admin-status");
+    const approvalAdminList = document.querySelector("#approval-admin-list");
+    const snakeAdminStatus = document.querySelector("#snake-admin-status");
+    const snakeAdminList = document.querySelector("#snake-admin-list");
+    const logoutButton = document.querySelector("#logout-button");
+    const imageFileInput = document.querySelector("#image-file");
+    const dropZone = document.querySelector("#drop-zone");
+    const selectedFileText = document.querySelector("#selected-file");
+    let selectedFile = null;
+
+    function setLoggedIn(isLoggedIn) {
+      loginPanel.hidden = isLoggedIn;
+      uploadPanel.hidden = !isLoggedIn;
+    }
+
+    function safeFileName(name) {
+      return name.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    function publicUrl(path) {
+      return db.storage.from("gallery").getPublicUrl(path).data.publicUrl;
+    }
+
+    function createThumbnail(file, maxSize = 900, quality = 0.82) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        image.onload = () => {
+          const scale = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+          const context = canvas.getContext("2d");
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(objectUrl);
+
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error("Could not create thumbnail."));
+              return;
+            }
+
+            resolve(blob);
+          }, "image/jpeg", quality);
+        };
+
+        image.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error("Could not read image."));
+        };
+
+        image.src = objectUrl;
+      });
+    }
+
+    function setSelectedFile(file) {
+      if (!file) {
+        selectedFile = null;
+        selectedFileText.textContent = "No picture selected";
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        uploadStatus.textContent = "Drop an image file, not another file type.";
+        return;
+      }
+
+      selectedFile = file;
+      selectedFileText.textContent = file.name;
+      uploadStatus.textContent = "";
+    }
+
+    imageFileInput.addEventListener("change", () => {
+      setSelectedFile(imageFileInput.files[0]);
+    });
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropZone.classList.add("is-dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropZone.classList.remove("is-dragover");
+      });
+    });
+
+    dropZone.addEventListener("drop", (event) => {
+      setSelectedFile(event.dataTransfer.files[0]);
+    });
+
+    async function loadImages() {
+      const { data, error } = await db
+        .from("gallery_images")
+        .select("id, title, image_path, thumbnail_path, created_at")
+        .order("created_at", { ascending: false });
+
+      adminList.replaceChildren();
+
+      if (error) {
+        uploadStatus.textContent = "Could not load gallery images.";
+        return;
+      }
+
+      (data || []).forEach((image) => {
+        const card = document.createElement("article");
+        const img = document.createElement("img");
+        const text = document.createElement("div");
+        const title = document.createElement("strong");
+        const meta = document.createElement("small");
+        const deleteButton = document.createElement("button");
+
+        card.className = "admin-card";
+        img.src = publicUrl(image.thumbnail_path || image.image_path);
+        img.alt = image.title;
+        img.onerror = () => {
+          img.alt = `${image.title} is uploaded, but storage is not public yet`;
+        };
+        title.textContent = image.title;
+        meta.textContent = image.created_at
+          ? `${image.image_path} - uploaded ${new Date(image.created_at).toLocaleString()}`
+          : image.image_path;
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => deleteImage(image));
+
+        text.append(title, meta);
+        card.append(img, text, deleteButton);
+        adminList.append(card);
+      });
+    }
+
+    async function deleteImage(image) {
+      uploadStatus.textContent = "Deleting image...";
+
+      const { error: storageError } = await db.storage
+        .from("gallery")
+        .remove([image.image_path, image.thumbnail_path].filter(Boolean));
+
+      const { error: rowError } = await db
+        .from("gallery_images")
+        .delete()
+        .eq("id", image.id);
+
+      if (storageError || rowError) {
+        uploadStatus.textContent = "Could not delete image. Check admin permissions.";
+        return;
+      }
+
+      uploadStatus.textContent = "Image deleted.";
+      loadImages();
+    }
+
+    async function loadApprovals() {
+      const { data, error } = await db
+        .from("approvals")
+        .select("id, name, approved_at")
+        .order("approved_at", { ascending: false });
+
+      approvalAdminList.replaceChildren();
+
+      if (error) {
+        approvalAdminStatus.textContent = "Could not load TOS approvals.";
+        return;
+      }
+
+      const approvals = data || [];
+      approvalAdminStatus.textContent = `${approvals.length} approval${approvals.length === 1 ? "" : "s"} found.`;
+
+      approvals.forEach((approval) => {
+        const card = document.createElement("article");
+        const text = document.createElement("div");
+        const name = document.createElement("strong");
+        const meta = document.createElement("small");
+        const deleteButton = document.createElement("button");
+
+        card.className = "admin-card approval-card";
+        name.textContent = approval.name;
+        meta.textContent = approval.approved_at
+          ? new Date(approval.approved_at).toLocaleString()
+          : "No approval date";
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => deleteApproval(approval));
+
+        text.append(name, meta);
+        card.append(text, deleteButton);
+        approvalAdminList.append(card);
+      });
+    }
+
+    async function deleteApproval(approval) {
+      approvalAdminStatus.textContent = `Deleting ${approval.name}...`;
+
+      const { error } = await db
+        .from("approvals")
+        .delete()
+        .eq("id", approval.id);
+
+      if (error) {
+        approvalAdminStatus.textContent = "Could not delete approval. Check admin permissions.";
+        return;
+      }
+
+      approvalAdminStatus.textContent = `${approval.name} was deleted.`;
+      loadApprovals();
+    }
+
+    async function loadSnakeScores() {
+      const { data, error } = await db
+        .from("snake_scores")
+        .select("id, name, score, created_at")
+        .order("score", { ascending: false })
+        .order("created_at", { ascending: true })
+        .limit(50);
+
+      snakeAdminList.replaceChildren();
+
+      if (error) {
+        snakeAdminStatus.textContent = "Could not load Snake scores.";
+        return;
+      }
+
+      const scores = data || [];
+      snakeAdminStatus.textContent = `${scores.length} score${scores.length === 1 ? "" : "s"} found.`;
+
+      scores.forEach((score) => {
+        const card = document.createElement("article");
+        const text = document.createElement("div");
+        const name = document.createElement("strong");
+        const meta = document.createElement("small");
+        const deleteButton = document.createElement("button");
+
+        card.className = "admin-card approval-card";
+        name.textContent = `${score.name} - ${score.score}`;
+        meta.textContent = score.created_at
+          ? new Date(score.created_at).toLocaleString()
+          : "No score date";
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => deleteSnakeScore(score));
+
+        text.append(name, meta);
+        card.append(text, deleteButton);
+        snakeAdminList.append(card);
+      });
+    }
+
+    async function deleteSnakeScore(score) {
+      snakeAdminStatus.textContent = `Deleting ${score.name}'s score...`;
+
+      const { error } = await db
+        .from("snake_scores")
+        .delete()
+        .eq("id", score.id);
+
+      if (error) {
+        snakeAdminStatus.textContent = "Could not delete Snake score. Check admin permissions.";
+        return;
+      }
+
+      snakeAdminStatus.textContent = `${score.name}'s score was deleted.`;
+      loadSnakeScores();
+    }
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      loginStatus.textContent = "Logging in...";
+
+      const email = document.querySelector("#login-email").value;
+      const password = document.querySelector("#login-password").value;
+      const { error } = await db.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        loginStatus.textContent = error.message;
+        return;
+      }
+
+      loginForm.reset();
+      loginStatus.textContent = "";
+      setLoggedIn(true);
+      loadImages();
+      loadApprovals();
+      loadSnakeScores();
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      await db.auth.signOut();
+      setLoggedIn(false);
+      adminList.replaceChildren();
+      approvalAdminList.replaceChildren();
+      snakeAdminList.replaceChildren();
+    });
+
+    uploadForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const title = document.querySelector("#image-title").value.trim().replace(/\s+/g, " ");
+      const file = selectedFile;
+      const submitButton = uploadForm.querySelector("button[type='submit']");
+
+      if (!title || !file) {
+        uploadStatus.textContent = "Choose a title and file first.";
+        return;
+      }
+
+      submitButton.disabled = true;
+      uploadStatus.textContent = "Uploading picture...";
+
+      const baseName = `${Date.now()}-${safeFileName(file.name)}`;
+      const path = `full/${baseName}`;
+      const thumbnailPath = `thumbs/${baseName.replace(/\.[^.]+$/, "")}.jpg`;
+      let thumbnailBlob;
+
+      try {
+        thumbnailBlob = await createThumbnail(file);
+      } catch (error) {
+        submitButton.disabled = false;
+        uploadStatus.textContent = error.message;
+        return;
+      }
+
+      const { error: uploadError } = await db.storage
+        .from("gallery")
+        .upload(path, file, {
+          cacheControl: "3600",
+          upsert: false
+        });
+
+      if (uploadError) {
+        submitButton.disabled = false;
+        uploadStatus.textContent = uploadError.message;
+        return;
+      }
+
+      const { error: thumbnailError } = await db.storage
+        .from("gallery")
+        .upload(thumbnailPath, thumbnailBlob, {
+          cacheControl: "3600",
+          contentType: "image/jpeg",
+          upsert: false
+        });
+
+      if (thumbnailError) {
+        submitButton.disabled = false;
+        uploadStatus.textContent = thumbnailError.message;
+        return;
+      }
+
+      const { error: rowError } = await db
+        .from("gallery_images")
+        .insert({
+          title,
+          image_path: path,
+          thumbnail_path: thumbnailPath
+        });
+
+      submitButton.disabled = false;
+
+      if (rowError) {
+        uploadStatus.textContent = "Uploaded file, but could not save it to the gallery table.";
+        return;
+      }
+
+      uploadForm.reset();
+      setSelectedFile(null);
+      uploadStatus.textContent = "Picture uploaded.";
+      loadImages();
+    });
+
+    db.auth.getSession().then(({ data }) => {
+      const isLoggedIn = Boolean(data.session);
+      setLoggedIn(isLoggedIn);
+
+      if (isLoggedIn) {
+        loadImages();
+        loadApprovals();
+        loadSnakeScores();
+      }
+    });
+  </script>
+</body>
+</html>

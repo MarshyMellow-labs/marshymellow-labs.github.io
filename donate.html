@@ -1,0 +1,443 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pay tribute to marshymellow</title>
+  <link rel="icon" href="assets/marshy-logo.png">
+  <style>
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Medium.ttf") format("truetype");
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Semibold.ttf") format("truetype");
+      font-weight: 800;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Bold.ttf") format("truetype");
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: light;
+      --ink: #372840;
+      --muted: #746579;
+      --paper: #eaf8ff;
+      --mint: #fff0a8;
+      --berry: #ff6fae;
+      --cocoa: #6d5aa8;
+      --sky: #bfe9ff;
+      --line: rgba(255, 111, 174, 0.24);
+      --shadow: 0 18px 42px rgba(255, 111, 174, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background:
+        linear-gradient(145deg, #cbeeff 0%, #eaf8ff 38%, #fff2b8 70%, #ffd6eb 100%),
+        var(--paper);
+      color: var(--ink);
+      font-family: "gg sans", "gg sans Normal", Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      align-items: center;
+      background: linear-gradient(90deg, rgba(211, 241, 255, 0.94), rgba(255, 236, 249, 0.92));
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      padding: 18px clamp(18px, 5vw, 64px);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      align-items: center;
+      color: var(--berry);
+      display: inline-flex;
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      font-weight: 900;
+      min-height: 64px;
+      letter-spacing: 0;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .brand-logo {
+      display: block;
+      height: 64px;
+      max-width: min(48vw, 420px);
+      object-fit: contain;
+      width: auto;
+    }
+
+    .brand-text {
+      display: none;
+    }
+
+    .nav-links {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .nav-links a,
+    .button {
+      background: rgba(255, 255, 255, 0.34);
+      border: 1px solid rgba(255, 111, 174, 0.2);
+      border-radius: 999px;
+      color: var(--ink);
+      font-size: 0.95rem;
+      font-weight: 800;
+      padding: 9px 14px;
+      text-decoration: none;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible,
+    .button:hover,
+    .button:focus-visible {
+      background: rgba(255, 242, 173, 0.92);
+      border-color: rgba(25, 33, 39, 0.25);
+      transform: translateY(-1px);
+    }
+
+    main {
+      padding: clamp(36px, 8vw, 86px) clamp(18px, 5vw, 64px);
+    }
+
+    .donate-shell {
+      align-items: start;
+      display: grid;
+      gap: clamp(24px, 5vw, 48px);
+      grid-template-columns: minmax(420px, 1fr) minmax(280px, 0.95fr);
+      margin: 0 auto;
+      max-width: 1120px;
+    }
+
+    h1 {
+      color: var(--berry);
+      font-size: clamp(3.2rem, 5.4vw, 5.6rem);
+      line-height: 0.98;
+      margin: 0;
+      overflow-wrap: normal;
+      text-shadow: 3px 3px 0 rgba(255, 242, 173, 0.95);
+      white-space: nowrap;
+    }
+
+    .pay-tribute-title {
+      display: block;
+      height: auto;
+      max-width: 100%;
+      width: clamp(300px, 48vw, 620px);
+    }
+
+    .intro {
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.22rem);
+      margin: 20px 0 0;
+      max-width: 52ch;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button.primary {
+      background: var(--berry);
+      border-color: var(--berry);
+      color: var(--ink);
+      box-shadow: 0 8px 18px rgba(255, 111, 174, 0.24);
+      min-height: 48px;
+      padding: 12px 18px;
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.62);
+      min-height: 48px;
+      padding: 12px 18px;
+    }
+
+    .support-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      margin-top: 28px;
+      overflow: hidden;
+    }
+
+    .support-card img {
+      aspect-ratio: 16 / 9;
+      display: block;
+      height: auto;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    .kofi-embed-card {
+      background: rgba(255, 255, 255, 0.82);
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: clamp(14px, 2vw, 18px);
+    }
+
+    .kofi-embed-card h2 {
+      color: var(--cocoa);
+      font-size: clamp(1.55rem, 3.4vw, 2.35rem);
+      line-height: 1;
+      margin: 0 0 14px;
+    }
+
+    .kofi-frame {
+      background: #fff;
+      border: 0;
+      border-radius: 8px;
+      display: block;
+      min-height: 640px;
+      width: 100%;
+    }
+
+    .kofi-fallback {
+      color: var(--muted);
+      margin: 12px 0 0;
+    }
+
+    .tribute-benefits {
+      background: rgba(255, 255, 255, 0.78);
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      grid-column: 1 / -1;
+      padding: clamp(18px, 3vw, 28px);
+    }
+
+    .tribute-benefits h2 {
+      color: var(--cocoa);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1;
+      margin: 0;
+    }
+
+    .tribute-benefits > p {
+      color: var(--muted);
+      margin: 12px 0 0;
+      max-width: 68ch;
+    }
+
+    .benefit-list {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      list-style: none;
+      margin: 22px 0 0;
+      padding: 0;
+    }
+
+    .benefit-list li {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--line);
+      border-left: 5px solid rgba(255, 111, 174, 0.72);
+      border-radius: 8px;
+      color: var(--ink);
+      font-weight: 600;
+      padding: 14px 16px;
+      transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .benefit-list li:hover,
+    .benefit-list li:focus-within {
+      background: #ffd6f4;
+      border-color: #ff87c5;
+      box-shadow: 0 12px 28px rgba(255, 111, 174, 0.18);
+      transform: translateY(-2px);
+    }
+
+    .benefit-list span {
+      color: var(--berry);
+      display: block;
+      font-weight: 900;
+      margin-bottom: 3px;
+    }
+
+    .fine-print {
+      border-top: 1px solid rgba(25, 33, 39, 0.12);
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 20px;
+      padding-top: 16px;
+    }
+
+    .site-footer {
+      align-items: center;
+      background: #5f4a98;
+      color: white;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 22px clamp(18px, 5vw, 64px);
+    }
+
+    .site-footer a {
+      color: white;
+      font-weight: 800;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ai-credit {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    @media (max-width: 760px) {
+      .donate-shell {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        white-space: normal;
+      }
+
+      .benefit-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .brand {
+        min-height: 52px;
+      }
+
+      .brand-logo {
+        height: 52px;
+        max-width: 72vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="MarshyMellow home">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
+      <span class="brand-text">marshymellow</span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="index.html#about">About</a>
+      <a href="index.html#pictures">Pictures</a>
+      <a href="index.html#tos">TOS</a>
+      <a href="approved.html">Approved</a>
+      <a href="donate.html">Pay Tribute</a>
+      <a href="snake.html">Snake</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="donate-shell" aria-labelledby="donate-title">
+      <div>
+        <p class="intro">Get Marshy a snack or pay your subscription fee. Nothing is included Marshy is broke.</p>
+        <h1 id="donate-title">
+          <img class="pay-tribute-title" src="assets/pay-tribute-title.png" alt="Pay Tribute!">
+        </h1>
+        <div class="actions">
+          <a class="button primary" href="https://ko-fi.com/marshyfoxy" target="_blank" rel="noopener">Pay Tribute on Ko-fi</a>
+          <a class="button secondary" href="index.html">Back home</a>
+        </div>
+
+        <article class="support-card">
+          <img src="assets/marshy-donate.png" alt="VRChat friends standing together near lanterns" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1514517220030-2193f206f5f1?auto=format&fit=crop&w=1100&q=80';">
+        </article>
+      </div>
+
+      <section class="kofi-embed-card" aria-labelledby="kofi-title">
+        <h2 id="kofi-title">Ko-fi tribute panel</h2>
+        <iframe
+          class="kofi-frame"
+          title="MarshyFoxy Ko-fi donation panel"
+          src="https://ko-fi.com/marshyfoxy/?hidefeed=true&widget=true&embed=true&preview=true">
+        </iframe>
+        <p class="kofi-fallback">
+          If the panel does not load,
+          <a href="https://ko-fi.com/marshyfoxy" target="_blank" rel="noopener">open Marshy's Ko-fi in a new tab</a>.
+        </p>
+      </section>
+
+      <section class="tribute-benefits" aria-labelledby="benefits-title">
+        <h2 id="benefits-title">Tribute rewards</h2>
+        <p>By paying tribute, you may receive the following extremely official care-document benefits, all lovingly filed by the MarshyMellow paperwork department.</p>
+        <ul class="benefit-list">
+          <li><span>Monthly tribute compliance</span>Your invisible account may be marked as spiritually less overdue by no less than $4.99.</li>
+          <li><span>Discord access</span>Donating may grant access to the MarshyMellow Discord, assuming the paperwork department remembers where it put the invite.</li>
+          <li><span>Pepsi and Monster fund</span>Donations help fuel Marshy's Pepsi and Monster addiction, as required by the snack ledger.</li>
+          <li><span>Good Boy repair credit</span>One ceremonial positive reinforcement coupon, valid only in theory and redeemable nowhere.</li>
+          <li><span>Anti-abandonment paperwork</span>Proof that you did not leave Marshy alone for five whole minutes without emotional consequences.</li>
+          <li><span>No-warranty deluxe tier</span>Includes no warranty, no returns, no secret powers, and no actual subscription features.</li>
+        </ul>
+        <p class="fine-print">Most rewards are decorative, ceremonial, indefinite, and mostly nonsense. Discord access may be granted as a supporter perk, but paying tribute does not buy products, moderation powers, ownership, warranty coverage, or control over MarshyMellow. No refunds. Marshy receives 100% of the moneys.</p>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-copy">
+      <span>MarshyMellow &#9825; &trade; 2026</span>
+      <span class="ai-credit">Made with AI bullshittery.</span>
+      <span class="ai-credit">Discord: marshymellow</span>
+    </div>
+    <a href="https://ko-fi.com/marshyfoxy" target="_blank" rel="noopener">ko-fi.com/marshyfoxy</a>
+  </footer>
+</body>
+</html>
+

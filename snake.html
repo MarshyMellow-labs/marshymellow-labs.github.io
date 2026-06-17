@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>marshymellow snake</title>
+  <link rel="icon" href="assets/marshy-logo.png">
+  <style>
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Semibold.ttf") format("truetype");
+      font-weight: 800;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Bold.ttf") format("truetype");
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: light;
+      --ink: #372840;
+      --muted: #746579;
+      --paper: #eaf8ff;
+      --berry: #ff6fae;
+      --cocoa: #6d5aa8;
+      --sky: #bfe9ff;
+      --cream: #fff2ad;
+      --line: rgba(255, 111, 174, 0.24);
+      --shadow: 0 18px 42px rgba(255, 111, 174, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background:
+        linear-gradient(145deg, #cbeeff 0%, #eaf8ff 38%, #fff2b8 70%, #ffd6eb 100%),
+        var(--paper);
+      color: var(--ink);
+      font-family: "gg sans", "gg sans Normal", Inter, "Segoe UI", system-ui, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      align-items: center;
+      background: linear-gradient(90deg, rgba(211, 241, 255, 0.94), rgba(255, 236, 249, 0.92));
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      padding: 18px clamp(18px, 5vw, 64px);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      align-items: center;
+      color: var(--berry);
+      display: inline-flex;
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      font-weight: 900;
+      min-height: 64px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .brand-logo {
+      display: block;
+      height: 64px;
+      max-width: min(48vw, 420px);
+      object-fit: contain;
+      width: auto;
+    }
+
+    .brand-text {
+      display: none;
+    }
+
+    .nav-links {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .nav-links a,
+    .button {
+      background: rgba(255, 255, 255, 0.34);
+      border: 1px solid rgba(255, 111, 174, 0.2);
+      border-radius: 999px;
+      color: var(--ink);
+      font-size: 0.95rem;
+      font-weight: 800;
+      padding: 9px 14px;
+      text-decoration: none;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible,
+    .button:hover,
+    .button:focus-visible {
+      background: rgba(255, 242, 173, 0.92);
+      border-color: rgba(25, 33, 39, 0.25);
+      transform: translateY(-1px);
+    }
+
+    main {
+      padding: clamp(32px, 7vw, 76px) clamp(18px, 5vw, 64px);
+    }
+
+    .game-shell {
+      display: grid;
+      gap: clamp(22px, 4vw, 40px);
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 520px);
+      margin: 0 auto;
+      max-width: 1120px;
+    }
+
+    .game-copy {
+      align-self: start;
+      padding-top: clamp(24px, 8vw, 130px);
+      width: fit-content;
+    }
+
+    h1 {
+      color: var(--berry);
+      font-size: clamp(3.1rem, 7vw, 6.4rem);
+      line-height: 0.95;
+      margin: 0;
+      text-shadow: 3px 3px 0 rgba(255, 242, 173, 0.95);
+    }
+
+    .snake-title-image {
+      display: block;
+      height: auto;
+      margin-left: clamp(-36px, -2.6vw, -18px);
+      max-width: 100%;
+      width: clamp(360px, 46vw, 650px);
+    }
+
+    .intro {
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      margin: 10px 0 0;
+      max-width: 48ch;
+    }
+
+    .game-panel {
+      background: rgba(255, 255, 255, 0.86);
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 16px;
+      padding: clamp(14px, 2vw, 18px);
+    }
+
+    .score-row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .score-box {
+      background: linear-gradient(135deg, rgba(191, 233, 255, 0.76), rgba(255, 242, 173, 0.58));
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .score-box span {
+      color: var(--muted);
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .score-box strong {
+      color: var(--cocoa);
+      display: block;
+      font-size: 1.35rem;
+      line-height: 1.1;
+    }
+
+    .board-wrap {
+      aspect-ratio: 1;
+      background: #dff5ff;
+      border: 3px solid rgba(255, 255, 255, 0.88);
+      border-radius: 8px;
+      box-shadow: inset 0 0 0 1px rgba(55, 40, 64, 0.08);
+      overflow: hidden;
+      width: 100%;
+    }
+
+    canvas {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+
+    .game-actions,
+    .d-pad {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.62);
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      font: inherit;
+      font-weight: 900;
+      justify-content: center;
+      min-height: 46px;
+      min-width: 46px;
+      padding: 10px 16px;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    button.primary {
+      background: var(--berry);
+      border-color: var(--berry);
+      box-shadow: 0 8px 18px rgba(255, 111, 174, 0.24);
+    }
+
+    button:hover,
+    button:focus-visible {
+      background: var(--cream);
+      transform: translateY(-1px);
+    }
+
+    .d-pad {
+      display: grid;
+      gap: 6px;
+      grid-template-columns: repeat(3, 62px);
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .d-pad button {
+      border-width: 3px;
+      font-size: 2.1rem;
+      min-height: 62px;
+      min-width: 62px;
+      padding: 0;
+    }
+
+    .d-pad .up {
+      grid-column: 2;
+    }
+
+    .d-pad .left {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .d-pad .right {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    .d-pad .down {
+      grid-column: 2;
+      grid-row: 3;
+    }
+
+    .game-status {
+      color: var(--cocoa);
+      font-weight: 900;
+      margin: 0;
+      min-height: 1.5em;
+      text-align: center;
+    }
+
+    .score-submit {
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .score-submit[hidden] {
+      display: none;
+    }
+
+    .score-submit label {
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .score-submit label strong {
+      color: var(--berry);
+    }
+
+    .score-submit-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .score-submit input {
+      background: #fffcff;
+      border: 2px solid rgba(255, 111, 174, 0.2);
+      border-radius: 999px;
+      color: var(--ink);
+      flex: 1;
+      font: inherit;
+      min-height: 46px;
+      min-width: 0;
+      padding: 10px 16px;
+    }
+
+    .score-submit input:focus {
+      border-color: var(--berry);
+      outline: 3px solid rgba(255, 111, 174, 0.2);
+    }
+
+    .submit-status {
+      color: var(--muted);
+      font-weight: 800;
+      margin: 0;
+      min-height: 1.5em;
+    }
+
+    .leaderboard-panel {
+      background: rgba(255, 255, 255, 0.86);
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      grid-column: 1 / -1;
+      padding: clamp(18px, 3vw, 26px);
+    }
+
+    .leaderboard-panel h2 {
+      color: var(--cocoa);
+      font-size: clamp(1.9rem, 5vw, 3.8rem);
+      line-height: 1;
+      margin: 0 0 16px;
+    }
+
+    .leaderboard-list {
+      display: grid;
+      gap: 10px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .leaderboard-list li {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid var(--line);
+      border-left: 5px solid rgba(255, 111, 174, 0.72);
+      border-radius: 8px;
+      display: grid;
+      gap: 8px;
+      grid-template-columns: auto 1fr auto;
+      padding: 12px 14px;
+    }
+
+    .leaderboard-rank {
+      color: var(--berry);
+      font-weight: 900;
+      min-width: 2.5ch;
+    }
+
+    .leaderboard-name {
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .leaderboard-score {
+      color: var(--cocoa);
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .leaderboard-empty {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .site-footer {
+      align-items: center;
+      background: #5f4a98;
+      color: white;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 22px clamp(18px, 5vw, 64px);
+    }
+
+    .site-footer a {
+      color: white;
+      font-weight: 800;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ai-credit {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    @media (max-width: 820px) {
+      .game-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .game-copy {
+        padding-top: 0;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .brand {
+        min-height: 52px;
+      }
+
+      .brand-logo {
+        height: 52px;
+        max-width: 72vw;
+      }
+
+      .snake-title-image {
+        margin-left: 0;
+        width: min(100%, 420px);
+      }
+
+      .score-row {
+        grid-template-columns: 1fr;
+      }
+
+      .score-submit-row,
+      .leaderboard-list li {
+        grid-template-columns: 1fr;
+      }
+
+      .score-submit-row {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="MarshyMellow home">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
+      <span class="brand-text">marshymellow</span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="index.html#about">About</a>
+      <a href="index.html#pictures">Pictures</a>
+      <a href="index.html#tos">TOS</a>
+      <a href="approved.html">Approved</a>
+      <a href="donate.html">Pay Tribute</a>
+      <a href="snake.html">Snake</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="game-shell" aria-labelledby="game-title">
+      <div class="game-copy">
+        <h1 id="game-title">
+          <img class="snake-title-image" src="assets/snake-title.png" alt="Snake!">
+        </h1>
+        <p class="intro">A tiny candy-blue snack chase for anyone trapped on MarshyMellow's website.</p>
+      </div>
+
+      <section class="game-panel" aria-label="Snake game">
+        <div class="score-row">
+          <div class="score-box">
+            <span>Score</span>
+            <strong id="score">0</strong>
+          </div>
+          <div class="score-box">
+            <span>Best</span>
+            <strong id="best-score">0</strong>
+          </div>
+          <div class="score-box">
+            <span>Status</span>
+            <strong id="status-label">Ready</strong>
+          </div>
+        </div>
+
+        <div class="board-wrap">
+          <canvas id="snake-board" width="560" height="560" aria-label="Snake game board"></canvas>
+        </div>
+
+        <div class="game-actions">
+          <button class="primary" type="button" id="start-button">Start</button>
+          <button type="button" id="pause-button">Pause</button>
+          <button type="button" id="restart-button">Restart</button>
+        </div>
+
+        <div class="d-pad" aria-label="Movement controls">
+          <button class="up" type="button" data-direction="up" aria-label="Move up">↑</button>
+          <button class="left" type="button" data-direction="left" aria-label="Move left">←</button>
+          <button class="right" type="button" data-direction="right" aria-label="Move right">→</button>
+          <button class="down" type="button" data-direction="down" aria-label="Move down">↓</button>
+        </div>
+
+        <p class="game-status" id="game-status" aria-live="polite">Ready</p>
+
+        <form class="score-submit" id="score-submit" hidden>
+          <label for="player-name">Submit last score: <strong id="final-score">0</strong></label>
+          <div class="score-submit-row">
+            <input id="player-name" type="text" maxlength="32" autocomplete="nickname" placeholder="Your name">
+            <button class="primary" type="submit">Submit</button>
+          </div>
+          <p class="submit-status" id="submit-status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="leaderboard-panel" aria-labelledby="leaderboard-title">
+        <h2 id="leaderboard-title">Leaderboard</h2>
+        <ol class="leaderboard-list" id="leaderboard-list"></ol>
+        <p class="leaderboard-empty" id="leaderboard-empty">No scores yet.</p>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-copy">
+      <span>MarshyMellow &#9825; &trade; 2026</span>
+      <span class="ai-credit">Made with AI bullshittery.</span>
+      <span class="ai-credit">Discord: marshymellow</span>
+    </div>
+    <a href="index.html">Back home</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const canvas = document.querySelector("#snake-board");
+    const ctx = canvas.getContext("2d");
+    const scoreElement = document.querySelector("#score");
+    const bestScoreElement = document.querySelector("#best-score");
+    const statusLabel = document.querySelector("#status-label");
+    const gameStatus = document.querySelector("#game-status");
+    const startButton = document.querySelector("#start-button");
+    const pauseButton = document.querySelector("#pause-button");
+    const restartButton = document.querySelector("#restart-button");
+    const scoreSubmit = document.querySelector("#score-submit");
+    const playerName = document.querySelector("#player-name");
+    const finalScoreElement = document.querySelector("#final-score");
+    const submitStatus = document.querySelector("#submit-status");
+    const leaderboardList = document.querySelector("#leaderboard-list");
+    const leaderboardEmpty = document.querySelector("#leaderboard-empty");
+    const cells = 20;
+    const boardSize = 560;
+    const cellSize = boardSize / cells;
+    const speed = 150;
+    let snake;
+    let food;
+    let direction;
+    let nextDirection;
+    let score;
+    let timer = null;
+    let running = false;
+    let paused = false;
+    let lastScore = 0;
+    let bestScore = Number(localStorage.getItem("marshymellowSnakeBest")) || 0;
+
+    bestScoreElement.textContent = bestScore;
+
+    function setStatus(value) {
+      statusLabel.textContent = value;
+      gameStatus.textContent = value;
+    }
+
+    function setScore(value) {
+      score = value;
+      scoreElement.textContent = score;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestScoreElement.textContent = bestScore;
+        localStorage.setItem("marshymellowSnakeBest", String(bestScore));
+      }
+    }
+
+    function normalizePlayerName(value) {
+      return value.trim().replace(/\s+/g, " ");
+    }
+
+    function getPlayerNameError(name) {
+      if (name.length < 2) {
+        return "Name must be at least 2 characters.";
+      }
+
+      if (name.length > 32) {
+        return "Name must be 32 characters or fewer.";
+      }
+
+      if (/https?:\/\/|www\.|\.com|\.gg|discord\.gg/i.test(name)) {
+        return "Links are not allowed in names.";
+      }
+
+      if (/[\u0000-\u001f\u007f]/.test(name)) {
+        return "Control characters are not allowed.";
+      }
+
+      if (/(.)\1{5,}/iu.test(name.replace(/\s/g, ""))) {
+        return "Name has too many repeated characters.";
+      }
+
+      return "";
+    }
+
+    function hideScoreSubmit() {
+      scoreSubmit.hidden = true;
+      submitStatus.textContent = "";
+    }
+
+    function showScoreSubmit(value) {
+      if (value < 1) {
+        hideScoreSubmit();
+        return;
+      }
+
+      finalScoreElement.textContent = value;
+      scoreSubmit.hidden = false;
+      submitStatus.textContent = "";
+      playerName.value = localStorage.getItem("marshymellowSnakeName") || "";
+    }
+
+    function renderLeaderboard(scores) {
+      leaderboardList.replaceChildren();
+      leaderboardEmpty.hidden = scores.length > 0;
+
+      scores.forEach((entry, index) => {
+        const item = document.createElement("li");
+        const rank = document.createElement("span");
+        const name = document.createElement("span");
+        const scoreText = document.createElement("span");
+
+        rank.className = "leaderboard-rank";
+        name.className = "leaderboard-name";
+        scoreText.className = "leaderboard-score";
+        rank.textContent = `#${index + 1}`;
+        name.textContent = entry.name;
+        scoreText.textContent = entry.score;
+
+        item.append(rank, name, scoreText);
+        leaderboardList.append(item);
+      });
+    }
+
+    async function loadLeaderboard() {
+      const { data, error } = await db
+        .from("snake_scores")
+        .select("name, score, created_at")
+        .order("score", { ascending: false })
+        .order("created_at", { ascending: true })
+        .limit(10);
+
+      if (error) {
+        leaderboardEmpty.hidden = false;
+        leaderboardEmpty.textContent = "Leaderboard is not set up yet.";
+        return;
+      }
+
+      leaderboardEmpty.textContent = "No scores yet.";
+      renderLeaderboard(data || []);
+    }
+
+    function sameCell(a, b) {
+      return a.x === b.x && a.y === b.y;
+    }
+
+    function randomFood() {
+      let position;
+
+      do {
+        position = {
+          x: Math.floor(Math.random() * cells),
+          y: Math.floor(Math.random() * cells)
+        };
+      } while (snake.some((part) => sameCell(part, position)));
+
+      return position;
+    }
+
+    function resetSnakePosition() {
+      snake = [
+        { x: 9, y: 10 },
+        { x: 8, y: 10 },
+        { x: 7, y: 10 }
+      ];
+      direction = { x: 1, y: 0 };
+      nextDirection = { x: 1, y: 0 };
+    }
+
+    function resetGame() {
+      clearInterval(timer);
+      timer = null;
+      resetSnakePosition();
+      setScore(0);
+      lastScore = 0;
+      hideScoreSubmit();
+      food = randomFood();
+      running = false;
+      paused = false;
+      setStatus("Ready");
+      draw();
+    }
+
+    function startGame() {
+      if (running && !paused) {
+        return;
+      }
+
+      running = true;
+      paused = false;
+      hideScoreSubmit();
+      setStatus("Playing");
+      clearInterval(timer);
+      timer = setInterval(step, speed);
+    }
+
+    function pauseGame() {
+      if (!running) {
+        return;
+      }
+
+      paused = !paused;
+
+      if (paused) {
+        clearInterval(timer);
+        timer = null;
+        setStatus("Paused");
+        return;
+      }
+
+      startGame();
+    }
+
+    function endGame() {
+      clearInterval(timer);
+      timer = null;
+      running = false;
+      paused = false;
+      lastScore = score;
+      resetSnakePosition();
+      setScore(0);
+      food = randomFood();
+      setStatus("Bonked");
+      showScoreSubmit(lastScore);
+      draw();
+    }
+
+    function setDirection(name) {
+      const directions = {
+        up: { x: 0, y: -1 },
+        down: { x: 0, y: 1 },
+        left: { x: -1, y: 0 },
+        right: { x: 1, y: 0 }
+      };
+      const requested = directions[name];
+
+      if (!requested) {
+        return;
+      }
+
+      if (requested.x + direction.x === 0 && requested.y + direction.y === 0) {
+        return;
+      }
+
+      nextDirection = requested;
+    }
+
+    function step() {
+      direction = nextDirection;
+
+      const head = {
+        x: snake[0].x + direction.x,
+        y: snake[0].y + direction.y
+      };
+
+      const hitWall = head.x < 0 || head.x >= cells || head.y < 0 || head.y >= cells;
+      const hitSelf = snake.some((part) => sameCell(part, head));
+
+      if (hitWall || hitSelf) {
+        endGame();
+        return;
+      }
+
+      snake.unshift(head);
+
+      if (sameCell(head, food)) {
+        setScore(score + 1);
+        food = randomFood();
+      } else {
+        snake.pop();
+      }
+
+      draw();
+    }
+
+    function roundedRect(x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.arcTo(x + width, y, x + width, y + height, radius);
+      ctx.arcTo(x + width, y + height, x, y + height, radius);
+      ctx.arcTo(x, y + height, x, y, radius);
+      ctx.arcTo(x, y, x + width, y, radius);
+      ctx.closePath();
+    }
+
+    function drawBackground() {
+      const gradient = ctx.createLinearGradient(0, 0, boardSize, boardSize);
+      gradient.addColorStop(0, "#d9f5ff");
+      gradient.addColorStop(0.58, "#fffaf0");
+      gradient.addColorStop(1, "#ffe1f0");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, boardSize, boardSize);
+
+      ctx.strokeStyle = "rgba(109, 90, 168, 0.08)";
+      ctx.lineWidth = 1;
+
+      for (let i = 1; i < cells; i += 1) {
+        const line = i * cellSize;
+        ctx.beginPath();
+        ctx.moveTo(line, 0);
+        ctx.lineTo(line, boardSize);
+        ctx.moveTo(0, line);
+        ctx.lineTo(boardSize, line);
+        ctx.stroke();
+      }
+    }
+
+    function drawFood() {
+      const centerX = food.x * cellSize + cellSize / 2;
+      const centerY = food.y * cellSize + cellSize / 2;
+
+      ctx.fillStyle = "#fff2ad";
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, cellSize * 0.38, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = "#ff6fae";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+
+    function drawSnake() {
+      snake.forEach((part, index) => {
+        const inset = index === 0 ? 3 : 4;
+        const x = part.x * cellSize + inset;
+        const y = part.y * cellSize + inset;
+        const size = cellSize - inset * 2;
+
+        ctx.fillStyle = index === 0 ? "#ff6fae" : index % 2 ? "#72cdf8" : "#bfe9ff";
+        roundedRect(x, y, size, size, 8);
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.74)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+    }
+
+    function drawOverlay() {
+      if (running && !paused) {
+        return;
+      }
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.38)";
+      ctx.fillRect(0, 0, boardSize, boardSize);
+      ctx.fillStyle = "#6d5aa8";
+      ctx.font = "900 46px 'gg sans', system-ui";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(statusLabel.textContent, boardSize / 2, boardSize / 2);
+    }
+
+    function draw() {
+      drawBackground();
+      drawFood();
+      drawSnake();
+      drawOverlay();
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.target.matches("input, textarea")) {
+        return;
+      }
+
+      const keys = {
+        ArrowUp: "up",
+        w: "up",
+        W: "up",
+        ArrowDown: "down",
+        s: "down",
+        S: "down",
+        ArrowLeft: "left",
+        a: "left",
+        A: "left",
+        ArrowRight: "right",
+        d: "right",
+        D: "right"
+      };
+
+      if (keys[event.key]) {
+        event.preventDefault();
+        setDirection(keys[event.key]);
+        startGame();
+      }
+
+      if (event.key === " ") {
+        event.preventDefault();
+        pauseGame();
+      }
+    });
+
+    document.querySelectorAll("[data-direction]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setDirection(button.dataset.direction);
+        startGame();
+      });
+    });
+
+    startButton.addEventListener("click", startGame);
+    pauseButton.addEventListener("click", pauseGame);
+    restartButton.addEventListener("click", () => {
+      resetGame();
+      startGame();
+    });
+
+    scoreSubmit.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const name = normalizePlayerName(playerName.value);
+      const nameError = getPlayerNameError(name);
+      const submitButton = scoreSubmit.querySelector("button");
+
+      if (lastScore < 1) {
+        submitStatus.textContent = "Play a round first.";
+        return;
+      }
+
+      if (nameError) {
+        submitStatus.textContent = nameError;
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitStatus.textContent = "Submitting score...";
+
+      const { error } = await db
+        .from("snake_scores")
+        .insert({
+          name,
+          score: lastScore
+        });
+
+      submitButton.disabled = false;
+
+      if (error) {
+        submitStatus.textContent = "Could not submit score. Check the leaderboard table setup.";
+        return;
+      }
+
+      localStorage.setItem("marshymellowSnakeName", name);
+      submitStatus.textContent = "Score submitted.";
+      lastScore = 0;
+      await loadLeaderboard();
+    });
+
+    db
+      .channel("snake-score-updates")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "snake_scores" },
+        loadLeaderboard
+      )
+      .subscribe();
+
+    loadLeaderboard();
+    resetGame();
+  </script>
+</body>
+</html>
