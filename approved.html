@@ -134,7 +134,7 @@
     }
 
     main {
-      padding: clamp(36px, 8vw, 86px) clamp(18px, 5vw, 64px);
+      padding: clamp(18px, 4vw, 42px) clamp(18px, 5vw, 64px) clamp(36px, 7vw, 76px);
     }
 
     .approved-shell {
@@ -144,11 +144,20 @@
 
     h1 {
       color: var(--berry);
+      display: flex;
+      justify-content: center;
       font-size: clamp(2.6rem, 7vw, 5.8rem);
       line-height: 0.98;
       margin: 0;
       overflow-wrap: anywhere;
       text-shadow: 3px 3px 0 rgba(255, 242, 173, 0.95);
+    }
+
+    .approved-title-image {
+      display: block;
+      height: auto;
+      max-width: 100%;
+      width: clamp(260px, 44vw, 560px);
     }
 
     .intro {
@@ -290,7 +299,9 @@
 
   <main>
     <section class="approved-shell" aria-labelledby="approved-title">
-      <h1 id="approved-title">Approved the TOS</h1>
+      <h1 id="approved-title">
+        <img class="approved-title-image" src="assets/approved-title.png" alt="Approved the TOS">
+      </h1>
       <p class="intro">Names appear here after someone submits the approval form on the marshymellow TOS page.</p>
 
       <div class="approved-panel">

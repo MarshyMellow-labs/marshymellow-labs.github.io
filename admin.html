@@ -104,11 +104,20 @@
       text-shadow: 3px 3px 0 rgba(255, 242, 173, 0.95);
     }
 
+    .admin-title-image {
+      display: block;
+      height: auto;
+      margin: 0 auto;
+      max-width: 100%;
+      width: clamp(220px, 34vw, 420px);
+    }
+
     .intro {
       color: var(--muted);
       font-size: 1.1rem;
-      margin: 10px 0 0;
+      margin: 10px auto 0;
       max-width: 62ch;
+      text-align: center;
     }
 
     .panel {
@@ -314,7 +323,9 @@
   <main>
     <section class="admin-shell" aria-labelledby="admin-title">
       <div>
-        <h1 id="admin-title">Gallery Admin</h1>
+        <h1 id="admin-title">
+          <img class="admin-title-image" src="assets/admin-title.png" alt="Admin">
+        </h1>
         <p class="intro">Log in with your Supabase account, upload a picture, and it will appear on the public gallery.</p>
       </div>
 
