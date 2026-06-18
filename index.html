@@ -159,6 +159,23 @@
       max-width: 640px;
     }
 
+    .hero-status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+
+    .hero-status span {
+      background: rgba(255, 255, 255, 0.52);
+      border: 1px solid rgba(255, 111, 174, 0.22);
+      border-radius: 999px;
+      color: var(--cocoa);
+      font-size: 0.9rem;
+      font-weight: 900;
+      padding: 8px 12px;
+    }
+
     .eyebrow {
       color: var(--cocoa);
       font-size: 0.82rem;
@@ -206,8 +223,54 @@
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 14px;
       margin-top: 30px;
+    }
+
+    .hero-actions .button {
+      font-size: 1.08rem;
+      min-height: 56px;
+      min-width: 150px;
+      padding: 14px 24px;
+    }
+
+    .hero-quick-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 30px;
+    }
+
+    .hero-quick-card {
+      background: rgba(255, 255, 255, 0.56);
+      border: 1px solid rgba(255, 111, 174, 0.24);
+      border-radius: 8px;
+      box-shadow: 0 12px 26px rgba(25, 33, 39, 0.06);
+      color: var(--ink);
+      display: grid;
+      gap: 2px;
+      min-height: 82px;
+      padding: 14px 16px;
+      text-decoration: none;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .hero-quick-card:hover,
+    .hero-quick-card:focus-visible {
+      background: rgba(255, 242, 173, 0.78);
+      border-color: rgba(255, 111, 174, 0.58);
+      transform: translateY(-2px);
+    }
+
+    .hero-quick-card strong {
+      color: var(--berry);
+      font-size: 1.18rem;
+      line-height: 1.1;
+    }
+
+    .hero-quick-card span {
+      color: var(--muted);
+      font-weight: 700;
     }
 
     .button {
@@ -293,7 +356,7 @@
     }
 
     .section-header {
-      align-items: end;
+      align-items: center;
       display: flex;
       gap: 18px;
       justify-content: space-between;
@@ -348,6 +411,14 @@
       border-radius: 8px;
       box-shadow: 0 10px 28px rgba(25, 33, 39, 0.08);
       overflow: hidden;
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .picture-card:hover,
+    .picture-card:focus-within {
+      border-color: rgba(255, 111, 174, 0.78);
+      box-shadow: 0 16px 36px rgba(255, 111, 174, 0.26);
+      transform: translateY(-4px);
     }
 
     .picture-card img {
@@ -356,7 +427,14 @@
       display: block;
       height: auto;
       object-fit: cover;
+      transition: filter 160ms ease, transform 160ms ease;
       width: 100%;
+    }
+
+    .picture-card:hover img,
+    .picture-card:focus-within img {
+      filter: brightness(1.08) saturate(1.08);
+      transform: scale(1.015);
     }
 
     .picture-card p {
@@ -375,15 +453,12 @@
     }
 
     .about-grid {
-      display: grid;
-      gap: 18px;
-      grid-template-columns: minmax(0, 1fr) minmax(240px, 0.64fr);
+      display: block;
       margin: 0 auto;
-      max-width: 1120px;
+      max-width: 900px;
     }
 
-    .about-copy,
-    .about-note {
+    .about-copy {
       background: rgba(255, 255, 255, 0.78);
       border: 2px solid rgba(255, 255, 255, 0.82);
       border-radius: 8px;
@@ -391,18 +466,30 @@
       padding: clamp(18px, 3vw, 28px);
     }
 
-    .about-copy p,
-    .about-note p {
+    .about-copy p {
       color: var(--muted);
       font-size: clamp(1rem, 2vw, 1.18rem);
       margin: 14px 0 0;
     }
 
-    .about-note strong {
+    .about-contact {
+      align-items: center;
+      border-top: 1px solid rgba(255, 111, 174, 0.22);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+      padding-top: 18px;
+    }
+
+    .about-contact strong {
       color: var(--berry);
-      display: block;
       font-size: 1.1rem;
-      margin-bottom: 8px;
+    }
+
+    .about-contact span {
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.18rem);
     }
 
     .tos {
@@ -619,6 +706,10 @@
         min-height: 300px;
       }
 
+      .hero-quick-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .section-header {
         align-items: start;
         flex-direction: column;
@@ -665,6 +756,10 @@
         grid-template-columns: 1fr;
       }
 
+      .hero-quick-grid {
+        grid-template-columns: 1fr;
+      }
+
       .approval-row {
         align-items: stretch;
         flex-direction: column;
@@ -691,6 +786,11 @@
   <main id="home">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
+        <div class="hero-status" aria-label="Site status">
+          <span>gallery open</span>
+          <span>TOS signatures accepted</span>
+          <span>snake ready</span>
+        </div>
         <p class="eyebrow">Soft, sweet, and a little dramatic</p>
         <img class="hero-logo" src="assets/marshy-logo.png" alt="MarshyMellow" onerror="this.hidden=true;">
         <h1 class="sr-only" id="hero-title">MarshyMellow</h1>
@@ -700,6 +800,24 @@
         <div class="hero-actions">
           <a class="button primary" href="index.html#pictures">See pictures</a>
           <a class="button secondary" href="index.html#tos">Read TOS</a>
+        </div>
+        <div class="hero-quick-grid" aria-label="Quick links">
+          <a class="hero-quick-card" href="index.html#pictures">
+            <strong id="hero-gallery-count">Pictures</strong>
+            <span>uploaded to the gallery</span>
+          </a>
+          <a class="hero-quick-card" href="approved.html">
+            <strong id="hero-approval-count">Approvals</strong>
+            <span>names on the TOS list</span>
+          </a>
+          <a class="hero-quick-card" href="snake.html">
+            <strong>Snake</strong>
+            <span>tiny snack chase</span>
+          </a>
+          <a class="hero-quick-card" href="donate.html">
+            <strong>Tribute</strong>
+            <span>paperwork department funding</span>
+          </a>
         </div>
       </div>
 
@@ -717,11 +835,11 @@
           </h2>
           <p>This website was made for fun, for friends, and for keeping MarshyMellow things in one place. It is a home for pictures, the TOS, silly extras, and whatever else gets added later.</p>
           <p>More pages, games, gallery bits, or other nonsense may appear in the future when the paperwork department feels motivated.</p>
+          <div class="about-contact" aria-label="Contact">
+            <strong>Discord</strong>
+            <span>marshymellow</span>
+          </div>
         </div>
-        <aside class="about-note" aria-label="Contact">
-          <strong>Discord</strong>
-          <p>marshymellow</p>
-        </aside>
       </div>
     </section>
 
@@ -797,6 +915,8 @@
     const imageViewerClose = document.querySelector("#image-viewer-close");
     const imageViewerPrev = document.querySelector("#image-viewer-prev");
     const imageViewerNext = document.querySelector("#image-viewer-next");
+    const heroGalleryCount = document.querySelector("#hero-gallery-count");
+    const heroApprovalCount = document.querySelector("#hero-approval-count");
     let currentImageIndex = 0;
     const APPROVAL_RATE_KEY = "marshymellowApprovalRate";
     const APPROVAL_SHORT_WINDOW_MS = 10 * 60 * 1000;
@@ -1008,8 +1128,17 @@
       }).format(new Date(value));
     }
 
+    function formatCount(count, singular, plural = `${singular}s`) {
+      if (!Number.isFinite(count)) {
+        return plural;
+      }
+
+      return `${count} ${count === 1 ? singular : plural}`;
+    }
+
     function renderUploadedImages(images) {
       gallery.querySelectorAll("[data-uploaded-image]").forEach((card) => card.remove());
+      heroGalleryCount.textContent = formatCount(images.length, "picture");
 
       images.forEach((image) => {
         const article = document.createElement("article");
@@ -1049,6 +1178,16 @@
       }
     }
 
+    async function loadApprovalCount() {
+      const { count, error } = await db
+        .from("approvals")
+        .select("id", { count: "exact", head: true });
+
+      if (!error) {
+        heroApprovalCount.textContent = formatCount(count, "approval");
+      }
+    }
+
     db
       .channel("gallery-image-updates")
       .on(
@@ -1058,8 +1197,19 @@
       )
       .subscribe();
 
+    db
+      .channel("approval-count-updates")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "approvals" },
+        loadApprovalCount
+      )
+      .subscribe();
+
     loadGalleryImages();
+    loadApprovalCount();
     setInterval(loadGalleryImages, 30000);
+    setInterval(loadApprovalCount, 30000);
 
     approvalForm.addEventListener("submit", async (event) => {
       event.preventDefault();
