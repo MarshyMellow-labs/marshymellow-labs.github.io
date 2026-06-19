@@ -308,6 +308,7 @@
       .admin-card img {
         width: 100%;
       }
+
     }
   </style>
 </head>
@@ -381,6 +382,12 @@
           <p class="status" id="snake-admin-status" aria-live="polite"></p>
           <div class="admin-list" id="snake-admin-list"></div>
         </section>
+
+        <section class="admin-section" aria-labelledby="dungeon-admin-title">
+          <h2 id="dungeon-admin-title">Dungeon scores</h2>
+          <p class="status" id="dungeon-admin-status" aria-live="polite"></p>
+          <div class="admin-list" id="dungeon-admin-list"></div>
+        </section>
       </section>
     </section>
   </main>
@@ -402,6 +409,8 @@
     const approvalAdminList = document.querySelector("#approval-admin-list");
     const snakeAdminStatus = document.querySelector("#snake-admin-status");
     const snakeAdminList = document.querySelector("#snake-admin-list");
+    const dungeonAdminStatus = document.querySelector("#dungeon-admin-status");
+    const dungeonAdminList = document.querySelector("#dungeon-admin-list");
     const logoutButton = document.querySelector("#logout-button");
     const imageFileInput = document.querySelector("#image-file");
     const dropZone = document.querySelector("#drop-zone");
@@ -421,12 +430,30 @@
       return db.storage.from("gallery").getPublicUrl(path).data.publicUrl;
     }
 
-    function createThumbnail(file, maxSize = 900, quality = 0.82) {
+    function formatBytes(bytes) {
+      if (bytes < 1024 * 1024) {
+        return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+      }
+
+      return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    }
+
+    function blobExtension(type) {
+      return type === "image/jpeg" ? "jpg" : "webp";
+    }
+
+    function canvasToBlob(canvas, type, quality) {
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), type, quality);
+      });
+    }
+
+    function createResizedImage(file, maxSize = 2560, quality = 0.86, preferredType = "image/webp") {
       return new Promise((resolve, reject) => {
         const image = new Image();
         const objectUrl = URL.createObjectURL(file);
 
-        image.onload = () => {
+        image.onload = async () => {
           const scale = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
           const canvas = document.createElement("canvas");
           canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
@@ -436,14 +463,21 @@
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
           URL.revokeObjectURL(objectUrl);
 
-          canvas.toBlob((blob) => {
-            if (!blob) {
-              reject(new Error("Could not create thumbnail."));
-              return;
-            }
+          const preferredBlob = await canvasToBlob(canvas, preferredType, quality);
+          const blob = preferredBlob && preferredBlob.type === preferredType
+            ? preferredBlob
+            : await canvasToBlob(canvas, "image/jpeg", quality);
 
-            resolve(blob);
-          }, "image/jpeg", quality);
+          if (!blob) {
+            reject(new Error("Could not compress image."));
+            return;
+          }
+
+          resolve({
+            blob,
+            contentType: blob.type || "image/jpeg",
+            extension: blobExtension(blob.type || "image/jpeg")
+          });
         };
 
         image.onerror = () => {
@@ -453,6 +487,10 @@
 
         image.src = objectUrl;
       });
+    }
+
+    function createThumbnail(file) {
+      return createResizedImage(file, 900, 0.82, "image/webp");
     }
 
     function setSelectedFile(file) {
@@ -517,9 +555,17 @@
 
         card.className = "admin-card";
         img.src = publicUrl(image.thumbnail_path || image.image_path);
+        img.dataset.fullSrc = publicUrl(image.image_path);
+        img.dataset.triedFullImage = image.thumbnail_path ? "false" : "true";
         img.alt = image.title;
         img.onerror = () => {
-          img.alt = `${image.title} is uploaded, but storage is not public yet`;
+          if (img.dataset.triedFullImage === "false") {
+            img.dataset.triedFullImage = "true";
+            img.src = img.dataset.fullSrc;
+            return;
+          }
+
+          img.alt = `${image.title} could not load`;
         };
         title.textContent = image.title;
         meta.textContent = image.created_at
@@ -533,6 +579,47 @@
         card.append(img, text, deleteButton);
         adminList.append(card);
       });
+    }
+
+    async function createGalleryFiles(file) {
+      const safeName = safeFileName(file.name).replace(/\.[^.]+$/, "") || "picture";
+      const baseName = `${Date.now()}-${safeName}`;
+      const fullImage = await createResizedImage(file);
+      const thumbnailImage = await createThumbnail(file);
+
+      return {
+        fullImage,
+        thumbnailImage,
+        path: `full/${baseName}.${fullImage.extension}`,
+        thumbnailPath: `thumbs/${baseName}.${thumbnailImage.extension}`
+      };
+    }
+
+    async function uploadGalleryFiles(files) {
+      const { error: uploadError } = await db.storage
+        .from("gallery")
+        .upload(files.path, files.fullImage.blob, {
+          cacheControl: "3600",
+          contentType: files.fullImage.contentType,
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { error: thumbnailError } = await db.storage
+        .from("gallery")
+        .upload(files.thumbnailPath, files.thumbnailImage.blob, {
+          cacheControl: "3600",
+          contentType: files.thumbnailImage.contentType,
+          upsert: false
+        });
+
+      if (thumbnailError) {
+        await db.storage.from("gallery").remove([files.path]);
+        throw thumbnailError;
+      }
     }
 
     async function deleteImage(image) {
@@ -668,6 +755,64 @@
       loadSnakeScores();
     }
 
+    async function loadDungeonScores() {
+      const { data, error } = await db
+        .from("dungeon_scores")
+        .select("id, name, score, floor_reached, created_at")
+        .order("score", { ascending: false })
+        .order("floor_reached", { ascending: false })
+        .order("created_at", { ascending: true })
+        .limit(50);
+
+      dungeonAdminList.replaceChildren();
+
+      if (error) {
+        dungeonAdminStatus.textContent = "Could not load Dungeon scores.";
+        return;
+      }
+
+      const scores = data || [];
+      dungeonAdminStatus.textContent = `${scores.length} score${scores.length === 1 ? "" : "s"} found.`;
+
+      scores.forEach((score) => {
+        const card = document.createElement("article");
+        const text = document.createElement("div");
+        const name = document.createElement("strong");
+        const meta = document.createElement("small");
+        const deleteButton = document.createElement("button");
+
+        card.className = "admin-card approval-card";
+        name.textContent = `${score.name} - ${score.score}`;
+        meta.textContent = `Floor ${score.floor_reached || 1} - ${
+          score.created_at ? new Date(score.created_at).toLocaleString() : "No score date"
+        }`;
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => deleteDungeonScore(score));
+
+        text.append(name, meta);
+        card.append(text, deleteButton);
+        dungeonAdminList.append(card);
+      });
+    }
+
+    async function deleteDungeonScore(score) {
+      dungeonAdminStatus.textContent = `Deleting ${score.name}'s dungeon score...`;
+
+      const { error } = await db
+        .from("dungeon_scores")
+        .delete()
+        .eq("id", score.id);
+
+      if (error) {
+        dungeonAdminStatus.textContent = "Could not delete Dungeon score. Check admin permissions.";
+        return;
+      }
+
+      dungeonAdminStatus.textContent = `${score.name}'s dungeon score was deleted.`;
+      loadDungeonScores();
+    }
+
     loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       loginStatus.textContent = "Logging in...";
@@ -687,6 +832,7 @@
       loadImages();
       loadApprovals();
       loadSnakeScores();
+      loadDungeonScores();
     });
 
     logoutButton.addEventListener("click", async () => {
@@ -695,6 +841,7 @@
       adminList.replaceChildren();
       approvalAdminList.replaceChildren();
       snakeAdminList.replaceChildren();
+      dungeonAdminList.replaceChildren();
     });
 
     uploadForm.addEventListener("submit", async (event) => {
@@ -710,45 +857,25 @@
       }
 
       submitButton.disabled = true;
-      uploadStatus.textContent = "Uploading picture...";
+      uploadStatus.textContent = "Compressing picture...";
 
-      const baseName = `${Date.now()}-${safeFileName(file.name)}`;
-      const path = `full/${baseName}`;
-      const thumbnailPath = `thumbs/${baseName.replace(/\.[^.]+$/, "")}.jpg`;
-      let thumbnailBlob;
+      let files;
 
       try {
-        thumbnailBlob = await createThumbnail(file);
+        files = await createGalleryFiles(file);
       } catch (error) {
         submitButton.disabled = false;
         uploadStatus.textContent = error.message;
         return;
       }
 
-      const { error: uploadError } = await db.storage
-        .from("gallery")
-        .upload(path, file, {
-          cacheControl: "3600",
-          upsert: false
-        });
+      uploadStatus.textContent = `Uploading compressed picture (${formatBytes(file.size)} to ${formatBytes(files.fullImage.blob.size)})...`;
 
-      if (uploadError) {
+      try {
+        await uploadGalleryFiles(files);
+      } catch (error) {
         submitButton.disabled = false;
-        uploadStatus.textContent = uploadError.message;
-        return;
-      }
-
-      const { error: thumbnailError } = await db.storage
-        .from("gallery")
-        .upload(thumbnailPath, thumbnailBlob, {
-          cacheControl: "3600",
-          contentType: "image/jpeg",
-          upsert: false
-        });
-
-      if (thumbnailError) {
-        submitButton.disabled = false;
-        uploadStatus.textContent = thumbnailError.message;
+        uploadStatus.textContent = error.message;
         return;
       }
 
@@ -756,13 +883,14 @@
         .from("gallery_images")
         .insert({
           title,
-          image_path: path,
-          thumbnail_path: thumbnailPath
+          image_path: files.path,
+          thumbnail_path: files.thumbnailPath
         });
 
       submitButton.disabled = false;
 
       if (rowError) {
+        await db.storage.from("gallery").remove([files.path, files.thumbnailPath]);
         uploadStatus.textContent = "Uploaded file, but could not save it to the gallery table.";
         return;
       }
@@ -781,6 +909,7 @@
         loadImages();
         loadApprovals();
         loadSnakeScores();
+        loadDungeonScores();
       }
     });
   </script>

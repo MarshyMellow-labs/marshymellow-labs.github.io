@@ -405,6 +405,17 @@
       max-width: 1120px;
     }
 
+    .gallery-controls {
+      display: flex;
+      justify-content: center;
+      margin: 24px auto 0;
+      max-width: 1120px;
+    }
+
+    .gallery-controls[hidden] {
+      display: none;
+    }
+
     .picture-card {
       background: rgba(255, 255, 255, 0.9);
       border: 2px solid rgba(255, 255, 255, 0.82);
@@ -780,6 +791,7 @@
       <a href="approved.html">Approved</a>
       <a href="donate.html">Pay Tribute</a>
       <a href="snake.html">Snake</a>
+      <a href="dungeon.html">Dungeon</a>
     </nav>
   </header>
 
@@ -789,7 +801,7 @@
         <div class="hero-status" aria-label="Site status">
           <span>gallery open</span>
           <span>TOS signatures accepted</span>
-          <span>snake ready</span>
+          <span>games ready</span>
         </div>
         <p class="eyebrow">Soft, sweet, and a little dramatic</p>
         <img class="hero-logo" src="assets/marshy-logo.png" alt="MarshyMellow" onerror="this.hidden=true;">
@@ -814,9 +826,9 @@
             <strong>Snake</strong>
             <span>tiny snack chase</span>
           </a>
-          <a class="hero-quick-card" href="donate.html">
-            <strong>Tribute</strong>
-            <span>paperwork department funding</span>
+          <a class="hero-quick-card" href="dungeon.html">
+            <strong>Dungeon</strong>
+            <span>pastel snack crawl</span>
           </a>
         </div>
       </div>
@@ -852,6 +864,9 @@
       </div>
 
       <div class="gallery" id="gallery"></div>
+      <div class="gallery-controls" id="gallery-controls" hidden>
+        <button class="button secondary" type="button" id="gallery-more-button">Show more pictures</button>
+      </div>
     </section>
 
     <section class="section sky" id="tos" aria-labelledby="tos-title">
@@ -917,7 +932,12 @@
     const imageViewerNext = document.querySelector("#image-viewer-next");
     const heroGalleryCount = document.querySelector("#hero-gallery-count");
     const heroApprovalCount = document.querySelector("#hero-approval-count");
+    const galleryControls = document.querySelector("#gallery-controls");
+    const galleryMoreButton = document.querySelector("#gallery-more-button");
     let currentImageIndex = 0;
+    let galleryImages = [];
+    let visibleGalleryCount = 8;
+    const GALLERY_BATCH_SIZE = 8;
     const APPROVAL_RATE_KEY = "marshymellowApprovalRate";
     const APPROVAL_SHORT_WINDOW_MS = 10 * 60 * 1000;
     const APPROVAL_SHORT_LIMIT = 2;
@@ -1140,7 +1160,7 @@
       gallery.querySelectorAll("[data-uploaded-image]").forEach((card) => card.remove());
       heroGalleryCount.textContent = formatCount(images.length, "picture");
 
-      images.forEach((image) => {
+      images.slice(0, visibleGalleryCount).forEach((image) => {
         const article = document.createElement("article");
         const img = document.createElement("img");
         const caption = document.createElement("p");
@@ -1152,19 +1172,32 @@
         article.dataset.uploadedImage = "true";
         img.src = thumbnail.publicUrl;
         img.dataset.fullSrc = fullImage.publicUrl;
+        img.dataset.triedFullImage = image.thumbnail_path ? "false" : "true";
         img.alt = image.title;
         img.loading = "lazy";
         caption.textContent = image.title;
         uploadedAt.dateTime = image.created_at;
         uploadedAt.textContent = `Uploaded ${formatImageDate(image.created_at)}`;
         img.onerror = () => {
-          caption.textContent = `${image.title} - image is not public yet`;
+          if (img.dataset.triedFullImage === "false") {
+            img.dataset.triedFullImage = "true";
+            img.src = fullImage.publicUrl;
+            return;
+          }
+
+          caption.textContent = `${image.title} - image could not load`;
         };
 
         caption.append(uploadedAt);
         article.append(img, caption);
         gallery.append(article);
       });
+
+      const hasMoreImages = images.length > visibleGalleryCount;
+      galleryControls.hidden = !hasMoreImages;
+      galleryMoreButton.textContent = hasMoreImages
+        ? `Show more pictures (${images.length - visibleGalleryCount} left)`
+        : "Show more pictures";
     }
 
     async function loadGalleryImages() {
@@ -1174,9 +1207,16 @@
         .order("created_at", { ascending: false });
 
       if (!error) {
-        renderUploadedImages(data || []);
+        galleryImages = data || [];
+        visibleGalleryCount = Math.min(visibleGalleryCount, Math.max(GALLERY_BATCH_SIZE, galleryImages.length));
+        renderUploadedImages(galleryImages);
       }
     }
+
+    galleryMoreButton.addEventListener("click", () => {
+      visibleGalleryCount += GALLERY_BATCH_SIZE;
+      renderUploadedImages(galleryImages);
+    });
 
     async function loadApprovalCount() {
       const { count, error } = await db
