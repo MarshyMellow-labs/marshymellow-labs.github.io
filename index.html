@@ -133,7 +133,8 @@
     }
 
     .nav-links a:hover,
-    .nav-links a:focus-visible {
+    .nav-links a:focus-visible,
+    .nav-links a[aria-current] {
       background: rgba(255, 242, 173, 0.92);
       border-color: rgba(25, 33, 39, 0.25);
       transform: translateY(-1px);
@@ -1085,6 +1086,7 @@
     const approvalName = document.querySelector("#approval-name");
     const approvalStatus = document.querySelector("#approval-status");
     const gallery = document.querySelector("#gallery");
+    const sectionNavLinks = Array.from(document.querySelectorAll('.nav-links a[href^="index.html#"]'));
     const imageViewer = document.querySelector("#image-viewer");
     const imageViewerImg = document.querySelector("#image-viewer-img");
     const imageViewerMeta = document.querySelector("#image-viewer-meta");
@@ -1110,6 +1112,23 @@
     const APPROVAL_LONG_LIMIT = 10;
     const APPROVAL_PENALTY_MS = 2 * 60 * 60 * 1000;
     const APPROVAL_FINGERPRINT_KEY = "marshymellowApprovalFingerprint";
+
+    function updateSectionNavigation() {
+      const currentHash = window.location.hash;
+
+      sectionNavLinks.forEach((link) => {
+        const linkHash = new URL(link.href).hash;
+
+        if (currentHash && linkHash === currentHash) {
+          link.setAttribute("aria-current", "location");
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      });
+    }
+
+    window.addEventListener("hashchange", updateSectionNavigation);
+    updateSectionNavigation();
 
     function getGalleryImages() {
       return Array.from(gallery.querySelectorAll(".picture-card img"));
