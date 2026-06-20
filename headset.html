@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marshy Valve Index</title>
+  <link rel="icon" href="assets/marshy-logo.png">
+  <style>
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Semibold.ttf") format("truetype");
+      font-weight: 800;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "gg sans";
+      src: url("assets/fonts/gg%20sans%20Bold.ttf") format("truetype");
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: light;
+      --ink: #372840;
+      --muted: #6d6472;
+      --blue: #bfeaff;
+      --blue-strong: #55bff2;
+      --pink: #ff6fae;
+      --yellow: #fff0a8;
+      --paper: #f8fcff;
+      --line: rgba(255, 111, 174, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "gg sans", "Segoe UI", sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    .site-header {
+      align-items: center;
+      background: linear-gradient(90deg, rgba(191, 234, 255, 0.96), rgba(255, 222, 239, 0.96));
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      padding: 14px clamp(18px, 4vw, 56px);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      align-items: center;
+      display: inline-flex;
+      min-height: 58px;
+    }
+
+    .brand img {
+      display: block;
+      height: 58px;
+      max-width: min(44vw, 360px);
+      object-fit: contain;
+      width: auto;
+    }
+
+    .nav-links {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      background: rgba(255, 255, 255, 0.38);
+      border: 1px solid rgba(255, 111, 174, 0.24);
+      border-radius: 999px;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 800;
+      padding: 8px 12px;
+      text-decoration: none;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible,
+    .nav-links a[aria-current="page"] {
+      background: var(--yellow);
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      align-items: end;
+      background-image: linear-gradient(90deg, rgba(24, 30, 34, 0.78) 0%, rgba(24, 30, 34, 0.42) 46%, rgba(24, 30, 34, 0.04) 76%), url("assets/marshy-index-hero.jpg");
+      background-position: center;
+      background-size: cover;
+      display: flex;
+      height: min(680px, calc(100svh - 145px));
+      min-height: 460px;
+      padding: clamp(30px, 6vw, 78px);
+    }
+
+    .hero-copy {
+      color: white;
+      max-width: 720px;
+      min-width: 0;
+      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+      width: 100%;
+    }
+
+    .eyebrow {
+      color: var(--yellow);
+      font-size: 0.86rem;
+      font-weight: 900;
+      margin: 0 0 12px;
+      text-transform: uppercase;
+    }
+
+    .sr-only {
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .headset-title-banner {
+      display: block;
+      filter: drop-shadow(0 5px 16px rgba(0, 0, 0, 0.36));
+      height: auto;
+      max-width: 100%;
+      width: min(720px, calc(100vw - 40px));
+    }
+
+    .hero-copy > p:last-of-type {
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      margin: 20px 0 0;
+      max-width: 50ch;
+    }
+
+    .hero-link {
+      background: var(--pink);
+      border: 2px solid var(--pink);
+      border-radius: 999px;
+      color: var(--ink);
+      display: inline-flex;
+      font-weight: 900;
+      margin-top: 26px;
+      padding: 11px 18px;
+      text-decoration: none;
+      text-shadow: none;
+    }
+
+    .status-band {
+      background: var(--blue);
+      border-bottom: 1px solid rgba(55, 40, 64, 0.12);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      padding: 0 clamp(18px, 4vw, 56px);
+    }
+
+    .status-item {
+      border-left: 1px solid rgba(55, 40, 64, 0.13);
+      padding: 22px clamp(14px, 2vw, 28px);
+    }
+
+    .status-item:last-child {
+      border-right: 1px solid rgba(55, 40, 64, 0.13);
+    }
+
+    .status-item span {
+      color: var(--muted);
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .status-item strong {
+      color: var(--ink);
+      display: block;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      margin-top: 3px;
+    }
+
+    .section {
+      padding: clamp(52px, 8vw, 104px) clamp(18px, 5vw, 72px);
+    }
+
+    .intro-section {
+      background: linear-gradient(135deg, #d9f3ff, #ffffff 52%, #fff2b8);
+    }
+
+    .intro-layout,
+    .tracking-layout {
+      align-items: center;
+      display: grid;
+      gap: clamp(34px, 7vw, 90px);
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      margin: 0 auto;
+      max-width: 1180px;
+    }
+
+    .section-label {
+      color: var(--pink);
+      font-weight: 900;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      color: #6452a1;
+      font-size: clamp(2.2rem, 5vw, 4.5rem);
+      line-height: 1;
+      margin: 0;
+    }
+
+    .section-copy {
+      color: var(--muted);
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      margin: 20px 0 0;
+      max-width: 58ch;
+    }
+
+    .quote {
+      border-left: 5px solid var(--pink);
+      color: var(--ink);
+      font-size: clamp(1.25rem, 2.4vw, 1.8rem);
+      font-weight: 800;
+      margin: 30px 0 0;
+      padding-left: 20px;
+    }
+
+    .detail-image {
+      border: 3px solid white;
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(55, 40, 64, 0.16);
+      display: block;
+      height: auto;
+      width: 100%;
+    }
+
+    .tracking-section {
+      background: linear-gradient(135deg, #ffe0ef, #f9fdff 48%, #d8f2ff);
+    }
+
+    .tracking-points {
+      display: grid;
+      gap: 0;
+      margin-top: 30px;
+    }
+
+    .tracking-point {
+      border-top: 1px solid rgba(55, 40, 64, 0.14);
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 120px 1fr;
+      padding: 16px 0;
+    }
+
+    .tracking-point strong {
+      color: var(--pink);
+    }
+
+    .tracking-point span {
+      color: var(--muted);
+    }
+
+    .gallery-section {
+      background: linear-gradient(135deg, #cceeff, #ffffff 48%, #ffe2f0);
+    }
+
+    .gallery-heading {
+      align-items: end;
+      display: flex;
+      gap: 24px;
+      justify-content: space-between;
+      margin: 0 auto 30px;
+      max-width: 1180px;
+    }
+
+    .gallery-heading p {
+      color: var(--muted);
+      margin: 0;
+      max-width: 38ch;
+    }
+
+    .device-gallery {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin: 0 auto;
+      max-width: 1180px;
+    }
+
+    .gallery-photo {
+      background: white;
+      border: 2px solid white;
+      border-radius: 8px;
+      cursor: zoom-in;
+      overflow: hidden;
+      padding: 0;
+      position: relative;
+    }
+
+    .gallery-photo img {
+      aspect-ratio: 4 / 3;
+      display: block;
+      object-fit: cover;
+      transition: filter 180ms ease, transform 180ms ease;
+      width: 100%;
+    }
+
+    .gallery-photo:hover img,
+    .gallery-photo:focus-visible img {
+      filter: brightness(1.08) saturate(1.08);
+      transform: scale(1.02);
+    }
+
+    .gallery-photo span {
+      background: rgba(255, 255, 255, 0.93);
+      bottom: 12px;
+      color: var(--ink);
+      font-weight: 900;
+      left: 12px;
+      padding: 7px 10px;
+      position: absolute;
+    }
+
+    .final-band {
+      background: #5f4a98;
+      color: white;
+      padding: clamp(42px, 6vw, 72px) clamp(18px, 5vw, 72px);
+      text-align: center;
+    }
+
+    .final-band h2 {
+      color: white;
+      font-size: clamp(2rem, 5vw, 4rem);
+    }
+
+    .final-band p {
+      color: rgba(255, 255, 255, 0.78);
+      margin: 14px auto 0;
+      max-width: 62ch;
+    }
+
+    .site-footer {
+      align-items: center;
+      background: #493875;
+      color: white;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 20px clamp(18px, 5vw, 64px);
+    }
+
+    .site-footer a {
+      color: white;
+      font-weight: 800;
+    }
+
+    .viewer {
+      align-items: center;
+      background: rgba(38, 29, 45, 0.88);
+      display: flex;
+      inset: 0;
+      justify-content: center;
+      padding: 70px 92px 42px;
+      position: fixed;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+    }
+
+    .viewer[hidden] {
+      display: none;
+    }
+
+    .viewer figure {
+      margin: 0;
+      max-width: 1320px;
+      text-align: center;
+    }
+
+    .viewer img {
+      border: 3px solid white;
+      border-radius: 8px;
+      display: block;
+      max-height: 80vh;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .viewer figcaption {
+      color: white;
+      font-weight: 800;
+      margin-top: 12px;
+    }
+
+    .viewer button {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 2rem;
+      font-weight: 900;
+      height: 58px;
+      position: absolute;
+      width: 58px;
+    }
+
+    .viewer-close {
+      font-size: 1.25rem !important;
+      right: 20px;
+      top: 20px;
+    }
+
+    .viewer-prev {
+      left: 20px;
+      top: 50%;
+    }
+
+    .viewer-next {
+      right: 20px;
+      top: 50%;
+    }
+
+    @media (max-width: 900px) {
+      .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        background-position: 60% center;
+        height: min(620px, calc(100svh - 190px));
+      }
+
+      .status-band {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .status-item:nth-child(3) {
+        border-top: 1px solid rgba(55, 40, 64, 0.13);
+      }
+
+      .status-item:nth-child(4) {
+        border-top: 1px solid rgba(55, 40, 64, 0.13);
+      }
+
+      .intro-layout,
+      .tracking-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .tracking-layout .detail-image {
+        order: -1;
+      }
+
+      .gallery-heading {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 580px) {
+      .site-header {
+        width: 100%;
+      }
+
+      .brand img {
+        height: 50px;
+        max-width: 76vw;
+      }
+
+      .nav-links {
+        align-self: stretch;
+        display: grid;
+        gap: 6px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        max-width: 100%;
+        width: calc(100vw - 40px);
+      }
+
+      .nav-links a {
+        font-size: 0.8rem;
+        padding: 7px 4px;
+        text-align: center;
+      }
+
+      .hero {
+        background-position: 63% center;
+        height: min(560px, calc(100svh - 250px));
+        min-height: 430px;
+        padding: 28px 20px;
+      }
+
+      .headset-title-banner {
+        max-width: calc(100vw - 40px);
+        width: calc(100vw - 40px);
+      }
+
+      .hero-copy {
+        max-width: calc(100vw - 40px);
+      }
+
+      .status-band,
+      .device-gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .status-item,
+      .status-item:last-child {
+        border-left: 0;
+        border-right: 0;
+        border-top: 1px solid rgba(55, 40, 64, 0.13);
+      }
+
+      .tracking-point {
+        grid-template-columns: 1fr;
+      }
+
+      .viewer {
+        padding: 68px 16px 96px;
+      }
+
+      .viewer-prev,
+      .viewer-next {
+        bottom: 20px;
+        top: auto;
+      }
+
+      .viewer-prev {
+        left: calc(50% - 70px);
+      }
+
+      .viewer-next {
+        right: calc(50% - 70px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="MarshyMellow home">
+      <img src="assets/marshy-logo.png" alt="MarshyMellow">
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="index.html#about">About</a>
+      <a href="index.html#pictures">Pictures</a>
+      <a href="index.html#tos">Marshys TOS</a>
+      <a href="approved.html">Approved</a>
+      <a href="headset.html" aria-current="page">Headset</a>
+      <a href="snake.html">Snake</a>
+      <a href="dungeon.html">Dungeon</a>
+      <a href="donate.html">Pay Tribute</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">MARSHY BUILT FACE AND EYE TRACKING DEVICE</p>
+        <h1 class="sr-only" id="page-title">Marshy's Valve Index</h1>
+        <img class="headset-title-banner" src="assets/marshy-valve-index-title.png" alt="Marshy's Valve Index">
+        <p>Marshys headset has been described as an IED but it is in fact a heavily modified Valve index with eye and face tracking.</p>
+        <a class="hero-link" href="#details">Inspect the build</a>
+      </div>
+    </section>
+
+    <section class="status-band" aria-label="Headset status">
+      <div class="status-item"><span>Eye tracking</span><strong>Yes</strong></div>
+      <div class="status-item"><span>Face tracking</span><strong>Yes</strong></div>
+      <div class="status-item"><span>Cooling</span><strong>Noctua</strong></div>
+      <div class="status-item"><span>Appearance</span><strong>Airport Unfriendly</strong></div>
+    </section>
+
+    <section class="section intro-section" id="details">
+      <div class="intro-layout">
+        <div>
+          <p class="section-label">THE MACHINE</p>
+          <h2>Questionable packaging but results</h2>
+          <p class="section-copy">The Marshy Index is a device that was built from the best of Aliexpress chinaisum technology put together somehow by sheer determination and lots of Marshys glue</p>
+          <p class="quote">Held together by hopes and dreams</p>
+        </div>
+        <img class="detail-image" src="assets/marshy-index-cooling.jpg" alt="Rear view of the modified Valve Index showing the cooling fan, controller and ribbon cables">
+      </div>
+    </section>
+
+    <section class="section tracking-section">
+      <div class="tracking-layout">
+        <img class="detail-image" src="assets/marshy-index-inside.jpg" alt="Inside view of the Valve Index with illuminated tracking cameras around the lenses">
+        <div>
+          <p class="section-label">TRACKING</p>
+          <h2>How does it work?</h2>
+          <p class="section-copy">Using 3x ESPs, 1x IR light controller, 3x cameras, 1x fan controller, 1x Noctua fan and a bunch of glue and soldering we are able to make something that vaguely resembles a VR headset but with eye and face tracking!</p>
+          <div class="tracking-points">
+            <div class="tracking-point"><strong>Weight?</strong><span>a lot</span></div>
+            <div class="tracking-point"><strong>Price?</strong><span>a lot</span></div>
+            <div class="tracking-point"><strong>Counter weight?</strong><span>Sock filled with coins</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section gallery-section" aria-labelledby="gallery-title">
+      <div class="gallery-heading">
+        <div>
+          <p class="section-label">THE CASE</p>
+          <h2 id="gallery-title">Inspect the situation</h2>
+        </div>
+        <p>Every one of these pictures is real. Select a photo for the full experience.</p>
+      </div>
+
+      <div class="device-gallery" id="device-gallery">
+        <button class="gallery-photo" type="button" data-caption="Cooling, power and controller stack">
+          <img src="assets/marshy-index-cooling.jpg" alt="Cooling fan, power bank and controller mounted on the Valve Index">
+          <span>Cooling stack</span>
+        </button>
+        <button class="gallery-photo" type="button" data-caption="Illuminated inward-facing eye tracking array">
+          <img src="assets/marshy-index-optics.jpg" alt="Valve Index lenses surrounded by illuminated eye tracking sensors">
+          <span>Eye tracking array</span>
+        </button>
+        <button class="gallery-photo" type="button" data-caption="Inside view with the tracking hardware active">
+          <img src="assets/marshy-index-inside.jpg" alt="Inside of the headset with active infrared tracking lights">
+          <span>Inside view</span>
+        </button>
+        <button class="gallery-photo" type="button" data-caption="Ribbon cables and camera boards in their natural habitat">
+          <img src="assets/marshy-index-sensors.jpg" alt="Close view of camera boards and ribbon cables mounted to the headset">
+          <span>Sensor boards</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="final-band">
+      <h2>The Marshy Edition Index</h2>
+      <p>The Marshy Index is a personal modification and is not an official Valve product. It simply refuses to look normal but does its job well enough</p>
+    </section>
+  </main>
+
+  <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Enlarged headset photo" hidden>
+    <button class="viewer-close" id="viewer-close" type="button" aria-label="Close">&times;</button>
+    <button class="viewer-prev" id="viewer-prev" type="button" aria-label="Previous photo">&lsaquo;</button>
+    <figure>
+      <img id="viewer-image" alt="">
+      <figcaption id="viewer-caption"></figcaption>
+    </figure>
+    <button class="viewer-next" id="viewer-next" type="button" aria-label="Next photo">&rsaquo;</button>
+  </div>
+
+  <footer class="site-footer">
+    <span>MarshyMellow &#9825; &trade; 2026</span>
+    <span>Made with AI bullshittery.</span>
+    <a href="index.html">Back home</a>
+  </footer>
+
+  <script>
+    const galleryButtons = Array.from(document.querySelectorAll(".gallery-photo"));
+    const viewer = document.querySelector("#viewer");
+    const viewerImage = document.querySelector("#viewer-image");
+    const viewerCaption = document.querySelector("#viewer-caption");
+    const viewerClose = document.querySelector("#viewer-close");
+    const viewerPrev = document.querySelector("#viewer-prev");
+    const viewerNext = document.querySelector("#viewer-next");
+    let currentPhoto = 0;
+
+    function showPhoto(index) {
+      currentPhoto = (index + galleryButtons.length) % galleryButtons.length;
+      const button = galleryButtons[currentPhoto];
+      const image = button.querySelector("img");
+      viewerImage.src = image.src;
+      viewerImage.alt = image.alt;
+      viewerCaption.textContent = button.dataset.caption;
+    }
+
+    function openViewer(index) {
+      showPhoto(index);
+      viewer.hidden = false;
+      document.body.style.overflow = "hidden";
+      viewerClose.focus();
+    }
+
+    function closeViewer() {
+      viewer.hidden = true;
+      viewerImage.removeAttribute("src");
+      document.body.style.overflow = "";
+    }
+
+    galleryButtons.forEach((button, index) => {
+      button.addEventListener("click", () => openViewer(index));
+    });
+
+    viewerClose.addEventListener("click", closeViewer);
+    viewerPrev.addEventListener("click", () => showPhoto(currentPhoto - 1));
+    viewerNext.addEventListener("click", () => showPhoto(currentPhoto + 1));
+    viewer.addEventListener("click", (event) => {
+      if (event.target === viewer) {
+        closeViewer();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (viewer.hidden) {
+        return;
+      }
+
+      if (event.key === "Escape") {
+        closeViewer();
+      } else if (event.key === "ArrowLeft") {
+        showPhoto(currentPhoto - 1);
+      } else if (event.key === "ArrowRight") {
+        showPhoto(currentPhoto + 1);
+      }
+    });
+  </script>
+</body>
+</html>

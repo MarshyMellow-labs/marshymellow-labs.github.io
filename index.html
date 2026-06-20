@@ -273,6 +273,10 @@
       font-weight: 700;
     }
 
+    .hero-quick-card.headset-card {
+      grid-column: 1 / -1;
+    }
+
     .button {
       align-items: center;
       border: 2px solid var(--ink);
@@ -744,6 +748,13 @@
       overflow-wrap: anywhere;
     }
 
+    .image-viewer-users .image-viewer-note {
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin: 10px 0 0;
+      opacity: 0.82;
+    }
+
     .image-viewer button {
       background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(255, 111, 174, 0.22);
@@ -922,11 +933,12 @@
     <nav class="nav-links" aria-label="Main navigation">
       <a href="index.html#about">About</a>
       <a href="index.html#pictures">Pictures</a>
-      <a href="index.html#tos">TOS</a>
+      <a href="index.html#tos">Marshys TOS</a>
       <a href="approved.html">Approved</a>
-      <a href="donate.html">Pay Tribute</a>
+      <a href="headset.html">Headset</a>
       <a href="snake.html">Snake</a>
       <a href="dungeon.html">Dungeon</a>
+      <a href="donate.html">Pay Tribute</a>
     </nav>
   </header>
 
@@ -964,6 +976,10 @@
           <a class="hero-quick-card" href="dungeon.html">
             <strong>Dungeon</strong>
             <span>pastel snack crawl</span>
+          </a>
+          <a class="hero-quick-card headset-card" href="headset.html">
+            <strong>Marshy's Valve Index</strong>
+            <span>eye and face tracking contraption</span>
           </a>
         </div>
       </div>
@@ -1139,12 +1155,15 @@
       const userSection = document.createElement("section");
       const userHeading = document.createElement("h3");
       const userNames = document.createElement("p");
+      const userNote = document.createElement("p");
       userSection.className = "image-viewer-users";
       userHeading.textContent = `Users in the instance (${users.length})`;
       userNames.textContent = users.length
         ? users.map((user) => user.displayName).join(", ")
         : "Instance users were not included in this photo's metadata.";
-      userSection.append(userHeading, userNames);
+      userNote.className = "image-viewer-note";
+      userNote.textContent = "This list comes from VRCX metadata and may not always be accurate.";
+      userSection.append(userHeading, userNames, userNote);
       imageViewerMeta.append(userSection);
     }
 
