@@ -405,6 +405,38 @@
       max-width: 1120px;
     }
 
+    .gallery-search {
+      margin: 0 auto 22px;
+      max-width: 1120px;
+    }
+
+    .gallery-search input {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 111, 174, 0.38);
+      border-radius: 999px;
+      color: var(--ink);
+      font: inherit;
+      min-height: 48px;
+      padding: 10px 18px;
+      width: min(100%, 440px);
+    }
+
+    .gallery-search input:focus {
+      border-color: var(--berry);
+      outline: 3px solid rgba(255, 111, 174, 0.18);
+    }
+
+    .gallery-empty {
+      color: var(--muted);
+      font-weight: 800;
+      margin: 0 auto 22px;
+      max-width: 1120px;
+    }
+
+    .gallery-empty[hidden] {
+      display: none;
+    }
+
     .gallery-controls {
       display: flex;
       justify-content: center;
@@ -966,6 +998,12 @@
         <p>Soft scenes, snack-table energy, and plenty of room for more marshymellow moments.</p>
       </div>
 
+      <div class="gallery-search">
+        <label class="sr-only" for="gallery-user-search">Search pictures by VRChat user</label>
+        <input id="gallery-user-search" type="search" list="gallery-user-suggestions" placeholder="Search for users in instance when picture was taken" autocomplete="off">
+        <datalist id="gallery-user-suggestions"></datalist>
+      </div>
+      <p class="gallery-empty" id="gallery-empty" hidden>No pictures found with that user.</p>
       <div class="gallery" id="gallery"></div>
       <div class="gallery-controls" id="gallery-controls" hidden>
         <button class="button secondary" type="button" id="gallery-more-button">Show all pictures</button>
@@ -1041,9 +1079,13 @@
     const heroApprovalCount = document.querySelector("#hero-approval-count");
     const galleryControls = document.querySelector("#gallery-controls");
     const galleryMoreButton = document.querySelector("#gallery-more-button");
+    const galleryUserSearch = document.querySelector("#gallery-user-search");
+    const galleryUserSuggestions = document.querySelector("#gallery-user-suggestions");
+    const galleryEmpty = document.querySelector("#gallery-empty");
     let currentImageIndex = 0;
     let galleryImages = [];
     let visibleGalleryCount = 8;
+    let gallerySearchQuery = "";
     const GALLERY_BATCH_SIZE = 8;
     const APPROVAL_RATE_KEY = "marshymellowApprovalRate";
     const APPROVAL_SHORT_WINDOW_MS = 10 * 60 * 1000;
@@ -1073,9 +1115,12 @@
       };
 
       imageViewerMeta.replaceChildren();
-      title.textContent = record?.title || image.alt || "Gallery picture";
+      title.textContent = record?.title?.trim() || "";
       details.className = "image-viewer-details";
-      imageViewerMeta.append(title);
+
+      if (title.textContent) {
+        imageViewerMeta.append(title);
+      }
 
       if (!metadata) {
         const message = document.createElement("p");
@@ -1338,11 +1383,63 @@
       return `${count} ${count === 1 ? singular : plural}`;
     }
 
-    function renderUploadedImages(images) {
-      gallery.querySelectorAll("[data-uploaded-image]").forEach((card) => card.remove());
-      heroGalleryCount.textContent = formatCount(images.length, "picture");
+    function normalizeUserSearch(value) {
+      return String(value || "").normalize("NFKC").toLocaleLowerCase().trim();
+    }
 
-      images.slice(0, visibleGalleryCount).forEach((image) => {
+    function imageMatchesUser(image, query) {
+      const metadata = image.vrchat_metadata;
+      const users = Array.isArray(metadata?.users) ? metadata.users : [];
+      const names = users.map((user) => user?.displayName);
+
+      if (metadata?.author?.displayName) {
+        names.push(metadata.author.displayName);
+      }
+
+      return names.some((name) => normalizeUserSearch(name).includes(query));
+    }
+
+    function updateUserSuggestions(images) {
+      const knownUsers = new Map();
+
+      images.forEach((image) => {
+        const users = Array.isArray(image.vrchat_metadata?.users)
+          ? image.vrchat_metadata.users
+          : [];
+
+        users.forEach((user) => {
+          const displayName = user?.displayName?.trim();
+
+          if (displayName) {
+            knownUsers.set(normalizeUserSearch(displayName), displayName);
+          }
+        });
+      });
+
+      const options = Array.from(knownUsers.values())
+        .sort((first, second) => first.localeCompare(second, undefined, { sensitivity: "base" }))
+        .map((displayName) => {
+          const option = document.createElement("option");
+          option.value = displayName;
+          return option;
+        });
+      galleryUserSuggestions.replaceChildren(...options);
+    }
+
+    function renderCurrentGallery() {
+      const filteredImages = gallerySearchQuery
+        ? galleryImages.filter((image) => imageMatchesUser(image, gallerySearchQuery))
+        : galleryImages;
+      renderUploadedImages(filteredImages, Boolean(gallerySearchQuery));
+    }
+
+    function renderUploadedImages(images, showAll = false) {
+      gallery.querySelectorAll("[data-uploaded-image]").forEach((card) => card.remove());
+      heroGalleryCount.textContent = formatCount(galleryImages.length, "picture");
+      galleryEmpty.hidden = images.length > 0;
+      const displayedImages = showAll ? images : images.slice(0, visibleGalleryCount);
+
+      displayedImages.forEach((image) => {
         const article = document.createElement("article");
         const img = document.createElement("img");
         const caption = document.createElement("div");
@@ -1359,10 +1456,10 @@
         img.src = thumbnail.publicUrl;
         img.dataset.fullSrc = fullImage.publicUrl;
         img.dataset.triedFullImage = image.thumbnail_path ? "false" : "true";
-        img.alt = image.title;
+        img.alt = image.title || "VRChat gallery picture";
         img.loading = "lazy";
         img.galleryRecord = image;
-        title.textContent = image.title;
+        title.textContent = image.title || "";
         capturedAt.dateTime = captureDate || "";
         capturedAt.textContent = captureDate
           ? `Taken ${formatImageDate(captureDate)}`
@@ -1374,16 +1471,22 @@
             return;
           }
 
-          title.textContent = `${image.title} - image could not load`;
+          title.textContent = image.title
+            ? `${image.title} - image could not load`
+            : "Image could not load";
         };
 
-        caption.append(title, capturedAt);
+        if (title.textContent) {
+          caption.append(title);
+        }
+
+        caption.append(capturedAt);
 
         article.append(img, caption);
         gallery.append(article);
       });
 
-      const hasMoreImages = images.length > visibleGalleryCount;
+      const hasMoreImages = !showAll && images.length > visibleGalleryCount;
       galleryControls.hidden = !hasMoreImages;
       galleryMoreButton.textContent = "Show all pictures";
     }
@@ -1407,14 +1510,20 @@
           const secondTime = new Date(galleryCaptureDate(second) || 0).getTime();
           return secondTime - firstTime;
         });
+        updateUserSuggestions(galleryImages);
         visibleGalleryCount = Math.min(visibleGalleryCount, Math.max(GALLERY_BATCH_SIZE, galleryImages.length));
-        renderUploadedImages(galleryImages);
+        renderCurrentGallery();
       }
     }
 
     galleryMoreButton.addEventListener("click", () => {
       visibleGalleryCount = galleryImages.length;
-      renderUploadedImages(galleryImages);
+      renderCurrentGallery();
+    });
+
+    galleryUserSearch.addEventListener("input", () => {
+      gallerySearchQuery = normalizeUserSearch(galleryUserSearch.value);
+      renderCurrentGallery();
     });
 
     async function loadApprovalCount() {

@@ -350,8 +350,8 @@
       <section class="panel" id="upload-panel" hidden>
         <form id="upload-form">
           <label>
-            Picture title
-            <input id="image-title" type="text" maxlength="80" placeholder="Marshy and friends" required>
+            Picture title (optional)
+            <input id="image-title" type="text" maxlength="80" placeholder="Leave blank for no title">
           </label>
           <label class="drop-zone" id="drop-zone">
             <input id="image-file" type="file" accept="image/*">
@@ -728,7 +728,7 @@
         img.src = publicUrl(image.thumbnail_path || image.image_path);
         img.dataset.fullSrc = publicUrl(image.image_path);
         img.dataset.triedFullImage = image.thumbnail_path ? "false" : "true";
-        img.alt = image.title;
+        img.alt = image.title || "VRChat gallery picture";
         img.onerror = () => {
           if (img.dataset.triedFullImage === "false") {
             img.dataset.triedFullImage = "true";
@@ -736,9 +736,9 @@
             return;
           }
 
-          img.alt = `${image.title} could not load`;
+          img.alt = image.title ? `${image.title} could not load` : "Picture could not load";
         };
-        title.textContent = image.title;
+        title.textContent = image.title || "Untitled picture";
         meta.textContent = image.created_at
           ? `${image.image_path} - uploaded ${new Date(image.created_at).toLocaleString()}`
           : image.image_path;
@@ -1023,8 +1023,8 @@
       const file = selectedFile;
       const submitButton = uploadForm.querySelector("button[type='submit']");
 
-      if (!title || !file) {
-        uploadStatus.textContent = "Choose a title and file first.";
+      if (!file) {
+        uploadStatus.textContent = "Choose a picture first.";
         return;
       }
 
