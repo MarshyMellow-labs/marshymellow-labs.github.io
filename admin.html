@@ -416,6 +416,7 @@
     const dropZone = document.querySelector("#drop-zone");
     const selectedFileText = document.querySelector("#selected-file");
     let selectedFile = null;
+    let selectedPhotoMetadata = null;
 
     function setLoggedIn(isLoggedIn) {
       loginPanel.hidden = isLoggedIn;
@@ -493,9 +494,163 @@
       return createResizedImage(file, 900, 0.82, "image/webp");
     }
 
-    function setSelectedFile(file) {
+    function readNullTerminated(bytes, start) {
+      let end = start;
+
+      while (end < bytes.length && bytes[end] !== 0) {
+        end += 1;
+      }
+
+      return {
+        text: new TextDecoder().decode(bytes.subarray(start, end)),
+        next: end + 1
+      };
+    }
+
+    function readPngTextChunks(buffer) {
+      const bytes = new Uint8Array(buffer);
+      const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+
+      if (bytes.length < 8 || !signature.every((value, index) => bytes[index] === value)) {
+        return [];
+      }
+
+      const view = new DataView(buffer);
+      const decoder = new TextDecoder();
+      const chunks = [];
+      let offset = 8;
+
+      while (offset + 12 <= bytes.length) {
+        const length = view.getUint32(offset);
+        const type = decoder.decode(bytes.subarray(offset + 4, offset + 8));
+        const dataStart = offset + 8;
+        const dataEnd = dataStart + length;
+
+        if (dataEnd + 4 > bytes.length) {
+          break;
+        }
+
+        if (type === "iTXt") {
+          const data = bytes.subarray(dataStart, dataEnd);
+          const keyword = readNullTerminated(data, 0);
+          const compressionFlag = data[keyword.next];
+          let cursor = keyword.next + 2;
+          cursor = readNullTerminated(data, cursor).next;
+          cursor = readNullTerminated(data, cursor).next;
+
+          if (compressionFlag === 0) {
+            chunks.push({
+              keyword: keyword.text,
+              text: decoder.decode(data.subarray(cursor))
+            });
+          }
+        } else if (type === "tEXt") {
+          const data = bytes.subarray(dataStart, dataEnd);
+          const keyword = readNullTerminated(data, 0);
+          chunks.push({
+            keyword: keyword.text,
+            text: decoder.decode(data.subarray(keyword.next))
+          });
+        }
+
+        offset = dataEnd + 4;
+
+        if (type === "IEND") {
+          break;
+        }
+      }
+
+      return chunks;
+    }
+
+    function xmpValue(document, tagName) {
+      return document.getElementsByTagName(tagName)[0]?.textContent?.trim() || null;
+    }
+
+    function metadataDateFromFileName(fileName) {
+      const match = fileName.match(/VRChat_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})(?:\.(\d{1,3}))?/i);
+
+      if (!match) {
+        return null;
+      }
+
+      const [, year, month, day, hour, minute, second, milliseconds = "0"] = match;
+      const date = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        Number(hour),
+        Number(minute),
+        Number(second),
+        Number(milliseconds.padEnd(3, "0"))
+      );
+
+      return Number.isNaN(date.getTime()) ? null : date.toISOString();
+    }
+
+    async function readVrchatMetadata(file) {
+      if (file.type !== "image/png" && !file.name.toLowerCase().endsWith(".png")) {
+        return null;
+      }
+
+      const chunks = readPngTextChunks(await file.arrayBuffer());
+      const description = chunks.find((chunk) => chunk.keyword === "Description")?.text;
+      const xmp = chunks.find((chunk) => chunk.keyword === "XML:com.adobe.xmp")?.text;
+      let vrcx = null;
+      let native = null;
+
+      if (description) {
+        try {
+          const parsed = JSON.parse(description);
+          if (parsed && typeof parsed === "object") {
+            vrcx = parsed;
+          }
+        } catch (error) {
+          // Older screenshot tools used a different Description format.
+        }
+      }
+
+      if (xmp) {
+        const document = new DOMParser().parseFromString(xmp, "application/xml");
+        if (!document.querySelector("parsererror")) {
+          native = {
+            capturedAt: xmpValue(document, "xmp:CreateDate") || xmpValue(document, "tiff:DateTime"),
+            authorId: xmpValue(document, "vrc:AuthorID"),
+            authorName: xmpValue(document, "xmp:Author"),
+            worldId: xmpValue(document, "vrc:WorldID") || xmpValue(document, "vrc:World"),
+            worldName: xmpValue(document, "vrc:WorldDisplayName")
+          };
+        }
+      }
+
+      const users = Array.isArray(vrcx?.players)
+        ? vrcx.players
+            .filter((player) => player?.displayName)
+            .map((player) => ({ id: player.id || null, displayName: player.displayName }))
+        : [];
+      const metadata = {
+        capturedAt: native?.capturedAt || metadataDateFromFileName(file.name),
+        author: {
+          id: vrcx?.author?.id || native?.authorId || null,
+          displayName: vrcx?.author?.displayName || native?.authorName || null
+        },
+        world: {
+          id: vrcx?.world?.id || native?.worldId || null,
+          name: vrcx?.world?.name || native?.worldName || null,
+          instanceId: vrcx?.world?.instanceId || null
+        },
+        users
+      };
+      const hasMetadata = metadata.capturedAt || metadata.author.id || metadata.author.displayName
+        || metadata.world.id || metadata.world.name || metadata.users.length;
+
+      return hasMetadata ? metadata : null;
+    }
+
+    async function setSelectedFile(file) {
       if (!file) {
         selectedFile = null;
+        selectedPhotoMetadata = null;
         selectedFileText.textContent = "No picture selected";
         return;
       }
@@ -506,8 +661,24 @@
       }
 
       selectedFile = file;
+      selectedPhotoMetadata = null;
       selectedFileText.textContent = file.name;
-      uploadStatus.textContent = "";
+      uploadStatus.textContent = "Reading VRChat photo details...";
+
+      try {
+        const metadata = await readVrchatMetadata(file);
+
+        if (selectedFile !== file) {
+          return;
+        }
+
+        selectedPhotoMetadata = metadata;
+        uploadStatus.textContent = metadata
+          ? `VRChat details found${metadata.world.name ? ` for ${metadata.world.name}` : ""}.`
+          : "No VRChat metadata was found. The picture can still be uploaded.";
+      } catch (error) {
+        uploadStatus.textContent = "Could not read VRChat metadata. The picture can still be uploaded.";
+      }
     }
 
     imageFileInput.addEventListener("change", () => {
@@ -581,7 +752,7 @@
       });
     }
 
-    async function createGalleryFiles(file) {
+    async function createGalleryFiles(file, metadata) {
       const safeName = safeFileName(file.name).replace(/\.[^.]+$/, "") || "picture";
       const baseName = `${Date.now()}-${safeName}`;
       const fullImage = await createResizedImage(file);
@@ -590,6 +761,7 @@
       return {
         fullImage,
         thumbnailImage,
+        metadata,
         path: `full/${baseName}.${fullImage.extension}`,
         thumbnailPath: `thumbs/${baseName}.${thumbnailImage.extension}`
       };
@@ -862,7 +1034,7 @@
       let files;
 
       try {
-        files = await createGalleryFiles(file);
+        files = await createGalleryFiles(file, selectedPhotoMetadata);
       } catch (error) {
         submitButton.disabled = false;
         uploadStatus.textContent = error.message;
@@ -879,25 +1051,32 @@
         return;
       }
 
+      const galleryRow = {
+        title,
+        image_path: files.path,
+        thumbnail_path: files.thumbnailPath,
+        vrchat_metadata: files.metadata
+      };
+
       const { error: rowError } = await db
         .from("gallery_images")
-        .insert({
-          title,
-          image_path: files.path,
-          thumbnail_path: files.thumbnailPath
-        });
+        .insert(galleryRow);
 
       submitButton.disabled = false;
 
       if (rowError) {
         await db.storage.from("gallery").remove([files.path, files.thumbnailPath]);
-        uploadStatus.textContent = "Uploaded file, but could not save it to the gallery table.";
+        uploadStatus.textContent = rowError.code === "PGRST204" || rowError.code === "42703"
+          ? "The VRChat metadata column is missing. Run supabase-gallery-metadata.sql in Supabase, then upload again."
+          : "Uploaded file, but could not save it to the gallery table.";
         return;
       }
 
       uploadForm.reset();
       setSelectedFile(null);
-      uploadStatus.textContent = "Picture uploaded.";
+      uploadStatus.textContent = files.metadata
+        ? "Picture uploaded with VRChat details."
+        : "Picture uploaded, but the original file did not contain VRChat metadata.";
       loadImages();
     });
 
