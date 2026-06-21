@@ -1,0 +1,325 @@
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #f8f1ff !important;
+  --muted: #e5dde9 !important;
+  --paper: #111827 !important;
+  --cream: #574c22 !important;
+  --mint: #394c35 !important;
+  --berry: #ff79b5 !important;
+  --cocoa: #bda8ff !important;
+  --sky: #183d52 !important;
+  --blue: #183d52 !important;
+  --blue-strong: #69cff8 !important;
+  --pink: #ff79b5 !important;
+  --yellow: #5c5022 !important;
+  --line: rgba(255, 121, 181, 0.32) !important;
+  --shadow: 0 18px 46px rgba(0, 0, 0, 0.38) !important;
+  background: #111827;
+}
+
+html[data-theme="dark"] body {
+  background: linear-gradient(145deg, #102837 0%, #151a2b 42%, #332b22 72%, #3d2134 100%) !important;
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .site-header {
+  background: linear-gradient(90deg, rgba(18, 48, 65, 0.97), rgba(55, 29, 54, 0.97)) !important;
+  border-color: var(--line) !important;
+}
+
+html[data-theme="dark"] .nav-links a,
+html[data-theme="dark"] .site-header .button,
+html[data-theme="dark"] .button.secondary,
+html[data-theme="dark"] button:not(.primary):not(.gallery-photo):not(.image-viewer-close):not(.image-viewer-nav):not(.viewer-close):not(.viewer-prev):not(.viewer-next) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 121, 181, 0.34) !important;
+  color: var(--ink) !important;
+}
+
+html[data-theme="dark"] .nav-links a:hover,
+html[data-theme="dark"] .nav-links a:focus-visible,
+html[data-theme="dark"] .nav-links a[aria-current],
+html[data-theme="dark"] .button:hover,
+html[data-theme="dark"] .button:focus-visible,
+html[data-theme="dark"] button:not(.primary):hover,
+html[data-theme="dark"] button:not(.primary):focus-visible {
+  background: #f4d96f !important;
+  border-color: #f4d96f !important;
+  color: #372840 !important;
+}
+
+html[data-theme="dark"] .button.primary,
+html[data-theme="dark"] button.primary {
+  color: #372840 !important;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background: #1a2233 !important;
+  border-color: rgba(255, 121, 181, 0.34) !important;
+  color: var(--ink) !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #c9becf;
+}
+
+html[data-theme="dark"] :where(
+  .tagline,
+  .intro,
+  .section-copy,
+  .section-header p,
+  .gallery-heading p,
+  .hero-quick-card span,
+  .picture-card time,
+  .about-copy p,
+  .about-contact span,
+  .tos-intro,
+  .tos-source,
+  .approval-note,
+  .image-viewer-details dd,
+  .image-viewer-users p,
+  .image-viewer-empty,
+  .image-viewer-note,
+  .approved-list time,
+  .kofi-fallback,
+  .tribute-benefits > p,
+  .fine-print,
+  .legend span,
+  .score-box span,
+  .submit-status,
+  .leaderboard-empty,
+  .tracking-point span,
+  .status-item span,
+  .admin-card small,
+  .selected-file,
+  .ai-credit
+) {
+  color: #e5dde9 !important;
+}
+
+html[data-theme="dark"] :where(
+  .approval-form label,
+  .quote
+) {
+  color: #fff8ff !important;
+}
+
+html[data-theme="dark"][data-page="404"] main > p {
+  color: #e5dde9 !important;
+}
+
+html[data-theme="dark"] .site-footer,
+html[data-theme="dark"] .final-band {
+  background: #33265b !important;
+}
+
+.theme-toggle {
+  align-items: center;
+  align-self: center;
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid rgba(255, 111, 174, 0.3);
+  border-radius: 50%;
+  color: #372840;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 40px;
+  font: inherit;
+  height: 40px;
+  justify-content: center;
+  min-height: 40px !important;
+  min-width: 40px !important;
+  padding: 0 !important;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+  width: 40px;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  background: #fff0a8 !important;
+  border-color: #ff79b5 !important;
+  color: #372840 !important;
+  transform: translateY(-1px);
+}
+
+.theme-toggle-icon::before {
+  content: "\263E";
+  display: block;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+html[data-theme="dark"] .theme-toggle-icon::before {
+  content: "\2600";
+}
+
+.theme-header-actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.theme-toggle-floating {
+  position: fixed;
+  right: 18px;
+  top: 18px;
+  z-index: 30;
+}
+
+/* Home and gallery */
+html[data-theme="dark"][data-page="index"] .hero {
+  background: linear-gradient(135deg, rgba(20, 61, 80, 0.96), rgba(22, 27, 44, 0.9) 48%, rgba(75, 31, 62, 0.9)) !important;
+}
+
+html[data-theme="dark"][data-page="index"] .section.mint,
+html[data-theme="dark"][data-page="index"] .section.sky {
+  background: linear-gradient(135deg, #14364a, #171c2d 48%, #40273b) !important;
+}
+
+html[data-theme="dark"] .hero-status span,
+html[data-theme="dark"] .hero-quick-card,
+html[data-theme="dark"] .picture-card,
+html[data-theme="dark"] .about-copy,
+html[data-theme="dark"] .about-contact,
+html[data-theme="dark"] .tos-text,
+html[data-theme="dark"] .image-viewer-meta,
+html[data-theme="dark"] .approved-panel,
+html[data-theme="dark"] .support-card,
+html[data-theme="dark"] .kofi-embed-card,
+html[data-theme="dark"] .tribute-benefits,
+html[data-theme="dark"] .benefit-list li,
+html[data-theme="dark"] .game-panel,
+html[data-theme="dark"] .score-submit,
+html[data-theme="dark"] .leaderboard-panel,
+html[data-theme="dark"] .leaderboard-list li,
+html[data-theme="dark"] .legend span,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .admin-card {
+  background: rgba(27, 34, 51, 0.94) !important;
+  border-color: rgba(255, 121, 181, 0.26) !important;
+}
+
+html[data-theme="dark"] .hero-photo span,
+html[data-theme="dark"] .gallery-photo span {
+  background: rgba(20, 25, 39, 0.94) !important;
+  color: var(--ink) !important;
+}
+
+html[data-theme="dark"] .tos-document,
+html[data-theme="dark"] .tos-frame {
+  border-color: rgba(255, 121, 181, 0.28) !important;
+}
+
+html[data-theme="dark"] .image-viewer {
+  background: rgba(8, 10, 18, 0.88) !important;
+}
+
+html[data-theme="dark"] .image-viewer button,
+html[data-theme="dark"] .viewer button {
+  background: rgba(24, 30, 46, 0.96) !important;
+  color: var(--ink) !important;
+}
+
+/* Approved list */
+html[data-theme="dark"] .approved-summary {
+  background: linear-gradient(135deg, #1b4b63, #20283a 48%, #55481f) !important;
+}
+
+html[data-theme="dark"] .approved-summary strong {
+  color: #fff8ff !important;
+}
+
+html[data-theme="dark"] .approved-summary .button {
+  background: #f4d96f !important;
+  border-color: #f4d96f !important;
+  color: #372840 !important;
+}
+
+/* Tribute */
+html[data-theme="dark"][data-page="donate"] .tribute-benefits h2 {
+  color: #d8ccff !important;
+}
+
+html[data-theme="dark"][data-page="donate"] .tribute-benefits > p,
+html[data-theme="dark"][data-page="donate"] .fine-print {
+  color: #d7ccd9 !important;
+}
+
+html[data-theme="dark"][data-page="donate"] .benefit-list li {
+  color: #fff8ff !important;
+}
+
+html[data-theme="dark"] .benefit-list li:hover,
+html[data-theme="dark"] .benefit-list li:focus-within {
+  background: #5a2948 !important;
+  border-color: #ff79b5 !important;
+}
+
+html[data-theme="dark"] .fine-print {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Games */
+html[data-theme="dark"] .score-box {
+  background: linear-gradient(135deg, rgba(38, 93, 119, 0.72), rgba(91, 75, 28, 0.66)) !important;
+}
+
+html[data-theme="dark"] .board-wrap {
+  background: #131d2a !important;
+  border-color: rgba(255, 121, 181, 0.24) !important;
+}
+
+/* Headset showcase */
+html[data-theme="dark"][data-page="headset"] .status-band {
+  background: #173d52 !important;
+}
+
+html[data-theme="dark"][data-page="headset"] .eyebrow {
+  color: #fff0a8 !important;
+}
+
+html[data-theme="dark"][data-page="headset"] .intro-section,
+html[data-theme="dark"][data-page="headset"] .tracking-section,
+html[data-theme="dark"][data-page="headset"] .gallery-section {
+  background: linear-gradient(135deg, #14364a, #171c2d 50%, #40273b) !important;
+}
+
+html[data-theme="dark"][data-page="headset"] .intro-section h2,
+html[data-theme="dark"][data-page="headset"] .tracking-section h2,
+html[data-theme="dark"][data-page="headset"] .gallery-section h2 {
+  color: #c7b8ff !important;
+}
+
+html[data-theme="dark"][data-page="headset"] .gallery-photo {
+  background: #1b2233 !important;
+  border-color: #1b2233 !important;
+}
+
+/* Admin */
+html[data-theme="dark"][data-page="admin"] .drop-zone {
+  background: rgba(44, 104, 133, 0.22) !important;
+}
+
+html[data-theme="dark"][data-page="admin"] .drop-zone.is-dragover {
+  background: rgba(111, 93, 30, 0.55) !important;
+}
+
+/* Missing page */
+html[data-theme="dark"][data-page="404"] main {
+  background: rgba(27, 34, 51, 0.94) !important;
+  border-color: rgba(255, 121, 181, 0.28) !important;
+}
+
+@media (max-width: 580px) {
+  .nav-links .theme-toggle {
+    justify-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle {
+    transition: none;
+  }
+}

@@ -487,6 +487,8 @@
       }
     }
   </style>
+  <script src="theme.js"></script>
+  <link rel="stylesheet" href="theme.css">
 </head>
 <body>
   <header class="site-header">
@@ -859,14 +861,15 @@
     }
 
     function drawBackground() {
+      const darkMode = document.documentElement.dataset.theme === "dark";
       const gradient = ctx.createLinearGradient(0, 0, boardSize, boardSize);
-      gradient.addColorStop(0, "#d9f5ff");
-      gradient.addColorStop(0.58, "#fffaf0");
-      gradient.addColorStop(1, "#ffe1f0");
+      gradient.addColorStop(0, darkMode ? "#153447" : "#d9f5ff");
+      gradient.addColorStop(0.58, darkMode ? "#1a2030" : "#fffaf0");
+      gradient.addColorStop(1, darkMode ? "#43243a" : "#ffe1f0");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, boardSize, boardSize);
 
-      ctx.strokeStyle = "rgba(109, 90, 168, 0.08)";
+      ctx.strokeStyle = darkMode ? "rgba(191, 233, 255, 0.08)" : "rgba(109, 90, 168, 0.08)";
       ctx.lineWidth = 1;
 
       for (let i = 1; i < cells; i += 1) {
@@ -916,9 +919,10 @@
         return;
       }
 
-      ctx.fillStyle = "rgba(255, 255, 255, 0.38)";
+      const darkMode = document.documentElement.dataset.theme === "dark";
+      ctx.fillStyle = darkMode ? "rgba(7, 10, 18, 0.62)" : "rgba(255, 255, 255, 0.38)";
       ctx.fillRect(0, 0, boardSize, boardSize);
-      ctx.fillStyle = "#6d5aa8";
+      ctx.fillStyle = darkMode ? "#d7c9ff" : "#6d5aa8";
       ctx.font = "900 46px 'gg sans', system-ui";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -931,6 +935,8 @@
       drawSnake();
       drawOverlay();
     }
+
+    window.addEventListener("marshy-theme-change", draw);
 
     document.addEventListener("keydown", (event) => {
       if (event.target.matches("input, textarea")) {
