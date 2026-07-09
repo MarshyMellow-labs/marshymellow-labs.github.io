@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>marshymellow</title>
   <link rel="icon" href="assets/marshy-logo.png">
+  <link rel="preconnect" href="https://hnqrptrfxxtuxhawyvge.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <style>
     @font-face {
       font-family: "gg sans";
@@ -930,7 +932,7 @@
 <body>
   <header class="site-header">
     <a class="brand" href="index.html" aria-label="MarshyMellow home">
-      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
       <span class="brand-text">marshymellow</span>
     </a>
     <nav class="nav-links" aria-label="Main navigation">
@@ -954,7 +956,7 @@
           <span>games ready</span>
         </div>
         <p class="eyebrow">Soft, sweet, and a little dramatic</p>
-        <img class="hero-logo" src="assets/marshy-logo.png" alt="MarshyMellow" onerror="this.hidden=true;">
+        <img class="hero-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" onerror="this.hidden=true;">
         <h1 class="sr-only" id="hero-title">MarshyMellow</h1>
         <p class="tagline">
           Welcome to MarshyMellow's website you are now trapped here.
@@ -988,7 +990,7 @@
       </div>
 
       <div class="hero-photo">
-        <img src="assets/marshy-hero.png" alt="Two VRChat avatars close together" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80';">
+        <img src="assets/marshy-hero.jpg" alt="Two VRChat avatars close together" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80';">
         <span>freshly fluffed</span>
       </div>
     </section>
@@ -997,7 +999,7 @@
       <div class="about-grid">
         <div class="about-copy">
           <h2 id="about-title">
-            <img class="section-title-image about-title-image" src="assets/about-title.png" alt="About">
+            <img class="section-title-image about-title-image" src="assets/about-title.png" alt="About" loading="lazy" decoding="async">
           </h2>
           <p>This website was made for fun, for friends, and for keeping MarshyMellow things in one place. It is a home for pictures, the TOS, silly extras, and whatever else gets added later.</p>
           <p>More pages, games, gallery bits, or other nonsense may appear in the future when the paperwork department feels motivated.</p>
@@ -1012,7 +1014,7 @@
     <section class="section mint" id="pictures" aria-labelledby="pictures-title">
       <div class="section-header">
         <h2 id="pictures-title">
-          <img class="section-title-image pictures-title-image" src="assets/pictures-title.png" alt="Pictures!">
+          <img class="section-title-image pictures-title-image" src="assets/pictures-title.png" alt="Pictures!" loading="lazy" decoding="async">
         </h2>
         <p>Soft scenes, snack-table energy, and plenty of room for more marshymellow moments.</p>
       </div>
@@ -1033,7 +1035,7 @@
       <div class="tos">
         <div class="tos-text">
           <h2 id="tos-title">
-            <img class="section-title-image tos-title-image" src="assets/tos-title.png" alt="TOS">
+            <img class="section-title-image tos-title-image" src="assets/tos-title.png" alt="TOS" loading="lazy" decoding="async">
           </h2>
           <p class="tos-intro">Read the full MarshyMellow Terms of Service below before submitting your name.</p>
           <p class="tos-source">
@@ -1104,6 +1106,8 @@
     const galleryEmpty = document.querySelector("#gallery-empty");
     let currentImageIndex = 0;
     let galleryImages = [];
+    let galleryLoaded = false;
+    let galleryLoading = false;
     let visibleGalleryCount = 8;
     let gallerySearchQuery = "";
     const GALLERY_BATCH_SIZE = 8;
@@ -1498,6 +1502,8 @@
         img.dataset.triedFullImage = image.thumbnail_path ? "false" : "true";
         img.alt = image.title || "VRChat gallery picture";
         img.loading = "lazy";
+        img.decoding = "async";
+        img.fetchPriority = "low";
         img.galleryRecord = image;
         title.textContent = image.title || "";
         capturedAt.dateTime = captureDate || "";
@@ -1532,27 +1538,47 @@
     }
 
     async function loadGalleryImages() {
-      let { data, error } = await db
-        .from("gallery_images")
-        .select("title, image_path, thumbnail_path, created_at, vrchat_metadata")
-        .order("created_at", { ascending: false });
-
-      if (error && (error.code === "PGRST204" || error.code === "42703")) {
-        ({ data, error } = await db
-          .from("gallery_images")
-          .select("title, image_path, thumbnail_path, created_at")
-          .order("created_at", { ascending: false }));
+      if (galleryLoading) {
+        return;
       }
 
+      galleryLoading = true;
+      try {
+        let { data, error } = await db
+          .from("gallery_images")
+          .select("title, image_path, thumbnail_path, created_at, vrchat_metadata")
+          .order("created_at", { ascending: false });
+
+        if (error && (error.code === "PGRST204" || error.code === "42703")) {
+          ({ data, error } = await db
+            .from("gallery_images")
+            .select("title, image_path, thumbnail_path, created_at")
+            .order("created_at", { ascending: false }));
+        }
+
+        if (!error) {
+          galleryImages = (data || []).sort((first, second) => {
+            const firstTime = new Date(galleryCaptureDate(first) || 0).getTime();
+            const secondTime = new Date(galleryCaptureDate(second) || 0).getTime();
+            return secondTime - firstTime;
+          });
+          updateUserSuggestions(galleryImages);
+          visibleGalleryCount = Math.min(visibleGalleryCount, Math.max(GALLERY_BATCH_SIZE, galleryImages.length));
+          renderCurrentGallery();
+          galleryLoaded = true;
+        }
+      } finally {
+        galleryLoading = false;
+      }
+    }
+
+    async function loadGalleryCount() {
+      const { count, error } = await db
+        .from("gallery_images")
+        .select("id", { count: "exact", head: true });
+
       if (!error) {
-        galleryImages = (data || []).sort((first, second) => {
-          const firstTime = new Date(galleryCaptureDate(first) || 0).getTime();
-          const secondTime = new Date(galleryCaptureDate(second) || 0).getTime();
-          return secondTime - firstTime;
-        });
-        updateUserSuggestions(galleryImages);
-        visibleGalleryCount = Math.min(visibleGalleryCount, Math.max(GALLERY_BATCH_SIZE, galleryImages.length));
-        renderCurrentGallery();
+        heroGalleryCount.textContent = formatCount(count, "picture");
       }
     }
 
@@ -1581,7 +1607,13 @@
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "gallery_images" },
-        loadGalleryImages
+        () => {
+          loadGalleryCount();
+
+          if (galleryLoaded) {
+            loadGalleryImages();
+          }
+        }
       )
       .subscribe();
 
@@ -1594,10 +1626,47 @@
       )
       .subscribe();
 
-    loadGalleryImages();
+    const gallerySection = document.querySelector("#pictures");
+    const galleryObserver = "IntersectionObserver" in window
+      ? new IntersectionObserver((entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            loadGalleryImages();
+            galleryObserver.disconnect();
+          }
+        }, { rootMargin: "700px 0px" })
+      : null;
+
+    if (galleryObserver) {
+      galleryObserver.observe(gallerySection);
+    } else {
+      loadGalleryImages();
+    }
+
+    loadGalleryCount();
     loadApprovalCount();
-    setInterval(loadGalleryImages, 30000);
-    setInterval(loadApprovalCount, 30000);
+    setInterval(() => {
+      if (document.hidden) {
+        return;
+      }
+
+      loadGalleryCount();
+      loadApprovalCount();
+
+      if (galleryLoaded) {
+        loadGalleryImages();
+      }
+    }, 5 * 60 * 1000);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        loadGalleryCount();
+        loadApprovalCount();
+
+        if (galleryLoaded) {
+          loadGalleryImages();
+        }
+      }
+    });
 
     approvalForm.addEventListener("submit", async (event) => {
       event.preventDefault();

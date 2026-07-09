@@ -99,4 +99,5 @@
       applyTheme(event.matches ? "dark" : "light", false);
     }
   });
+
 }());
