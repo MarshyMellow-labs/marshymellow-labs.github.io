@@ -265,6 +265,36 @@
       text-shadow: 2px 2px 0 rgba(255, 242, 173, 0.95);
     }
 
+    .status-admin-section {
+      border-top: 0;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    .status-privacy-toggle {
+      align-items: center;
+      background: rgba(191, 233, 255, 0.34);
+      border: 1px solid rgba(255, 111, 174, 0.28);
+      border-radius: 8px;
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      padding: 14px 16px;
+    }
+
+    .status-privacy-toggle input {
+      accent-color: var(--berry);
+      flex: 0 0 auto;
+      min-height: 22px;
+      padding: 0;
+      width: 22px;
+    }
+
+    .status-admin-summary {
+      color: var(--muted);
+      margin: 10px 0 0;
+    }
+
     .admin-card {
       align-items: center;
       background: rgba(255, 255, 255, 0.74);
@@ -302,7 +332,37 @@
         flex-direction: column;
       }
 
-      .admin-card {
+      .status-admin-section {
+      border-top: 0;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    .status-privacy-toggle {
+      align-items: center;
+      background: rgba(191, 233, 255, 0.34);
+      border: 1px solid rgba(255, 111, 174, 0.28);
+      border-radius: 8px;
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      padding: 14px 16px;
+    }
+
+    .status-privacy-toggle input {
+      accent-color: var(--berry);
+      flex: 0 0 auto;
+      min-height: 22px;
+      padding: 0;
+      width: 22px;
+    }
+
+    .status-admin-summary {
+      color: var(--muted);
+      margin: 10px 0 0;
+    }
+
+    .admin-card {
         align-items: start;
         grid-template-columns: 1fr;
       }
@@ -352,6 +412,19 @@
       </section>
 
       <section class="panel" id="upload-panel" hidden>
+        <section class="admin-section status-admin-section" aria-labelledby="status-admin-title">
+          <h2 id="status-admin-title">Where is Marshy?</h2>
+          <p class="status-admin-summary" id="status-admin-summary">Checking the status beacon...</p>
+          <label class="status-privacy-toggle">
+            <input id="status-force-hidden" type="checkbox">
+            Hide Marshy's location on the public status page
+          </label>
+          <div class="actions">
+            <button class="primary" type="button" id="status-save-button">Save privacy setting</button>
+          </div>
+          <p class="status" id="status-admin-message" aria-live="polite"></p>
+        </section>
+
         <form id="upload-form">
           <label>
             Picture title (optional)
@@ -419,6 +492,10 @@
     const imageFileInput = document.querySelector("#image-file");
     const dropZone = document.querySelector("#drop-zone");
     const selectedFileText = document.querySelector("#selected-file");
+    const statusForceHidden = document.querySelector("#status-force-hidden");
+    const statusSaveButton = document.querySelector("#status-save-button");
+    const statusAdminSummary = document.querySelector("#status-admin-summary");
+    const statusAdminMessage = document.querySelector("#status-admin-message");
     let selectedFile = null;
     let selectedPhotoMetadata = null;
 
@@ -989,6 +1066,64 @@
       loadDungeonScores();
     }
 
+    function describeMarshyStatus(status) {
+      if (!status) {
+        return "No status row was found.";
+      }
+
+      const state = status.force_hidden ? "hidden by admin" : status.state;
+      const world = status.world_name ? " in " + status.world_name : "";
+      const instance = status.instance_type ? " (" + status.instance_type + ")" : "";
+      const players = status.state === "public" && Number.isInteger(status.player_count)
+        ? " " + status.player_count + " player" + (status.player_count === 1 ? "" : "s") + "."
+        : "";
+      const updated = status.updated_at
+        ? new Date(status.updated_at).toLocaleString()
+        : "never";
+
+      return "Updater state: " + state + world + instance + "." + players + " Last signal: " + updated + ".";
+    }
+
+    async function loadMarshyStatus() {
+      statusAdminSummary.textContent = "Checking the status beacon...";
+
+      const { data, error } = await db
+        .from("marshy_status")
+        .select("state, world_name, instance_type, player_count, updated_at, force_hidden")
+        .eq("id", "marshy")
+        .maybeSingle();
+
+      if (error) {
+        statusAdminSummary.textContent = "Could not load the status. Run supabase-marshy-status.sql first.";
+        return;
+      }
+
+      statusForceHidden.checked = Boolean(data?.force_hidden);
+      statusAdminSummary.textContent = describeMarshyStatus(data);
+    }
+
+    statusSaveButton.addEventListener("click", async () => {
+      statusSaveButton.disabled = true;
+      statusAdminMessage.textContent = "Saving privacy setting...";
+
+      const { error } = await db
+        .from("marshy_status")
+        .update({ force_hidden: statusForceHidden.checked })
+        .eq("id", "marshy");
+
+      statusSaveButton.disabled = false;
+
+      if (error) {
+        statusAdminMessage.textContent = "Could not save. Check the Marshy status admin policy.";
+        return;
+      }
+
+      statusAdminMessage.textContent = statusForceHidden.checked
+        ? "Marshy is now hiding on the public page."
+        : "Automatic instance status is visible again.";
+      loadMarshyStatus();
+    });
+
     loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       loginStatus.textContent = "Logging in...";
@@ -1009,6 +1144,7 @@
       loadApprovals();
       loadSnakeScores();
       loadDungeonScores();
+      loadMarshyStatus();
     });
 
     logoutButton.addEventListener("click", async () => {
@@ -1018,6 +1154,8 @@
       approvalAdminList.replaceChildren();
       snakeAdminList.replaceChildren();
       dungeonAdminList.replaceChildren();
+      statusAdminSummary.textContent = "Log in to manage the status beacon.";
+      statusAdminMessage.textContent = "";
     });
 
     uploadForm.addEventListener("submit", async (event) => {
@@ -1093,6 +1231,7 @@
         loadApprovals();
         loadSnakeScores();
         loadDungeonScores();
+        loadMarshyStatus();
       }
     });
   </script>
