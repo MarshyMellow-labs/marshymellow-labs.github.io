@@ -96,12 +96,12 @@
 
     if (!nav.querySelector('a[href="where-is-marshy.html"]')) {
       const statusLink = document.createElement("a");
-      const headsetLink = nav.querySelector('a[href="headset.html"]');
+      const tributeLink = nav.querySelector('a[href="donate.html"]');
       statusLink.href = "where-is-marshy.html";
       statusLink.textContent = "Where is Marshy?";
 
-      if (headsetLink) {
-        nav.insertBefore(statusLink, headsetLink);
+      if (tributeLink) {
+        nav.insertBefore(statusLink, tributeLink);
       } else {
         nav.append(statusLink);
       }
