@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-S4gbP+xils0xoBNY6TxOD/ktTETbpvjoy9mjxNFoyT0='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co; frame-src 'none'; upgrade-insecure-requests">
+  <script src="security.js"></script>
   <title>Where is Marshy? - MarshyMellow</title>
   <link rel="icon" href="assets/marshy-logo.png">
   <link rel="preconnect" href="https://hnqrptrfxxtuxhawyvge.supabase.co" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <style>
     @font-face {
       font-family: "gg sans";
@@ -441,7 +443,7 @@
 <body>
   <header class="site-header">
     <a class="brand" href="index.html" aria-label="MarshyMellow home">
-      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" data-fallback-action="hide-show-next">
       <span class="brand-text">marshymellow</span>
     </a>
     <nav class="nav-links" aria-label="Main navigation">
@@ -516,7 +518,7 @@
     <a href="donate.html">Pay Tribute</a>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
     const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
