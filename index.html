@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-YB9cDKSxb840/gdA8QgjnhixFXcMz3I6khUMs4Ge69c='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co https://images.unsplash.com; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src https://docs.google.com; upgrade-insecure-requests">
+  <script src="security.js"></script>
   <title>marshymellow</title>
   <link rel="icon" href="assets/marshy-logo.png">
   <link rel="preconnect" href="https://hnqrptrfxxtuxhawyvge.supabase.co" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <style>
     @font-face {
       font-family: "gg sans";
@@ -932,7 +934,7 @@
 <body>
   <header class="site-header">
     <a class="brand" href="index.html" aria-label="MarshyMellow home">
-      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" data-fallback-action="hide-show-next">
       <span class="brand-text">marshymellow</span>
     </a>
     <nav class="nav-links" aria-label="Main navigation">
@@ -956,7 +958,7 @@
           <span>games ready</span>
         </div>
         <p class="eyebrow">Soft, sweet, and a little dramatic</p>
-        <img class="hero-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" onerror="this.hidden=true;">
+        <img class="hero-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" data-fallback-action="hide">
         <h1 class="sr-only" id="hero-title">MarshyMellow</h1>
         <p class="tagline">
           Welcome to MarshyMellow's website you are now trapped here.
@@ -994,7 +996,7 @@
       </div>
 
       <div class="hero-photo">
-        <img src="assets/marshy-hero.jpg" alt="Two VRChat avatars close together" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=1200&q=80';">
+        <img src="assets/marshy-hero.jpg" alt="Two VRChat avatars close together" decoding="async" fetchpriority="high" data-fallback-src="https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&amp;fit=crop&amp;w=1200&amp;q=80">
         <span>freshly fluffed</span>
       </div>
     </section>
@@ -1048,7 +1050,13 @@
           </p>
 
           <div class="tos-document">
-            <iframe class="tos-frame" title="MarshyMellow Terms of Service" src="https://docs.google.com/document/d/e/2PACX-1vTXw3rH1CLQKezdKK2GpDgzpOkfj9oQa_0GBFTElUKv9aUqqE_i60ktq_vsk0uuE1p0ZUoOFQ4xadDO/pub?embedded=true"></iframe>
+            <iframe
+              class="tos-frame"
+              title="MarshyMellow Terms of Service"
+              referrerpolicy="strict-origin-when-cross-origin"
+              sandbox="allow-forms allow-popups allow-same-origin allow-scripts"
+              src="https://docs.google.com/document/d/e/2PACX-1vTXw3rH1CLQKezdKK2GpDgzpOkfj9oQa_0GBFTElUKv9aUqqE_i60ktq_vsk0uuE1p0ZUoOFQ4xadDO/pub?embedded=true">
+            </iframe>
           </div>
 
           <form class="approval-form" id="approval-form">
@@ -1085,7 +1093,7 @@
     <a href="donate.html">Pay Tribute</a>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
     const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
@@ -1177,7 +1185,7 @@
 
       addDetail("Date and time", formatImageDate(metadata.capturedAt));
       addDetail("Author", metadata.author?.displayName);
-      addDetail("World", metadata.world?.name || metadata.world?.id);
+      addDetail("World", metadata.world?.name);
       imageViewerMeta.append(details);
 
       const users = Array.isArray(metadata.users) ? metadata.users.filter((user) => user?.displayName) : [];

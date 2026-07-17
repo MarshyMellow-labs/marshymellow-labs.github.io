@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-V+EWoFOTBk8/T9uQk2smoSK2m7Qa+5qLXfu7ky/fv0w='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' blob: https://hnqrptrfxxtuxhawyvge.supabase.co; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co; frame-src 'none'; upgrade-insecure-requests">
+  <script src="security.js"></script>
   <title>marshymellow admin</title>
   <link rel="icon" href="assets/marshy-logo.png">
   <link rel="preconnect" href="https://hnqrptrfxxtuxhawyvge.supabase.co" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <style>
     @font-face {
       font-family: "gg sans";
@@ -379,7 +381,7 @@
 <body>
   <header class="site-header">
     <a class="brand" href="index.html" aria-label="MarshyMellow home">
-      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" data-fallback-action="hide-show-next">
       <span class="brand-text">marshymellow</span>
     </a>
     <a class="button" href="index.html">Back to site</a>
@@ -431,7 +433,7 @@
             <input id="image-title" type="text" maxlength="80" placeholder="Leave blank for no title">
           </label>
           <label class="drop-zone" id="drop-zone">
-            <input id="image-file" type="file" accept="image/*">
+            <input id="image-file" type="file" accept="image/png,image/jpeg,image/webp">
             <strong>Drop picture here</strong>
             <span>or click to choose one</span>
             <p class="selected-file" id="selected-file">No picture selected</p>
@@ -469,7 +471,7 @@
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
     const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
@@ -496,12 +498,39 @@
     const statusSaveButton = document.querySelector("#status-save-button");
     const statusAdminSummary = document.querySelector("#status-admin-summary");
     const statusAdminMessage = document.querySelector("#status-admin-message");
+    const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
+    const MAX_SOURCE_IMAGE_BYTES = 25 * 1024 * 1024;
+    const MAX_SOURCE_IMAGE_PIXELS = 40 * 1024 * 1024;
     let selectedFile = null;
     let selectedPhotoMetadata = null;
 
     function setLoggedIn(isLoggedIn) {
       loginPanel.hidden = isLoggedIn;
       uploadPanel.hidden = !isLoggedIn;
+    }
+
+    function loadAdminData() {
+      loadImages();
+      loadApprovals();
+      loadSnakeScores();
+      loadDungeonScores();
+      loadMarshyStatus();
+    }
+
+    async function activateAdminSession(statusElement = loginStatus) {
+      const { data: isAdmin, error } = await db.rpc("is_site_admin");
+
+      if (error || isAdmin !== true) {
+        await db.auth.signOut();
+        setLoggedIn(false);
+        statusElement.textContent = "This account is not authorized to use the admin page.";
+        return false;
+      }
+
+      setLoggedIn(true);
+      statusElement.textContent = "";
+      loadAdminData();
+      return true;
     }
 
     function safeFileName(name) {
@@ -536,6 +565,14 @@
         const objectUrl = URL.createObjectURL(file);
 
         image.onload = async () => {
+          const sourcePixels = image.naturalWidth * image.naturalHeight;
+
+          if (!image.naturalWidth || !image.naturalHeight || sourcePixels > MAX_SOURCE_IMAGE_PIXELS) {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error("That picture is too large to process safely."));
+            return;
+          }
+
           const scale = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
           const canvas = document.createElement("canvas");
           canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
@@ -648,6 +685,23 @@
       return document.getElementsByTagName(tagName)[0]?.textContent?.trim() || null;
     }
 
+    function cleanMetadataText(value, maxLength = 160) {
+      return typeof value === "string"
+        ? value.trim().replace(/\s+/g, " ").slice(0, maxLength)
+        : "";
+    }
+
+    function cleanMetadataDate(value) {
+      const normalized = typeof value === "string" ? value.trim().slice(0, 64) : "";
+
+      if (!normalized) {
+        return null;
+      }
+
+      const parsedDate = new Date(normalized);
+      return Number.isNaN(parsedDate.getTime()) ? null : parsedDate.toISOString();
+    }
+
     function metadataDateFromFileName(fileName) {
       const match = fileName.match(/VRChat_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})(?:\.(\d{1,3}))?/i);
 
@@ -696,34 +750,39 @@
         if (!document.querySelector("parsererror")) {
           native = {
             capturedAt: xmpValue(document, "xmp:CreateDate") || xmpValue(document, "tiff:DateTime"),
-            authorId: xmpValue(document, "vrc:AuthorID"),
             authorName: xmpValue(document, "xmp:Author"),
-            worldId: xmpValue(document, "vrc:WorldID") || xmpValue(document, "vrc:World"),
             worldName: xmpValue(document, "vrc:WorldDisplayName")
           };
         }
       }
 
-      const users = Array.isArray(vrcx?.players)
-        ? vrcx.players
-            .filter((player) => player?.displayName)
-            .map((player) => ({ id: player.id || null, displayName: player.displayName }))
-        : [];
+      const seenUsers = new Set();
+      const users = [];
+
+      if (Array.isArray(vrcx?.players)) {
+        vrcx.players.forEach((player) => {
+          const displayName = cleanMetadataText(player?.displayName, 80);
+          const key = displayName.toLocaleLowerCase();
+
+          if (displayName && !seenUsers.has(key) && users.length < 200) {
+            seenUsers.add(key);
+            users.push({ displayName });
+          }
+        });
+      }
+
       const metadata = {
-        capturedAt: native?.capturedAt || metadataDateFromFileName(file.name),
+        capturedAt: cleanMetadataDate(native?.capturedAt) || metadataDateFromFileName(file.name),
         author: {
-          id: vrcx?.author?.id || native?.authorId || null,
-          displayName: vrcx?.author?.displayName || native?.authorName || null
+          displayName: cleanMetadataText(vrcx?.author?.displayName || native?.authorName, 80) || null
         },
         world: {
-          id: vrcx?.world?.id || native?.worldId || null,
-          name: vrcx?.world?.name || native?.worldName || null,
-          instanceId: vrcx?.world?.instanceId || null
+          name: cleanMetadataText(vrcx?.world?.name || native?.worldName, 160) || null
         },
         users
       };
-      const hasMetadata = metadata.capturedAt || metadata.author.id || metadata.author.displayName
-        || metadata.world.id || metadata.world.name || metadata.users.length;
+      const hasMetadata = metadata.capturedAt || metadata.author.displayName
+        || metadata.world.name || metadata.users.length;
 
       return hasMetadata ? metadata : null;
     }
@@ -736,8 +795,21 @@
         return;
       }
 
-      if (!file.type.startsWith("image/")) {
-        uploadStatus.textContent = "Drop an image file, not another file type.";
+      if (!ALLOWED_IMAGE_TYPES.has(file.type.toLowerCase())) {
+        selectedFile = null;
+        selectedPhotoMetadata = null;
+        selectedFileText.textContent = "No picture selected";
+        imageFileInput.value = "";
+        uploadStatus.textContent = "Choose a PNG, JPEG, or WebP picture.";
+        return;
+      }
+
+      if (file.size > MAX_SOURCE_IMAGE_BYTES) {
+        selectedFile = null;
+        selectedPhotoMetadata = null;
+        selectedFileText.textContent = "No picture selected";
+        imageFileInput.value = "";
+        uploadStatus.textContent = "Choose a picture smaller than 25 MB.";
         return;
       }
 
@@ -1138,13 +1210,7 @@
       }
 
       loginForm.reset();
-      loginStatus.textContent = "";
-      setLoggedIn(true);
-      loadImages();
-      loadApprovals();
-      loadSnakeScores();
-      loadDungeonScores();
-      loadMarshyStatus();
+      await activateAdminSession();
     });
 
     logoutButton.addEventListener("click", async () => {
@@ -1222,16 +1288,11 @@
       loadImages();
     });
 
-    db.auth.getSession().then(({ data }) => {
-      const isLoggedIn = Boolean(data.session);
-      setLoggedIn(isLoggedIn);
+    db.auth.getSession().then(async ({ data }) => {
+      setLoggedIn(false);
 
-      if (isLoggedIn) {
-        loadImages();
-        loadApprovals();
-        loadSnakeScores();
-        loadDungeonScores();
-        loadMarshyStatus();
+      if (data.session) {
+        await activateAdminSession();
       }
     });
   </script>
