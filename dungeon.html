@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-Iix2HprncCv+gjK5+1uNT9f7IfmuRkIkKKZXY9ZynUw='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src 'none'; upgrade-insecure-requests">
+  <script src="security.js"></script>
   <title>marshymellow dungeon</title>
   <link rel="icon" href="assets/marshy-logo.png">
   <link rel="preconnect" href="https://hnqrptrfxxtuxhawyvge.supabase.co" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <style>
     @font-face {
       font-family: "gg sans";
@@ -478,7 +480,7 @@
 <body>
   <header class="site-header">
     <a class="brand" href="index.html" aria-label="MarshyMellow home">
-      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" onerror="this.hidden=true; this.nextElementSibling.style.display='inline';">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" data-fallback-action="hide-show-next">
       <span class="brand-text">marshymellow</span>
     </a>
     <nav class="nav-links" aria-label="Main navigation">
@@ -489,6 +491,7 @@
       <a href="headset.html">Headset</a>
       <a href="snake.html">Snake</a>
       <a href="dungeon.html" aria-current="page">Dungeon</a>
+      <a href="where-is-marshy.html">Where is Marshy?</a>
       <a href="donate.html">Pay Tribute</a>
     </nav>
   </header>
@@ -573,11 +576,12 @@
     <a href="donate.html">Pay Tribute</a>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
     const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SCORE_FINGERPRINT_KEY = "marshymellowScoreFingerprint";
     const canvas = document.querySelector("#dungeon-board");
     const ctx = canvas.getContext("2d");
     const scoreElement = document.querySelector("#score");
@@ -617,6 +621,19 @@
     let bestScore = Number(localStorage.getItem("marshymellowDungeonBest")) || 0;
 
     bestScoreElement.textContent = bestScore;
+
+    function getScoreFingerprint() {
+      let fingerprint = localStorage.getItem(SCORE_FINGERPRINT_KEY);
+
+      if (!fingerprint) {
+        fingerprint = crypto.randomUUID
+          ? crypto.randomUUID()
+          : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+        localStorage.setItem(SCORE_FINGERPRINT_KEY, fingerprint);
+      }
+
+      return fingerprint;
+    }
 
     function key(cell) {
       return `${cell.x},${cell.y}`;
@@ -1134,17 +1151,19 @@
       submitStatus.textContent = "Submitting score...";
 
       const { error } = await db
-        .from("dungeon_scores")
-        .insert({
-          name,
-          score: lastScore,
-          floor_reached: lastFloor
+        .rpc("submit_dungeon_score", {
+          player_name: name,
+          player_score: lastScore,
+          floor_reached: lastFloor,
+          visitor_fingerprint: getScoreFingerprint()
         });
 
       submitButton.disabled = false;
 
       if (error) {
-        submitStatus.textContent = "Could not submit score. Check the dungeon leaderboard table setup.";
+        submitStatus.textContent = error.message.includes("too_many_dungeon_scores")
+          ? "Too many score submissions. Please wait and try again."
+          : "Could not submit score. Check the dungeon leaderboard table setup.";
         return;
       }
 

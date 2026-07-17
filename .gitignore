@@ -1,0 +1,17 @@
+# Local Supabase link state
+supabase/.temp/
+supabase/.branches/
+
+# Local secrets and environment overrides
+.env
+.env.*
+!.env.example
+*.local
+
+# Generated deployment folders
+dist/
+_site/
+
+# Operating-system files
+.DS_Store
+Thumbs.db
