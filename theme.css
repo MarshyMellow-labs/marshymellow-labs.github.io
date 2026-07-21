@@ -704,3 +704,114 @@ html[data-theme="dark"] .nav-menu-toggle {
     transition: none;
   }
 }
+
+/* Shared live heart-rate badge */
+.site-heart-rate {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(255, 111, 174, 0.34);
+  border-radius: 999px;
+  color: #4a3653;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+  font-weight: 800;
+  gap: 5px;
+  min-height: 42px;
+  padding: 8px 12px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-heart-icon {
+  color: #ff4f9a;
+  font-size: 1.2rem;
+}
+
+.site-heart-rate[data-live="true"] .site-heart-icon {
+  animation: site-heart-beat 1.05s ease-in-out infinite;
+}
+
+.site-heart-value {
+  color: #d94486;
+  font-size: 1rem;
+}
+
+.site-heart-rate-floating {
+  position: fixed;
+  right: 72px;
+  top: 16px;
+  z-index: 30;
+}
+
+html[data-theme="dark"] .site-heart-rate {
+  background: rgba(27, 34, 51, 0.95);
+  border-color: rgba(255, 121, 181, 0.4);
+  color: #f8f1ff;
+}
+
+html[data-theme="dark"] .site-heart-value {
+  color: #ff91c2;
+}
+
+@keyframes site-heart-beat {
+  0%, 100% { transform: scale(1); }
+  18% { transform: scale(1.16); }
+  35% { transform: scale(1); }
+  52% { transform: scale(1.1); }
+}
+
+/* Marshy Zappy Zaps dark-mode contrast */
+html[data-theme="dark"][data-page="control-marshy"] {
+  --control-ink: #fff8ff;
+  --control-muted: #ded4e2;
+  --control-card: rgba(27, 34, 51, 0.94);
+  --control-line: rgba(255, 121, 181, 0.3);
+  --control-pink-dark: #ff91c2;
+  --control-purple: #b9a9ff;
+}
+
+html[data-theme="dark"][data-page="control-marshy"] :where(
+  .control-hero-copy,
+  .heart-card,
+  .control-card,
+  .request-panel,
+  .control-actions,
+  .control-rules
+) {
+  border-color: rgba(255, 121, 181, 0.28);
+}
+
+html[data-theme="dark"][data-page="control-marshy"] .action-card {
+  background: rgba(37, 45, 65, 0.96) !important;
+  border-color: rgba(255, 121, 181, 0.3) !important;
+  color: var(--control-ink) !important;
+}
+
+html[data-theme="dark"][data-page="control-marshy"] .extreme-action {
+  background: linear-gradient(145deg, rgba(52, 39, 61, 0.98), rgba(75, 38, 60, 0.95)) !important;
+}
+
+html[data-theme="dark"][data-page="control-marshy"] .safety-note {
+  background: rgba(92, 80, 34, 0.5);
+  border-color: rgba(244, 217, 111, 0.28);
+}
+
+
+@media (max-width: 720px) {
+  .site-heart-label {
+    display: none;
+  }
+
+  .site-heart-rate {
+    min-height: 40px;
+    padding-inline: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  html.nav-enhanced .site-header .brand-logo,
+  html.nav-enhanced .site-header .brand > img {
+    max-width: min(52vw, 190px) !important;
+  }
+}

@@ -5,6 +5,11 @@
     .replace(/\.html$/i, "") || "index";
   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
+  if (pageName === "snake" || pageName === "dungeon") {
+    window.location.replace("games.html#" + pageName);
+    return;
+  }
+
   function storedTheme() {
     try {
       return window.localStorage.getItem(storageKey);
@@ -94,16 +99,52 @@
       return;
     }
 
+    const legacyGameLinks = Array.from(
+      nav.querySelectorAll('a[href="snake.html"], a[href="dungeon.html"]')
+    );
+    let gamesLink = nav.querySelector('a[href="games.html"]');
+
+    if (!gamesLink) {
+      gamesLink = document.createElement("a");
+      gamesLink.href = "games.html";
+      gamesLink.textContent = "Games";
+      nav.insertBefore(
+        gamesLink,
+        nav.querySelector('a[href="where-is-marshy.html"]') || nav.firstChild
+      );
+    }
+
+    if (["games", "snake", "dungeon"].includes(pageName)) {
+      gamesLink.setAttribute("aria-current", "page");
+    }
+
+    legacyGameLinks.forEach(function (link) {
+      link.remove();
+    });
+
     if (!nav.querySelector('a[href="where-is-marshy.html"]')) {
       const statusLink = document.createElement("a");
-      const headsetLink = nav.querySelector('a[href="headset.html"]');
+      const tributeLink = nav.querySelector('a[href="donate.html"]');
       statusLink.href = "where-is-marshy.html";
       statusLink.textContent = "Where is Marshy?";
 
-      if (headsetLink) {
-        nav.insertBefore(statusLink, headsetLink);
+      if (tributeLink) {
+        nav.insertBefore(statusLink, tributeLink);
       } else {
         nav.append(statusLink);
+      }
+    }
+
+    if (!nav.querySelector('a[href="control-marshy.html"]')) {
+      const controlLink = document.createElement("a");
+      const tributeLink = nav.querySelector('a[href="donate.html"]');
+      controlLink.href = "control-marshy.html";
+      controlLink.textContent = "Marshy Zappy Zaps";
+
+      if (tributeLink) {
+        nav.insertBefore(controlLink, tributeLink);
+      } else {
+        nav.append(controlLink);
       }
     }
 
@@ -159,6 +200,74 @@
         setMenu(false);
       }
     });
+  }
+
+  function installHeartRate() {
+    const indicator = document.createElement("a");
+    const value = document.createElement("strong");
+    const header = document.querySelector(".site-header");
+    const nav = document.querySelector(".nav-links");
+    const endpoint = "https://hnqrptrfxxtuxhawyvge.supabase.co/rest/v1/rpc/get_marshy_control_state";
+    const publishableKey = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
+
+    indicator.className = "site-heart-rate";
+    indicator.href = "control-marshy.html";
+    indicator.setAttribute("aria-label", "Marshy's heart rate: checking");
+    indicator.setAttribute("aria-live", "polite");
+    indicator.innerHTML = '<span class="site-heart-icon" aria-hidden="true">♥</span><span class="site-heart-label">Marshy</span>';
+    value.className = "site-heart-value";
+    value.textContent = "—";
+    indicator.append(value, document.createTextNode(" BPM"));
+
+    if (header) {
+      header.insertBefore(indicator, nav || header.lastElementChild);
+    } else {
+      indicator.classList.add("site-heart-rate-floating");
+      document.body.append(indicator);
+    }
+
+    async function refreshHeartRate() {
+      if (document.hidden) {
+        return;
+      }
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            apikey: publishableKey,
+            Authorization: "Bearer " + publishableKey,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ control_session_id: null })
+        });
+
+        if (!response.ok) {
+          throw new Error("Heart-rate request failed");
+        }
+
+        const state = await response.json();
+        const live = state?.heart_rate_status === "live" && Number.isInteger(state?.heart_rate);
+        value.textContent = live ? String(state.heart_rate) : "—";
+        indicator.dataset.live = String(live);
+        indicator.setAttribute(
+          "aria-label",
+          live
+            ? "Marshy's heart rate: " + state.heart_rate + " beats per minute"
+            : "Marshy's heart rate is unavailable"
+        );
+        indicator.title = live ? state.heart_rate + " BPM" : "Heart rate unavailable";
+      } catch (error) {
+        value.textContent = "—";
+        indicator.dataset.live = "false";
+        indicator.setAttribute("aria-label", "Marshy's heart rate is unavailable");
+        indicator.title = "Heart rate unavailable";
+      }
+    }
+
+    refreshHeartRate();
+    window.setInterval(refreshHeartRate, 5000);
+    document.addEventListener("visibilitychange", refreshHeartRate);
   }
 
   function installScrollMotion() {
@@ -267,6 +376,7 @@
   }
 
   function initializeUi() {
+    installHeartRate();
     installToggle();
     installNavigation();
     installScrollMotion();

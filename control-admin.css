@@ -1,0 +1,276 @@
+.admin-discord-button {
+  background: #5865f2;
+  border-color: #5865f2;
+  color: white;
+}
+
+.control-admin-section {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.control-admin-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.control-admin-status-pill {
+  background: rgba(116, 101, 121, 0.1);
+  border: 1px solid rgba(116, 101, 121, 0.2);
+  border-radius: 999px;
+  color: #746579;
+  font-size: 0.86rem;
+  font-weight: 900;
+  padding: 8px 12px;
+}
+
+.control-admin-status-pill[data-state="ready"] {
+  background: rgba(59, 165, 121, 0.12);
+  border-color: rgba(59, 165, 121, 0.26);
+  color: #257253;
+}
+
+.control-admin-status-pill[data-state="stopped"],
+.control-admin-status-pill[data-state="offline"] {
+  background: rgba(217, 71, 94, 0.1);
+  border-color: rgba(217, 71, 94, 0.25);
+  color: #b72f48;
+}
+
+.control-admin-emergency {
+  background: rgba(255, 231, 235, 0.72);
+  border: 2px solid rgba(217, 71, 94, 0.22);
+  border-radius: 12px;
+  margin-top: 20px;
+  padding: 18px;
+}
+
+.control-admin-emergency p {
+  color: #746579;
+  margin: 6px 0 0;
+}
+
+.control-stop-button {
+  background: #d9475e;
+  border-color: #d9475e;
+  color: white;
+}
+
+.control-admin-telemetry {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.control-admin-telemetry span {
+  background: rgba(191, 233, 255, 0.3);
+  border: 1px solid rgba(255, 111, 174, 0.18);
+  border-radius: 10px;
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+}
+
+.control-admin-telemetry small {
+  color: #746579;
+  overflow-wrap: anywhere;
+}
+
+.control-settings-form {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 22px;
+}
+
+.control-settings-form fieldset {
+  align-content: start;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(255, 111, 174, 0.2);
+  border-radius: 12px;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  min-width: 0;
+  padding: 16px;
+}
+
+.control-settings-form fieldset:first-child {
+  grid-column: span 2;
+}
+
+.control-settings-form legend {
+  color: #ff6fae;
+  font-size: 1.12rem;
+  font-weight: 900;
+  padding: 0 6px;
+}
+
+.control-settings-form input[type="number"] {
+  border-radius: 10px;
+  min-width: 0;
+  width: 100%;
+}
+
+.control-check {
+  align-items: center;
+  background: rgba(191, 233, 255, 0.28);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  padding: 11px;
+}
+
+.control-check input {
+  accent-color: #ff6fae;
+  flex: 0 0 auto;
+  min-height: 20px;
+  width: 20px;
+}
+
+.control-form-note {
+  color: #746579;
+  font-size: 0.86rem;
+  margin: 0;
+}
+
+.control-form-wide {
+  grid-column: 1 / -1;
+}
+
+.control-admin-subsection {
+  border-top: 1px solid rgba(55, 40, 64, 0.12);
+  margin-top: 26px;
+  padding-top: 22px;
+}
+
+.control-admin-subsection h3 {
+  color: #372840;
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+.control-moderation-copy {
+  color: #746579;
+  margin: 5px 0 0;
+  max-width: 62ch;
+}
+
+.control-queue-card,
+.control-block-card,
+.control-user-card {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 111, 174, 0.2);
+  border-radius: 10px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 13px;
+}
+
+.control-queue-card p,
+.control-block-card p,
+.control-user-card p {
+  color: #746579;
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.control-queue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.control-user-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  max-width: 520px;
+}
+
+.control-timeout-control {
+  align-items: stretch;
+  display: flex;
+  gap: 6px;
+}
+
+.control-timeout-control select {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(55, 40, 64, 0.28);
+  border-radius: 999px;
+  color: #372840;
+  font: inherit;
+  font-weight: 800;
+  padding: 8px 30px 8px 11px;
+}
+
+.control-user-restriction {
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.control-user-restriction[data-state="blocked"] {
+  color: #b72f48;
+}
+
+.control-user-restriction[data-state="timed-out"] {
+  color: #8a5a13;
+}
+
+.control-block-button {
+  border-color: rgba(217, 71, 94, 0.46);
+  color: #b72f48;
+}
+
+.control-empty-state {
+  color: #746579;
+  font-style: italic;
+  margin: 0;
+  padding: 10px 0;
+}
+
+@media (max-width: 860px) {
+  .control-admin-telemetry,
+  .control-settings-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .control-settings-form fieldset:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .control-admin-telemetry,
+  .control-settings-form {
+    grid-template-columns: 1fr;
+  }
+
+  .control-settings-form fieldset:first-child,
+  .control-form-wide {
+    grid-column: auto;
+  }
+
+  .control-queue-card,
+  .control-block-card,
+  .control-user-card {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .control-queue-actions,
+  .control-user-actions {
+    justify-content: flex-start;
+  }
+}

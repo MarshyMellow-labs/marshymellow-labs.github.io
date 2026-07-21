@@ -140,12 +140,19 @@
       text-transform: uppercase;
     }
 
-    h1 {
-      color: var(--berry);
-      font-size: clamp(3rem, 8vw, 6.8rem);
-      line-height: 0.94;
-      margin: 0;
-      text-shadow: 4px 4px 0 rgba(255, 240, 168, 0.96);
+    .where-title {
+      aspect-ratio: 2.25 / 1;
+      margin: 8px auto 0;
+      max-width: 900px;
+      overflow: hidden;
+    }
+
+    .where-title img {
+      display: block;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 45%;
+      width: 100%;
     }
 
     .intro {
@@ -437,8 +444,8 @@
       }
     }
   </style>
-  <script src="theme.js"></script>
-  <link rel="stylesheet" href="theme.css">
+  <script src="theme.js?v=20260720-1"></script>
+  <link rel="stylesheet" href="theme.css?v=20260720-1">
 </head>
 <body>
   <header class="site-header">
@@ -452,8 +459,7 @@
       <a href="index.html#tos">Marshys TOS</a>
       <a href="approved.html">Approved</a>
       <a href="headset.html">Headset</a>
-      <a href="snake.html">Snake</a>
-      <a href="dungeon.html">Dungeon</a>
+      <a href="games.html">Games</a>
       <a href="where-is-marshy.html" aria-current="page">Where is Marshy?</a>
       <a href="donate.html">Pay Tribute</a>
     </nav>
@@ -463,7 +469,9 @@
     <section class="where-shell" aria-labelledby="where-title">
       <header class="title-block">
         <p class="eyebrow">Live VRChat status</p>
-        <h1 id="where-title">Where is Marshy?</h1>
+        <h1 class="where-title" id="where-title">
+          <img src="assets/marshy-where-is-title.png" alt="Where is Marshy?" decoding="async" fetchpriority="high">
+        </h1>
         <p class="intro">A tiny location beacon with sensible privacy rules.</p>
       </header>
 

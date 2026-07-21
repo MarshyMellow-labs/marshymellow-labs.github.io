@@ -1,11 +1,21 @@
-Put the marshymellow site images in this folder using these filenames:
+Marshymellow website assets:
 
+- about-title.png
+- admin-title.png
+- approved-title.png
+- dungeon-title.png
+- marshy-donate.jpg
+- marshy-hero.jpg
+- marshy-index-cooling.jpg
+- marshy-index-hero.jpg
+- marshy-index-inside.jpg
+- marshy-index-optics.jpg
+- marshy-index-sensors.jpg
 - marshy-logo.png
-- marshy-hero.png
-- marshy-friends.png
-- marshy-closeup.png
-- marshy-selfie.png
-- marshy-portrait.png
-- marshy-donate.png
-
-The website falls back to the old online images if these files are missing.
+- marshy-valve-index-title.png
+- marshy-where-is-title.png
+- marshy-zappy-zaps-title.png
+- pay-tribute-title.png
+- pictures-title.png
+- snake-title.png
+- tos-title.png

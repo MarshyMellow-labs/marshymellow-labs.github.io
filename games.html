@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js; script-src-attr 'none'; style-src 'self'; font-src 'self'; img-src 'self'; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests">
+  <script src="security.js"></script>
+  <title>MarshyMellow Games</title>
+  <link rel="icon" href="assets/marshy-logo.png">
+  <link rel="preconnect" href="https://hnqrptrfxxtuxhawyvge.supabase.co" crossorigin>
+  <link rel="stylesheet" href="games.css?v=20260720-2">
+  <link rel="stylesheet" href="theme.css?v=20260720-1">
+  <script src="theme.js?v=20260720-1"></script>
+</head>
+<body class="games-page">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="MarshyMellow home">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" data-fallback-action="hide-show-next">
+      <span class="brand-text">marshymellow</span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="index.html#about">About</a>
+      <a href="index.html#pictures">Pictures</a>
+      <a href="index.html#tos">Marshys TOS</a>
+      <a href="approved.html">Approved</a>
+      <a href="headset.html">Headset</a>
+      <a href="games.html" aria-current="page">Games</a>
+      <a href="where-is-marshy.html">Where is Marshy?</a>
+      <a href="control-marshy.html">Marshy Zappy Zaps</a>
+      <a href="donate.html">Pay Tribute</a>
+    </nav>
+  </header>
+
+  <main class="games-shell">
+    <header class="games-heading">
+      <p class="games-eyebrow">Pick your distraction</p>
+      <h1>MarshyMellow Games</h1>
+      <p>Choose a snack chase or a tiny pastel dungeon crawl.</p>
+    </header>
+
+    <div class="game-tabs" role="tablist" aria-label="Choose a game">
+      <button type="button" role="tab" id="snake-tab" aria-controls="snake-game-root" data-game-tab="snake">
+        <img src="assets/snake-title.png" alt="Snake">
+      </button>
+      <button type="button" role="tab" id="dungeon-tab" aria-controls="dungeon-game-root" data-game-tab="dungeon">
+        <img src="assets/dungeon-title.png" alt="Dungeon">
+      </button>
+    </div>
+
+<section class="embedded-game game-shell" id="snake-game-root" data-game-root="snake" data-game-panel="snake" role="tabpanel" aria-labelledby="snake-tab">
+      <div class="game-copy">
+        <h1 id="snake-game-title">
+          <img class="snake-title-image" src="assets/snake-title.png" alt="Snake!" decoding="async">
+        </h1>
+        <p class="intro">A tiny candy-blue snack chase for anyone trapped on MarshyMellow's website.</p>
+      </div>
+
+      <section class="game-panel" aria-label="Snake game">
+        <div class="score-row">
+          <div class="score-box">
+            <span>Score</span>
+            <strong id="snake-score">0</strong>
+          </div>
+          <div class="score-box">
+            <span>Best</span>
+            <strong id="snake-best-score">0</strong>
+          </div>
+          <div class="score-box">
+            <span>Status</span>
+            <strong id="snake-status-label">Ready</strong>
+          </div>
+        </div>
+
+        <div class="board-wrap">
+          <canvas id="snake-snake-board" width="560" height="560" aria-label="Snake game board"></canvas>
+        </div>
+
+        <div class="game-actions">
+          <button class="primary" type="button" id="snake-start-button">Start</button>
+          <button type="button" id="snake-pause-button">Pause</button>
+          <button type="button" id="snake-restart-button">Restart</button>
+        </div>
+
+        <div class="d-pad" aria-label="Movement controls">
+          <button class="up" type="button" data-direction="up" aria-label="Move up">↑</button>
+          <button class="left" type="button" data-direction="left" aria-label="Move left">←</button>
+          <button class="right" type="button" data-direction="right" aria-label="Move right">→</button>
+          <button class="down" type="button" data-direction="down" aria-label="Move down">↓</button>
+        </div>
+
+        <p class="game-status" id="snake-game-status" aria-live="polite">Ready</p>
+
+        <form class="score-submit" id="snake-score-submit" hidden>
+          <label for="snake-player-name">Submit last score: <strong id="snake-final-score">0</strong></label>
+          <div class="score-submit-row">
+            <input id="snake-player-name" type="text" maxlength="32" autocomplete="nickname" placeholder="Your name">
+            <button class="primary" type="submit">Submit</button>
+          </div>
+          <p class="submit-status" id="snake-submit-status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="leaderboard-panel" aria-labelledby="snake-leaderboard-title">
+        <h2 id="snake-leaderboard-title">Leaderboard</h2>
+        <ol class="leaderboard-list" id="snake-leaderboard-list"></ol>
+        <p class="leaderboard-empty" id="snake-leaderboard-empty">No scores yet.</p>
+      </section>
+    </section>
+
+<section class="embedded-game dungeon-shell" id="dungeon-game-root" data-game-root="dungeon" data-game-panel="dungeon" role="tabpanel" aria-labelledby="dungeon-tab" hidden>
+      <div class="game-copy">
+        <h1 id="dungeon-game-title">
+          <img class="dungeon-title-image" src="assets/dungeon-title.png" alt="Marshy Dungeon" decoding="async">
+        </h1>
+        <p class="intro">A tiny pastel dungeon crawl. Collect snacks, bonk paperwork blobs, and reach the exit before Marshy's patience runs out.</p>
+        <div class="legend" aria-label="Game legend">
+          <span><strong>Pink</strong> is Marshy</span>
+          <span><strong>Yellow</strong> snacks score points</span>
+          <span><strong>Blue</strong> drinks heal patience</span>
+          <span><strong>Purple</strong> blobs are trouble</span>
+        </div>
+      </div>
+
+      <section class="game-panel" aria-label="Marshy dungeon game">
+        <div class="score-row">
+          <div class="score-box">
+            <span>Score</span>
+            <strong id="dungeon-score">0</strong>
+          </div>
+          <div class="score-box">
+            <span>Best</span>
+            <strong id="dungeon-best-score">0</strong>
+          </div>
+          <div class="score-box">
+            <span>Floor</span>
+            <strong id="dungeon-floor">1</strong>
+          </div>
+          <div class="score-box">
+            <span>Patience</span>
+            <strong id="dungeon-hp">5</strong>
+          </div>
+        </div>
+
+        <div class="board-wrap">
+          <canvas id="dungeon-dungeon-board" width="600" height="600" aria-label="Dungeon game board"></canvas>
+        </div>
+
+        <div class="game-actions">
+          <button class="primary" type="button" id="dungeon-new-run-button">New run</button>
+          <button type="button" id="dungeon-new-floor-button">New floor</button>
+        </div>
+
+        <div class="d-pad" aria-label="Movement controls">
+          <button class="up" type="button" data-direction="up" aria-label="Move up">&uarr;</button>
+          <button class="left" type="button" data-direction="left" aria-label="Move left">&larr;</button>
+          <button class="right" type="button" data-direction="right" aria-label="Move right">&rarr;</button>
+          <button class="down" type="button" data-direction="down" aria-label="Move down">&darr;</button>
+        </div>
+
+        <p class="game-status" id="dungeon-game-status" aria-live="polite">Find the exit door.</p>
+
+        <form class="score-submit" id="dungeon-score-submit" hidden>
+          <label for="dungeon-player-name">Submit last dungeon score: <strong id="dungeon-final-score">0</strong></label>
+          <div class="score-submit-row">
+            <input id="dungeon-player-name" type="text" maxlength="32" autocomplete="nickname" placeholder="Your name">
+            <button class="primary" type="submit">Submit</button>
+          </div>
+          <p class="submit-status" id="dungeon-submit-status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="leaderboard-panel" aria-labelledby="dungeon-leaderboard-title">
+        <h2 id="dungeon-leaderboard-title">Dungeon leaderboard</h2>
+        <ol class="leaderboard-list" id="dungeon-leaderboard-list"></ol>
+        <p class="leaderboard-empty" id="dungeon-leaderboard-empty">No scores yet.</p>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-copy">
+      <span>MarshyMellow &#9825; &trade; 2026</span>
+      <span class="ai-credit">Made with AI bullshittery.</span>
+      <span class="ai-credit">Discord: marshymellow</span>
+    </div>
+    <a href="index.html">Back home</a>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="snake-game.js?v=20260720-1"></script>
+  <script src="dungeon-game.js?v=20260720-1"></script>
+  <script src="games.js?v=20260720-2"></script>
+</body>
+</html>

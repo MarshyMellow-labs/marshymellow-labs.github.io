@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-FOKU8FIU8j3+jNh/UM4zD8owpz8DugQVdcN/vGDj18A='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' blob: https://hnqrptrfxxtuxhawyvge.supabase.co; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co; frame-src 'none'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-V+EWoFOTBk8/T9uQk2smoSK2m7Qa+5qLXfu7ky/fv0w=' 'sha256-FOKU8FIU8j3+jNh/UM4zD8owpz8DugQVdcN/vGDj18A='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' blob: https://hnqrptrfxxtuxhawyvge.supabase.co; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co; frame-src 'none'; upgrade-insecure-requests">
   <script src="security.js"></script>
   <title>marshymellow admin</title>
   <link rel="icon" href="assets/marshy-logo.png">
@@ -375,8 +375,9 @@
 
     }
   </style>
-  <script src="theme.js"></script>
-  <link rel="stylesheet" href="theme.css">
+  <script src="theme.js?v=20260720-1"></script>
+  <link rel="stylesheet" href="theme.css?v=20260720-1">
+  <link rel="stylesheet" href="control-admin.css?v=20260721-1">
 </head>
 <body>
   <header class="site-header">
@@ -393,7 +394,7 @@
         <h1 id="admin-title">
           <img class="admin-title-image" src="assets/admin-title.png" alt="Admin" decoding="async">
         </h1>
-        <p class="intro">Log in with your Supabase account, upload a picture, and it will appear on the public gallery.</p>
+        <p class="intro">Log in with Discord to manage Marshy Zappy Zaps, location privacy, pictures, approvals, and game scores.</p>
       </div>
 
       <section class="panel" id="login-panel">
@@ -407,7 +408,8 @@
             <input id="login-password" type="password" autocomplete="current-password" required>
           </label>
           <div class="actions">
-            <button class="primary" type="submit">Log in</button>
+            <button class="admin-discord-button" type="button" id="admin-discord-login">Log in with Discord</button>
+            <button type="submit">Use admin email</button>
           </div>
           <p class="status" id="login-status" aria-live="polite"></p>
         </form>
@@ -427,6 +429,151 @@
           <p class="status" id="status-admin-message" aria-live="polite"></p>
         </section>
 
+        <section class="admin-section control-admin-section" id="control-admin-section" aria-labelledby="control-admin-title">
+          <div class="control-admin-heading">
+            <div>
+              <h2 id="control-admin-title">Marshy Zappy Zaps</h2>
+              <p class="status-admin-summary">Manage the public queue, tier prices, Pulsoid sharing, and emergency state.</p>
+            </div>
+            <span class="control-admin-status-pill" id="control-admin-status-pill">Checking companion…</span>
+          </div>
+
+          <div class="control-admin-emergency">
+            <strong>Emergency controls</strong>
+            <p>Stop disarms the website, asks the local companion to end any operation, clears the queue, and refunds tokens.</p>
+            <div class="actions">
+              <button class="control-stop-button" type="button" id="control-stop-button">Stop now &amp; clear queue</button>
+              <button type="button" id="control-reset-stop-button">Reset stop</button>
+            </div>
+          </div>
+
+          <div class="control-admin-telemetry" id="control-admin-telemetry">
+            <span><strong>Companion</strong><small id="control-companion-state">Unknown</small></span>
+            <span><strong>PiShock</strong><small id="control-pishock-state">Unknown</small></span>
+            <span><strong>Local arm</strong><small id="control-arm-state">Unknown</small></span>
+            <span><strong>Pulsoid</strong><small id="control-pulsoid-state">Unknown</small></span>
+            <span><strong>Heart rate</strong><small id="control-heart-rate-state">Hidden</small></span>
+          </div>
+
+          <form id="control-settings-form" class="control-settings-form">
+            <fieldset>
+              <legend>Session</legend>
+              <label class="control-check">
+                <input id="control-enabled" type="checkbox">
+                Accept public requests
+              </label>
+              <label class="control-check">
+                <input id="control-share-heart-rate" type="checkbox">
+                Show my current Pulsoid heart rate publicly
+              </label>
+              <label>
+                Cooldown seconds (minimum 1)
+                <input id="control-cooldown" type="number" min="1" max="600" step="1" required>
+              </label>
+              <label>
+                Queue limit
+                <input id="control-queue-limit" type="number" min="1" max="50" step="1" required>
+              </label>
+              <label>
+                Request lifetime (seconds)
+                <input id="control-request-ttl" type="number" min="60" max="900" step="1" required>
+              </label>
+              <label>
+                Minimum Discord account age (days)
+                <input id="control-discord-age" type="number" min="0" max="3650" step="1" required>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Vibrate</legend>
+              <label>
+                Strength % on half-scale (100 = half maximum)
+                <input id="control-vibrate-percent" type="number" min="1" max="100" step="1" required>
+              </label>
+              <label>
+                Duration ms
+                <input id="control-vibrate-duration" type="number" min="100" max="1000" step="100" required>
+              </label>
+              <p class="control-form-note">Vibrate remains free but uses the global queue and cooldown.</p>
+            </fieldset>
+
+            <fieldset>
+              <legend>Low</legend>
+              <label>
+                % on half-scale (100 = half maximum)
+                <input id="control-low-percent" type="number" min="1" max="100" step="1" required>
+              </label>
+              <label>
+                Token cost
+                <input id="control-low-cost" type="number" min="1" max="300" step="1" required>
+              </label>
+              <label>
+                Duration ms
+                <input id="control-low-duration" type="number" min="100" max="1000" step="100" required>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>High</legend>
+              <label>
+                % on half-scale (100 = half maximum)
+                <input id="control-high-percent" type="number" min="1" max="100" step="1" required>
+              </label>
+              <label>
+                Token cost
+                <input id="control-high-cost" type="number" min="1" max="300" step="1" required>
+              </label>
+              <label>
+                Duration ms
+                <input id="control-high-duration" type="number" min="100" max="1000" step="100" required>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Extreme</legend>
+              <label>
+                % on half-scale (100 = half maximum)
+                <input id="control-extreme-percent" type="number" min="1" max="100" step="1" required>
+              </label>
+              <label>
+                Token cost
+                <input id="control-extreme-cost" type="number" min="1" max="300" step="1" required>
+              </label>
+              <label>
+                Duration ms
+                <input id="control-extreme-duration" type="number" min="100" max="1000" step="100" required>
+              </label>
+              <p class="control-form-note">Extreme 100 uses half of the private local maximum.</p>
+            </fieldset>
+
+            <p class="control-form-note control-form-wide">Website percentages use a half-scale: each displayed 1% equals 0.5% of the separate maximum configured locally. Roulette alone may reach 200%, which equals that local maximum. This page cannot raise the local maximum. Marshy Token balances are always capped at 300.</p>
+            <div class="actions control-form-wide">
+              <button class="primary" type="submit">Save control settings</button>
+            </div>
+            <p class="status control-form-wide" id="control-admin-message" aria-live="polite"></p>
+          </form>
+
+          <section class="control-admin-subsection" aria-labelledby="control-queue-title">
+            <h3 id="control-queue-title">Live queue</h3>
+            <div class="admin-list" id="control-admin-queue"></div>
+          </section>
+
+          <section class="control-admin-subsection" aria-labelledby="control-blocks-title">
+            <h3 id="control-blocks-title">Permanently blocked users</h3>
+            <div class="admin-list" id="control-admin-blocks"></div>
+          </section>
+
+          <section class="control-admin-subsection" aria-labelledby="control-audit-title">
+            <div class="control-admin-heading">
+              <div>
+                <h3 id="control-audit-title">Recent request users</h3>
+                <p class="control-moderation-copy">One row per Discord account that sent a Zappy request. Temporarily time them out or block them permanently.</p>
+              </div>
+              <button type="button" id="control-refresh-audit">Refresh</button>
+            </div>
+            <div class="admin-list control-user-list" id="control-admin-audit"></div>
+          </section>
+        </section>
         <form id="upload-form">
           <label>
             Picture title (optional)
@@ -1296,5 +1443,6 @@
       }
     });
   </script>
+  <script src="control-admin.js?v=20260721-3"></script>
 </body>
 </html>

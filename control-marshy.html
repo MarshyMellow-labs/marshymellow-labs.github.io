@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co; frame-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests">
+  <script src="security.js"></script>
+  <title>Marshy Zappy Zaps</title>
+  <link rel="icon" href="assets/marshy-logo.png">
+  <link rel="preconnect" href="https://hnqrptrfxxtuxhawyvge.supabase.co" crossorigin>
+  <link rel="stylesheet" href="theme.css?v=20260720-1">
+  <link rel="stylesheet" href="control-marshy.css?v=20260721-6">
+  <script src="theme.js?v=20260720-1"></script>
+</head>
+<body class="control-page">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="MarshyMellow home">
+      <img class="brand-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" data-fallback-action="hide-show-next">
+      <span class="brand-text">marshymellow</span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="index.html#about">About</a>
+      <a href="index.html#pictures">Pictures</a>
+      <a href="approved.html">Approved</a>
+      <a href="headset.html">Headset</a>
+      <a href="games.html">Games</a>
+      <a href="where-is-marshy.html">Where is Marshy?</a>
+      <a href="control-marshy.html" aria-current="page">Marshy Zappy Zaps</a>
+      <a href="donate.html">Pay Tribute</a>
+    </nav>
+  </header>
+
+  <main class="control-shell">
+    <section class="control-hero" aria-labelledby="control-title">
+      <div class="control-hero-copy">
+        <p class="control-kicker">Marshy Zappy Zap control panel</p>
+        <h1 class="control-title" id="control-title">
+          <img src="assets/marshy-zappy-zaps-title.png" alt="Marshy Zappy Zaps" decoding="async">
+        </h1>
+        <p class="control-intro">Earn one Marshy Token each second this page is active, then spend them on zappy requests.</p>
+        <div class="control-status-line">
+          <span class="control-status-dot" id="device-status-dot" aria-hidden="true"></span>
+          <strong id="device-status">Checking Marshy's controller…</strong>
+          <span id="cooldown-status"></span>
+        </div>
+      </div>
+
+      <aside class="heart-card" aria-live="polite">
+        <span class="heart-icon" aria-hidden="true">♥</span>
+        <span class="heart-label">Marshy's heart rate</span>
+        <strong class="heart-value" id="heart-rate">—</strong>
+        <span class="heart-state" id="heart-rate-status">Checking Pulsoid…</span>
+      </aside>
+    </section>
+
+    <section class="control-dashboard" aria-label="Marshy control dashboard">
+      <article class="control-card account-card">
+        <div>
+          <p class="card-eyebrow">Discord account</p>
+          <h2 id="account-name">Sign in to earn tokens</h2>
+          <p id="account-copy">Discord gives each visitor one identity, one wallet, and one place in the queue.</p>
+        </div>
+        <button class="discord-button" id="discord-login" type="button">Continue with Discord</button>
+        <button class="quiet-button" id="discord-logout" type="button" hidden>Log out</button>
+      </article>
+
+      <article class="control-card token-card">
+        <div class="token-heading">
+          <div>
+            <p class="card-eyebrow">Your wallet</p>
+            <h2>Marshy Tokens</h2>
+          </div>
+          <strong class="token-value"><span id="token-count">0</span><small>/300</small></strong>
+        </div>
+        <div class="token-meter" role="progressbar" aria-label="Marshy Token balance" aria-valuemin="0" aria-valuemax="300" aria-valuenow="0" id="token-meter">
+          <span id="token-meter-fill"></span>
+        </div>
+        <p class="token-earning" id="token-earning">Sign in with Discord to begin earning.</p>
+      </article>
+
+      <article class="control-card queue-card">
+        <div>
+          <p class="card-eyebrow">Global queue</p>
+          <h2><span id="queue-count">0</span> waiting</h2>
+          <p id="queue-copy">The global queue cooldown can be as short as 1 second.</p>
+        </div>
+        <span class="queue-badge" id="queue-badge">Queue open</span>
+      </article>
+    </section>
+
+    <section class="request-panel" id="request-panel" hidden aria-labelledby="request-title">
+      <div>
+        <p class="card-eyebrow">Your request</p>
+        <h2 id="request-title">Waiting in the queue</h2>
+        <p id="request-copy"></p>
+      </div>
+      <button class="quiet-button" id="cancel-request" type="button">Cancel and refund</button>
+    </section>
+
+    <section class="control-actions" aria-labelledby="actions-title">
+      <div class="section-heading">
+        <div>
+          <p class="control-kicker">Choose one</p>
+          <h2 id="actions-title">Send Marshy a Zap</h2>
+        </div>
+        <p>Only one request per person may be queued at a time. Costs and strengths are calculated by the server.</p>
+      </div>
+
+      <article class="roulette-panel" aria-labelledby="roulette-title">
+        <div class="roulette-stage">
+          <span class="roulette-pointer" aria-hidden="true"></span>
+          <canvas class="roulette-wheel" id="roulette-wheel" width="360" height="360" aria-hidden="true"></canvas>
+        </div>
+        <div class="roulette-copy">
+          <p class="control-kicker">Feeling lucky?</p>
+          <h3 id="roulette-title">Zappy Roulette</h3>
+          <p>Spend 100 Marshy Tokens and let the server choose one of 22 equal slots.</p>
+          <ul class="roulette-odds" aria-label="Roulette outcomes">
+            <li><strong>11</strong> Vibey!</li>
+            <li><strong>5</strong> 50% Zappy!</li>
+            <li><strong>3</strong> 75% Zappy!!</li>
+            <li><strong>2</strong> 100% Zappy!!!</li>
+            <li><strong>1</strong> 200% MEGA ZAPPY!!!!</li>
+          </ul>
+          <button class="roulette-button" id="roulette-spin" type="button" disabled>
+            Spin for 100 tokens
+          </button>
+          <button class="roulette-use-button" id="roulette-use" type="button" hidden>
+            Send my zappies!
+          </button>
+          <p class="roulette-result" id="roulette-result" aria-live="polite">The result is selected securely when you spin.</p>
+        </div>
+      </article>
+
+      <div class="action-grid">
+        <button class="action-card vibrate-action" type="button" data-control-action="vibrate" disabled>
+          <span class="action-icon" aria-hidden="true">〰</span>
+          <span class="action-name">Vibrate</span>
+          <span class="action-description">A free vibration with the same global cooldown.</span>
+          <span class="action-cost"><strong data-cost-for="vibrate">Free</strong></span>
+        </button>
+
+        <button class="action-card low-action" type="button" data-control-action="low" disabled>
+          <span class="action-icon" aria-hidden="true">⚡</span>
+          <span class="action-name">Low Zap</span>
+          <span class="action-description"><span data-percent-for="low">33</span>%</span>
+          <span class="action-cost"><strong data-cost-for="low">100</strong> tokens</span>
+        </button>
+
+        <button class="action-card high-action" type="button" data-control-action="high" disabled>
+          <span class="action-icon" aria-hidden="true">⚡⚡</span>
+          <span class="action-name">High Zap</span>
+          <span class="action-description"><span data-percent-for="high">66</span>%</span>
+          <span class="action-cost"><strong data-cost-for="high">200</strong> tokens</span>
+        </button>
+
+        <button class="action-card extreme-action" type="button" data-control-action="extreme" disabled>
+          <span class="action-icon" aria-hidden="true">⚡⚡⚡</span>
+          <span class="action-name">Extreme Zap</span>
+          <span class="action-description"><span data-percent-for="extreme">100</span>%</span>
+          <span class="action-cost"><strong data-cost-for="extreme">300</strong> tokens</span>
+        </button>
+      </div>
+
+      <p class="control-message" id="control-message" aria-live="polite"></p>
+    </section>
+
+    <section class="control-rules" aria-labelledby="rules-title">
+      <div>
+        <p class="control-kicker">How it stays fair</p>
+        <h2 id="rules-title">One visitor, one wallet, one request</h2>
+      </div>
+      <ul>
+        <li>Your balance stops at 300 tokens, even if the page stays open.</li>
+        <li>Only one active page earns for a Discord account at a time.</li>
+        <li>Closing or hiding the page stops earning and expires queued requests.</li>
+        <li>Disconnects, emergency stops, and cancelled requests automatically return spent tokens.</li>
+      </ul>
+      <p class="safety-note">Every result remains capped by Marshy's private local safety maximum.</p>
+    </section>
+  </main>
+
+  <footer>
+    <span>MarshyMellow Labs</span>
+    <a href="index.html">Home</a>
+    <a href="where-is-marshy.html">Where is Marshy?</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="control-marshy.js?v=20260721-8"></script>
+</body>
+</html>
