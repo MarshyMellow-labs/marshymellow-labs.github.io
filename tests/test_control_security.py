@@ -85,7 +85,7 @@ class ControlMarshySecurityTests(unittest.TestCase):
 
     def test_control_scripts_use_cache_busting_versions(self):
         self.assertIn('src="control-marshy.js?v=20260721-8"', self.page)
-        self.assertIn('src="control-admin.js?v=20260721-3"', self.admin_page)
+        self.assertIn('src="control-admin.js?v=20260721-4"', self.admin_page)
         self.assertIn('href="control-admin.css?v=20260721-1"', self.admin_page)
         self.assertIn('href="control-marshy.css?v=20260721-6"', self.page)
 
@@ -353,6 +353,11 @@ class ControlMarshySecurityTests(unittest.TestCase):
         self.assertNotIn("admin_get_marshy_control_audit", self.admin_script)
         self.assertNotIn("JSON.stringify(entry.details", self.admin_script)
         self.assertIn("Recent request users", self.admin_page)
+        self.assertIn("usr_[a-z0-9-]{8,}", self.admin_script)
+        self.assertNotIn("usr_[a-z0-9-]{8,}\\s*\\)\\s*$/i", self.admin_script)
+        self.assertIn("\\u200b-\\u200d\\ufeff", self.admin_script.lower())
+        self.assertIn("title.textContent = username", self.admin_script)
+        self.assertIn("setUserBlock(entry.user_id", self.admin_script)
 
     def test_admin_refresh_preserves_unsaved_control_settings(self):
         self.assertIn("let formDirty = false;", self.admin_script)

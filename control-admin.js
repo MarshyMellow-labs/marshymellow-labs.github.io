@@ -116,11 +116,15 @@
   function displayDiscordName(value) {
     const cleaned = typeof value === "string" ? value.trim() : "";
     const withoutInternalId = cleaned.replace(
-      /\s*\(\s*usr_[a-z0-9-]{8,}\s*\)\s*$/i,
+      /(?:\s*[([]\s*)?usr_[a-z0-9-]{8,}(?:\s*[)\]])?/gi,
       ""
-    ).trim();
+    )
+      .replace(/\s{2,}/g, " ")
+      .replace(/[\u200b-\u200d\ufeff]/gi, "")
+      .replace(/[()[\]\s]+$/g, "")
+      .trim();
 
-    if (!withoutInternalId || /^usr_[a-z0-9-]{8,}$/i.test(withoutInternalId)) {
+    if (!withoutInternalId) {
       return "Discord user";
     }
 
