@@ -1,8 +1,0 @@
-/*
-  Content-Security-Policy: default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-V+EWoFOTBk8/T9uQk2smoSK2m7Qa+5qLXfu7ky/fv0w=' 'sha256-FOKU8FIU8j3+jNh/UM4zD8owpz8DugQVdcN/vGDj18A=' 'sha256-HjEvAKtG2WppP0TvbU/RYjGBxXm4ivTrw/4vp7kXAFg=' 'sha256-Iix2HprncCv+gjK5+1uNT9f7IfmuRkIkKKZXY9ZynUw=' 'sha256-Lmewpv6bv4xQq5IkGYJPqGW0t+y6KO6J7UyDjp3ZFQ0=' 'sha256-YB9cDKSxb840/gdA8QgjnhixFXcMz3I6khUMs4Ge69c=' 'sha256-f+zoOHWimc8R+PjZXIGsWCzcf8xhNjIxb5V625Z5iaw=' 'sha256-S4gbP+xils0xoBNY6TxOD/ktTETbpvjoy9mjxNFoyT0='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' blob: https://hnqrptrfxxtuxhawyvge.supabase.co https://images.unsplash.com; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src https://docs.google.com https://ko-fi.com; frame-ancestors 'none'; upgrade-insecure-requests
-  Cross-Origin-Opener-Policy: same-origin-allow-popups
-  Permissions-Policy: camera=(), geolocation=(), microphone=(), usb=(), payment=(self "https://ko-fi.com")
-  Referrer-Policy: strict-origin-when-cross-origin
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  X-Permitted-Cross-Domain-Policies: none

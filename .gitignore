@@ -5,6 +5,16 @@
 __pycache__/
 *.py[cod]
 
+# Development-only files excluded from the public GitHub Pages tree
+companion/
+supabase/
+tests/
+MARSHY-STATUS-SETUP.md
+supabase-gallery-metadata.sql
+supabase-marshy-status.sql
+assets/README.txt
+_headers
+
 # Local Supabase link state
 supabase/.temp/
 supabase/.branches/
