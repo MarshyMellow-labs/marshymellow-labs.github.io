@@ -110,7 +110,7 @@
       gamesLink.textContent = "Games";
       nav.insertBefore(
         gamesLink,
-        nav.querySelector('a[href="where-is-marshy.html"]') || nav.firstChild
+        nav.querySelector('a[href="control-marshy.html"]') || nav.querySelector('a[href="donate.html"]') || nav.firstChild
       );
     }
 
@@ -121,19 +121,6 @@
     legacyGameLinks.forEach(function (link) {
       link.remove();
     });
-
-    if (!nav.querySelector('a[href="where-is-marshy.html"]')) {
-      const statusLink = document.createElement("a");
-      const tributeLink = nav.querySelector('a[href="donate.html"]');
-      statusLink.href = "where-is-marshy.html";
-      statusLink.textContent = "Where is Marshy?";
-
-      if (tributeLink) {
-        nav.insertBefore(statusLink, tributeLink);
-      } else {
-        nav.append(statusLink);
-      }
-    }
 
     if (!nav.querySelector('a[href="control-marshy.html"]')) {
       const controlLink = document.createElement("a");
@@ -203,13 +190,19 @@
   }
 
   function installHeartRate() {
+    const group = document.createElement("div");
     const indicator = document.createElement("a");
     const value = document.createElement("strong");
+    const location = document.createElement("span");
+    const locationLabel = document.createElement("span");
+    const locationCount = document.createElement("strong");
     const header = document.querySelector(".site-header");
     const nav = document.querySelector(".nav-links");
-    const endpoint = "https://hnqrptrfxxtuxhawyvge.supabase.co/rest/v1/rpc/get_marshy_control_state";
+    const heartEndpoint = "https://hnqrptrfxxtuxhawyvge.supabase.co/rest/v1/rpc/get_marshy_control_state";
+    const statusEndpoint = "https://hnqrptrfxxtuxhawyvge.supabase.co/rest/v1/rpc/get_public_marshy_summary";
     const publishableKey = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
 
+    group.className = "site-live-status";
     indicator.className = "site-heart-rate";
     indicator.href = "control-marshy.html";
     indicator.setAttribute("aria-label", "Marshy's heart rate: checking");
@@ -218,13 +211,30 @@
     value.className = "site-heart-value";
     value.textContent = "—";
     indicator.append(value, document.createTextNode(" BPM"));
+    location.className = "site-location-status";
+    location.dataset.state = "unknown";
+    location.setAttribute("aria-label", "Marshy's location: checking");
+    location.setAttribute("aria-live", "polite");
+    location.innerHTML = '<span class="site-location-icon" aria-hidden="true">●</span>';
+    locationLabel.className = "site-location-label";
+    locationLabel.textContent = "Checking…";
+    locationCount.className = "site-location-count";
+    locationCount.hidden = true;
+    location.append(locationLabel, locationCount);
+    group.append(indicator, location);
 
     if (header) {
-      header.insertBefore(indicator, nav || header.lastElementChild);
+      header.insertBefore(group, nav || header.lastElementChild);
     } else {
-      indicator.classList.add("site-heart-rate-floating");
-      document.body.append(indicator);
+      group.classList.add("site-live-status-floating");
+      document.body.append(group);
     }
+
+    const requestHeaders = {
+      apikey: publishableKey,
+      Authorization: "Bearer " + publishableKey,
+      "Content-Type": "application/json"
+    };
 
     async function refreshHeartRate() {
       if (document.hidden) {
@@ -232,13 +242,9 @@
       }
 
       try {
-        const response = await fetch(endpoint, {
+        const response = await fetch(heartEndpoint, {
           method: "POST",
-          headers: {
-            apikey: publishableKey,
-            Authorization: "Bearer " + publishableKey,
-            "Content-Type": "application/json"
-          },
+          headers: requestHeaders,
           body: JSON.stringify({ control_session_id: null })
         });
 
@@ -265,9 +271,71 @@
       }
     }
 
+    function renderLocation(status) {
+      const state = typeof status?.state === "string" ? status.state : "unknown";
+      const world = typeof status?.world_name === "string" ? status.world_name.trim() : "";
+      const reportedCount = status?.player_count;
+      const playerCount = Number.isInteger(reportedCount) && reportedCount >= 0
+        ? reportedCount
+        : null;
+      const labels = {
+        public: world || "In VRChat",
+        private: world || "Private world",
+        traveling: "Changing worlds",
+        online: "VRChat online",
+        offline: "VRChat offline",
+        unknown: "Location unavailable"
+      };
+      const label = labels[state] || labels.unknown;
+      const showCount = state === "public" && playerCount !== null;
+
+      location.dataset.state = state;
+      locationLabel.textContent = label;
+      locationCount.hidden = !showCount;
+      locationCount.textContent = showCount ? String(playerCount) : "";
+      locationCount.title = showCount
+        ? `${playerCount} ${playerCount === 1 ? "player" : "players"}`
+        : "";
+      location.title = label;
+      location.setAttribute(
+        "aria-label",
+        showCount
+          ? `Marshy's location: ${label}; ${playerCount} ${playerCount === 1 ? "player" : "players"}`
+          : `Marshy's location: ${label}`
+      );
+    }
+
+    async function refreshLocation() {
+      if (document.hidden) {
+        return;
+      }
+
+      try {
+        const response = await fetch(statusEndpoint, {
+          method: "POST",
+          headers: requestHeaders,
+          body: "{}"
+        });
+
+        if (!response.ok) {
+          throw new Error("Location request failed");
+        }
+
+        const data = await response.json();
+        renderLocation(Array.isArray(data) ? data[0] || null : data);
+      } catch (error) {
+        renderLocation(null);
+      }
+    }
+
     refreshHeartRate();
+    refreshLocation();
     window.setInterval(refreshHeartRate, 5000);
-    document.addEventListener("visibilitychange", refreshHeartRate);
+    window.setInterval(refreshLocation, 30000);
+    document.addEventListener("visibilitychange", function () {
+      refreshHeartRate();
+      refreshLocation();
+    });
   }
 
   function installScrollMotion() {

@@ -127,6 +127,25 @@
   padding: 11px;
 }
 
+.control-roulette-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.control-roulette-settings {
+  gap: 14px;
+}
+
+.control-roulette-spacer {
+  display: block;
+}
+
+.control-roulette-settings .control-form-note {
+  border-top: 1px solid rgba(55, 40, 64, 0.1);
+  padding-top: 12px;
+}
+
 .control-check input {
   accent-color: #ff6fae;
   flex: 0 0 auto;
@@ -257,7 +276,11 @@
     grid-template-columns: 1fr;
   }
 
+  .control-roulette-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .control-settings-form fieldset:first-child,
+
   .control-form-wide {
     grid-column: auto;
   }
@@ -272,5 +295,15 @@
   .control-queue-actions,
   .control-user-actions {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .control-roulette-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .control-roulette-spacer {
+    display: none;
   }
 }

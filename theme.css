@@ -705,7 +705,15 @@ html[data-theme="dark"] .nav-menu-toggle {
   }
 }
 
-/* Shared live heart-rate badge */
+/* Shared heart-rate and simplified VRChat status badges */
+.site-live-status {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 1 auto;
+  gap: 7px;
+  min-width: 0;
+}
+
 .site-heart-rate {
   align-items: center;
   background: rgba(255, 255, 255, 0.76);
@@ -737,6 +745,56 @@ html[data-theme="dark"] .nav-menu-toggle {
   font-size: 1rem;
 }
 
+.site-location-status {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(120, 213, 250, 0.5);
+  border-radius: 999px;
+  color: #4a3653;
+  display: inline-flex;
+  flex: 0 1 auto;
+  font-size: 0.82rem;
+  font-weight: 800;
+  gap: 6px;
+  min-height: 42px;
+  min-width: 0;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.site-location-icon {
+  color: #a99fb0;
+  font-size: 0.75rem;
+}
+
+.site-location-status[data-state="public"] .site-location-icon,
+.site-location-status[data-state="online"] .site-location-icon {
+  color: #31ae75;
+}
+
+.site-location-status[data-state="private"] .site-location-icon {
+  color: #ff4f9a;
+}
+
+.site-location-status[data-state="traveling"] .site-location-icon {
+  color: #d99c00;
+}
+
+.site-location-label {
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-location-count {
+  background: rgba(120, 213, 250, 0.2);
+  border-radius: 999px;
+  color: #28749a;
+  min-width: 24px;
+  padding: 2px 7px;
+  text-align: center;
+}
+
 .site-heart-rate-floating {
   position: fixed;
   right: 72px;
@@ -744,7 +802,14 @@ html[data-theme="dark"] .nav-menu-toggle {
   z-index: 30;
 }
 
-html[data-theme="dark"] .site-heart-rate {
+.site-live-status-floating {
+  position: fixed;
+  right: 72px;
+  top: 16px;
+  z-index: 30;
+}
+
+html[data-theme="dark"] :is(.site-heart-rate, .site-location-status) {
   background: rgba(27, 34, 51, 0.95);
   border-color: rgba(255, 121, 181, 0.4);
   color: #f8f1ff;
@@ -752,6 +817,10 @@ html[data-theme="dark"] .site-heart-rate {
 
 html[data-theme="dark"] .site-heart-value {
   color: #ff91c2;
+}
+
+html[data-theme="dark"] .site-location-count {
+  color: #9edfff;
 }
 
 @keyframes site-heart-beat {
@@ -803,9 +872,30 @@ html[data-theme="dark"][data-page="control-marshy"] .safety-note {
     display: none;
   }
 
-  .site-heart-rate {
+  .site-heart-rate,
+  .site-location-status {
     min-height: 40px;
     padding-inline: 10px;
+  }
+
+  .site-location-label {
+    max-width: 120px;
+  }
+}
+
+@media (max-width: 580px) {
+  html.nav-enhanced .site-header {
+    flex-wrap: wrap;
+  }
+
+  .site-live-status {
+    justify-content: center;
+    order: 3;
+    width: 100%;
+  }
+
+  .site-location-label {
+    max-width: min(48vw, 160px);
   }
 }
 

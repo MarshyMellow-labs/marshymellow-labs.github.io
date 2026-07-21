@@ -5,27 +5,23 @@
   const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
   const HEARTBEAT_INTERVAL_MS = 5000;
   const TOKEN_CAP = 300;
-  const ROULETTE_COST = 100;
   const ROULETTE_LANDING_MS = 3600;
-  const ROULETTE_SLOTS = [
-    "Vibey!",
-    "50% Zappy!",
-    "Vibey!",
-    "75% Zappy!!",
-    "Vibey!",
-    "50% Zappy!",
-    "Vibey!",
-    "100% Zappy!!!",
-    "Vibey!",
-    "50% Zappy!",
-    "Vibey!",
-    "75% Zappy!!",
-    "Vibey!",
-    "50% Zappy!",
-    "Vibey!",
-    "200% MEGA ZAPPY!!!!",
-    "Vibey!", "75% Zappy!!", "Vibey!", "50% Zappy!", "Vibey!", "100% Zappy!!!"
-  ];
+  const DEFAULT_ROULETTE_CONFIG = {
+    cost: 100,
+    slots: [
+      { action: "vibrate", percent: null }, { action: "low", percent: 50 },
+      { action: "vibrate", percent: null }, { action: "high", percent: 75 },
+      { action: "vibrate", percent: null }, { action: "low", percent: 50 },
+      { action: "vibrate", percent: null }, { action: "extreme", percent: 100 },
+      { action: "vibrate", percent: null }, { action: "low", percent: 50 },
+      { action: "vibrate", percent: null }, { action: "high", percent: 75 },
+      { action: "vibrate", percent: null }, { action: "low", percent: 50 },
+      { action: "vibrate", percent: null }, { action: "extreme", percent: 200 },
+      { action: "vibrate", percent: null }, { action: "high", percent: 75 },
+      { action: "vibrate", percent: null }, { action: "low", percent: 50 },
+      { action: "vibrate", percent: null }, { action: "extreme", percent: 100 }
+    ]
+  };
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const elements = {
@@ -53,6 +49,8 @@
     message: document.querySelector("#control-message"),
     rouletteWheel: document.querySelector("#roulette-wheel"),
     rouletteResult: document.querySelector("#roulette-result"),
+    rouletteDescription: document.querySelector("#roulette-description"),
+    rouletteOdds: document.querySelector("#roulette-odds"),
     rouletteSpin: document.querySelector("#roulette-spin"),
     rouletteUse: document.querySelector("#roulette-use"),
     actionButtons: Array.from(document.querySelectorAll("[data-control-action]"))
@@ -72,6 +70,9 @@
   let rouletteReady = false;
   let rouletteLandingTimer = null;
 
+  let rouletteConfig = DEFAULT_ROULETTE_CONFIG;
+  let rouletteSlots = DEFAULT_ROULETTE_CONFIG.slots;
+  let rouletteConfigInFlight = false;
   const deviceLabels = {
     ready: "Marshy's controller is ready",
     cooldown: "Marshy is cooling down",
@@ -177,6 +178,93 @@
     }[action] || "Request";
   }
 
+  function rouletteLabel(slot) {
+    if (slot?.action === "vibrate") {
+      return "Vibey!";
+    }
+
+    const percent = Number(slot?.percent);
+
+    if (percent >= 200) {
+      return `${percent}% MEGA ZAPPY!!!!`;
+    }
+
+    if (percent >= 100) {
+      return `${percent}% Zappy!!!`;
+    }
+
+    if (percent >= 75) {
+      return `${percent}% Zappy!!`;
+    }
+
+    return `${percent}% Zappy!`;
+  }
+
+  function normalizeRouletteConfig(value) {
+    const cost = Number(value?.cost);
+    const sourceSlots = Array.isArray(value?.slots) ? value.slots : [];
+
+    if (!Number.isInteger(cost) || cost < 1 || cost > TOKEN_CAP
+      || sourceSlots.length < 2 || sourceSlots.length > 60
+    ) {
+      return null;
+    }
+
+    const slots = sourceSlots.map((slot) => {
+      const action = typeof slot?.action === "string" ? slot.action : "";
+      const percent = slot?.percent === null ? null : Number(slot?.percent);
+
+      if (!["vibrate", "low", "high", "extreme"].includes(action)
+        || (action !== "vibrate" && (!Number.isInteger(percent) || percent < 1 || percent > 200))
+      ) {
+        return null;
+      }
+
+      return { action, percent: action === "vibrate" ? null : percent };
+    });
+
+    return slots.includes(null) ? null : { cost, slots };
+  }
+
+  function displayRouletteConfig(config) {
+    rouletteSlots = config.slots;
+    elements.rouletteDescription.textContent = `Spend ${config.cost} Marshy Tokens and let the server choose one of ${config.slots.length} equal slots.`;
+    elements.rouletteSpin.textContent = `Spin for ${config.cost} tokens`;
+    elements.rouletteOdds.replaceChildren();
+    const outcomes = new Map();
+
+    for (const slot of config.slots) {
+      const label = rouletteLabel(slot);
+      outcomes.set(label, (outcomes.get(label) || 0) + 1);
+    }
+
+    for (const [label, count] of outcomes) {
+      const item = document.createElement("li");
+      const total = document.createElement("strong");
+      total.textContent = String(count);
+      item.append(total, ` ${label}`);
+      elements.rouletteOdds.append(item);
+    }
+
+    drawRouletteWheel();
+  }
+
+  function applyRouletteConfig(value) {
+    const normalized = normalizeRouletteConfig(value);
+
+    if (!normalized) {
+      return false;
+    }
+
+    rouletteConfig = normalized;
+
+    if (!roulettePrize) {
+      displayRouletteConfig(normalized);
+    }
+
+    return true;
+  }
+
   function drawRouletteWheel() {
     const canvas = elements.rouletteWheel;
 
@@ -197,10 +285,10 @@
     context.scale(ratio, ratio);
     const center = size / 2;
     const radius = center - 8;
-    const slice = (Math.PI * 2) / ROULETTE_SLOTS.length;
+    const slice = (Math.PI * 2) / rouletteSlots.length;
     const colors = ["#ff6fae", "#80d9ff", "#ffe36e", "#a98cff", "#8ce5c4"];
 
-    ROULETTE_SLOTS.forEach((label, index) => {
+    rouletteSlots.forEach((slot, index) => {
       const centerAngle = -Math.PI / 2 + index * slice;
       context.beginPath();
       context.moveTo(center, center);
@@ -221,7 +309,7 @@
       context.font = "900 11px Arial, sans-serif";
       context.textAlign = "center";
       context.textBaseline = "middle";
-      const marker = label.startsWith("Vib") ? "V" : label.match(/^\d+/)?.[0] || "?";
+      const marker = slot.action === "vibrate" ? "V" : String(slot.percent);
       context.font = `900 ${marker.length > 2 ? 12 : 15}px Arial, sans-serif`;
       context.fillText(marker, 0, 0, 28);
       context.restore();
@@ -229,7 +317,7 @@
   }
 
   function positionRoulette(slot, animate) {
-    const sliceDegrees = 360 / ROULETTE_SLOTS.length;
+    const sliceDegrees = 360 / rouletteSlots.length;
     const desired = (360 - (slot - 1) * sliceDegrees) % 360;
 
     if (animate) {
@@ -271,7 +359,7 @@
 
     rouletteReady = true;
     elements.rouletteUse.hidden = false;
-    elements.rouletteResult.textContent = `You got: ${ROULETTE_SLOTS[roulettePrize.slot - 1]} Click Send my zappies! when you are ready.`;
+    elements.rouletteResult.textContent = `You got: ${rouletteLabel(rouletteSlots[roulettePrize.slot - 1])} Click Send my zappies! when you are ready.`;
     updateButtons(currentState);
   }
 
@@ -279,7 +367,16 @@
     const slot = Number(prize?.slot);
     const id = typeof prize?.id === "string" ? prize.id : "";
 
-    if (!id || !Number.isInteger(slot) || slot < 1 || slot > ROULETTE_SLOTS.length) {
+    const prizeConfig = normalizeRouletteConfig({
+      cost: prize?.token_cost ?? rouletteConfig.cost,
+      slots: prize?.wheel_slots ?? rouletteConfig.slots
+    });
+
+    if (prizeConfig) {
+      displayRouletteConfig(prizeConfig);
+    }
+
+    if (!id || !Number.isInteger(slot) || slot < 1 || slot > rouletteSlots.length) {
       elements.rouletteResult.textContent = "The server returned an invalid roulette result.";
       return;
     }
@@ -306,6 +403,7 @@
     elements.rouletteSpin.hidden = false;
     elements.rouletteUse.hidden = true;
     elements.rouletteResult.textContent = "The result is selected securely when you spin.";
+    displayRouletteConfig(rouletteConfig);
   }
 
   function updateAccount() {
@@ -475,14 +573,14 @@
         || (lacksTokens ? `You need ${cost - balance} more Marshy Tokens.` : "");
     }
 
-    const rouletteLacksTokens = balance < ROULETTE_COST;
+    const rouletteLacksTokens = balance < rouletteConfig.cost;
     elements.rouletteSpin.disabled = requestInFlight
       || Boolean(commonReason)
       || Boolean(roulettePrize)
       || rouletteLacksTokens;
     elements.rouletteSpin.title = commonReason
       || (roulettePrize ? "Use your current roulette result first." : "")
-      || (rouletteLacksTokens ? `You need ${ROULETTE_COST - balance} more Marshy Tokens.` : "");
+      || (rouletteLacksTokens ? `You need ${rouletteConfig.cost - balance} more Marshy Tokens.` : "");
 
     elements.rouletteUse.disabled = requestInFlight
       || Boolean(commonReason)
@@ -504,6 +602,25 @@
     updateRequest(state);
     updateTierLabels(state);
     updateButtons(state);
+  }
+
+  async function refreshRouletteConfig() {
+    if (rouletteConfigInFlight) {
+      return;
+    }
+
+    rouletteConfigInFlight = true;
+
+    try {
+      const { data, error } = await db.rpc("get_marshy_roulette_config");
+
+      if (!error) {
+        applyRouletteConfig(data);
+        updateButtons(currentState);
+      }
+    } finally {
+      rouletteConfigInFlight = false;
+    }
   }
 
   async function fetchPublicState() {
@@ -700,7 +817,7 @@
       await refreshRoulettePrize();
     } finally {
       requestInFlight = false;
-      elements.rouletteSpin.textContent = "Spin for 100 tokens";
+      elements.rouletteSpin.textContent = `Spin for ${rouletteConfig.cost} tokens`;
       elements.rouletteSpin.removeAttribute("aria-busy");
       updateButtons(currentState);
     }
@@ -712,7 +829,7 @@
     }
 
     const prize = roulettePrize;
-    const prizeLabel = ROULETTE_SLOTS[prize.slot - 1];
+    const prizeLabel = rouletteLabel(rouletteSlots[prize.slot - 1]);
     requestInFlight = true;
     updateButtons(currentState);
     elements.rouletteUse.textContent = "Sending zappies...";
@@ -784,6 +901,7 @@
     heartbeatTimer = window.setInterval(() => {
       if (!document.hidden) {
         refreshState();
+        refreshRouletteConfig();
       }
     }, HEARTBEAT_INTERVAL_MS);
   }
@@ -793,7 +911,7 @@
   elements.cancelRequest.addEventListener("click", cancelRequest);
   elements.rouletteSpin.addEventListener("click", spinRouletteRequest);
   elements.rouletteUse.addEventListener("click", redeemRoulettePrize);
-  drawRouletteWheel();
+  displayRouletteConfig(DEFAULT_ROULETTE_CONFIG);
 
   for (const button of elements.actionButtons) {
     button.addEventListener("click", () => enqueue(button.dataset.controlAction));
@@ -813,19 +931,21 @@
   db.auth.onAuthStateChange((_event, session) => {
     authSession = session;
     updateAccount();
-    window.setTimeout(refreshState, 0);
-    window.setTimeout(refreshRoulettePrize, 0);
+    window.setTimeout(async () => {
+      await refreshRouletteConfig();
+      await Promise.all([refreshState(), refreshRoulettePrize()]);
+    }, 0);
   });
 
-  db.auth.getSession().then(({ data, error }) => {
+  db.auth.getSession().then(async ({ data, error }) => {
     if (error) {
       setMessage(messageForError(error), "error");
     }
 
     authSession = data?.session || null;
     updateAccount();
-    refreshState();
-    refreshRoulettePrize();
+    await refreshRouletteConfig();
+    await Promise.all([refreshState(), refreshRoulettePrize()]);
     startHeartbeat();
   });
 })();

@@ -375,9 +375,9 @@
 
     }
   </style>
-  <script src="theme.js?v=20260720-1"></script>
-  <link rel="stylesheet" href="theme.css?v=20260720-1">
-  <link rel="stylesheet" href="control-admin.css?v=20260721-1">
+  <script src="theme.js?v=20260721-2"></script>
+  <link rel="stylesheet" href="theme.css?v=20260721-2">
+  <link rel="stylesheet" href="control-admin.css?v=20260721-2">
 </head>
 <body>
   <header class="site-header">
@@ -433,7 +433,7 @@
           <div class="control-admin-heading">
             <div>
               <h2 id="control-admin-title">Marshy Zappy Zaps</h2>
-              <p class="status-admin-summary">Manage the public queue, tier prices, Pulsoid sharing, and emergency state.</p>
+              <p class="status-admin-summary">Manage the public queue, tier prices, roulette, Pulsoid sharing, and emergency state.</p>
             </div>
             <span class="control-admin-status-pill" id="control-admin-status-pill">Checking companion…</span>
           </div>
@@ -547,6 +547,58 @@
             </fieldset>
 
             <p class="control-form-note control-form-wide">Website percentages use a half-scale: each displayed 1% equals 0.5% of the separate maximum configured locally. Roulette alone may reach 200%, which equals that local maximum. This page cannot raise the local maximum. Marshy Token balances are always capped at 300.</p>
+            <fieldset class="control-roulette-settings control-form-wide">
+              <legend>Zappy Roulette</legend>
+              <div class="control-roulette-grid">
+                <label>
+                  Spin cost (tokens)
+                  <input id="control-roulette-cost" type="number" min="1" max="300" step="1" required>
+                </label>
+                <label>
+                  Wheel size (slices)
+                  <input id="control-roulette-slots" type="number" min="2" max="60" step="1" required>
+                </label>
+                <label>
+                  Vibey slices
+                  <input id="control-roulette-vibrate-count" type="number" min="0" max="60" step="1" required>
+                </label>
+                <span class="control-roulette-spacer" aria-hidden="true"></span>
+                <label>
+                  First Zappy slices
+                  <input id="control-roulette-low-count" type="number" min="0" max="60" step="1" required>
+                </label>
+                <label>
+                  First Zappy strength %
+                  <input id="control-roulette-low-percent" type="number" min="1" max="200" step="1" required>
+                </label>
+                <label>
+                  Second Zappy slices
+                  <input id="control-roulette-high-count" type="number" min="0" max="60" step="1" required>
+                </label>
+                <label>
+                  Second Zappy strength %
+                  <input id="control-roulette-high-percent" type="number" min="1" max="200" step="1" required>
+                </label>
+                <label>
+                  Third Zappy slices
+                  <input id="control-roulette-extreme-count" type="number" min="0" max="60" step="1" required>
+                </label>
+                <label>
+                  Third Zappy strength %
+                  <input id="control-roulette-extreme-percent" type="number" min="1" max="200" step="1" required>
+                </label>
+                <label>
+                  Mega Zappy slices
+                  <input id="control-roulette-mega-count" type="number" min="0" max="60" step="1" required>
+                </label>
+                <label>
+                  Mega Zappy strength %
+                  <input id="control-roulette-mega-percent" type="number" min="1" max="200" step="1" required>
+                </label>
+              </div>
+              <p class="control-form-note">All five slice counts must add up to the wheel size. Zero removes that prize from the wheel.</p>
+            </fieldset>
+
             <div class="actions control-form-wide">
               <button class="primary" type="submit">Save control settings</button>
             </div>
@@ -1443,6 +1495,6 @@
       }
     });
   </script>
-  <script src="control-admin.js?v=20260721-4"></script>
+  <script src="control-admin.js?v=20260721-5"></script>
 </body>
 </html>
