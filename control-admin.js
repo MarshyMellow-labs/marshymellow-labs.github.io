@@ -39,7 +39,18 @@
     highDuration: document.querySelector("#control-high-duration"),
     extremePercent: document.querySelector("#control-extreme-percent"),
     extremeCost: document.querySelector("#control-extreme-cost"),
-    extremeDuration: document.querySelector("#control-extreme-duration")
+    extremeDuration: document.querySelector("#control-extreme-duration"),
+    rouletteCost: document.querySelector("#control-roulette-cost"),
+    rouletteSlots: document.querySelector("#control-roulette-slots"),
+    rouletteVibrateCount: document.querySelector("#control-roulette-vibrate-count"),
+    rouletteLowCount: document.querySelector("#control-roulette-low-count"),
+    rouletteLowPercent: document.querySelector("#control-roulette-low-percent"),
+    rouletteHighCount: document.querySelector("#control-roulette-high-count"),
+    rouletteHighPercent: document.querySelector("#control-roulette-high-percent"),
+    rouletteExtremeCount: document.querySelector("#control-roulette-extreme-count"),
+    rouletteExtremePercent: document.querySelector("#control-roulette-extreme-percent"),
+    rouletteMegaCount: document.querySelector("#control-roulette-mega-count"),
+    rouletteMegaPercent: document.querySelector("#control-roulette-mega-percent")
   };
 
   if (!elements.section || !elements.discordLogin) {
@@ -83,6 +94,14 @@
 
     if (value.includes("cooldown")) {
       return "The global cooldown cannot be shorter than 1 second.";
+    }
+
+    if (value.includes("roulette_prize_counts_do_not_match_wheel_size")) {
+      return "The roulette prize counts must add up to the wheel size.";
+    }
+
+    if (value.includes("invalid_roulette_settings")) {
+      return "Check the roulette cost, wheel size, prize counts, and increasing strengths.";
     }
 
     return "The Marshy Zappy Zaps action could not be completed.";
@@ -162,6 +181,15 @@
     return Number.isFinite(timestamp) && Date.now() - timestamp <= seconds * 1000;
   }
 
+  function roulettePrize(settings, action, fallbackPercent, fallbackCount) {
+    const prizes = Array.isArray(settings.roulette_prizes) ? settings.roulette_prizes : [];
+    const found = prizes.find((prize) => prize?.action === action);
+    return {
+      count: found && Number.isInteger(Number(found.count)) ? Number(found.count) : fallbackCount,
+      percent: found && Number.isInteger(Number(found.percent)) ? Number(found.percent) : fallbackPercent
+    };
+  }
+
   function fillSettings(settings) {
     elements.enabled.disabled = Boolean(settings.emergency_stopped);
 
@@ -186,6 +214,24 @@
     setInput(elements.extremePercent, settings.extreme_percent);
     setInput(elements.extremeCost, settings.extreme_cost);
     setInput(elements.extremeDuration, settings.extreme_duration_ms);
+
+    const vibrate = roulettePrize(settings, "vibrate", null, 11);
+    const low = roulettePrize(settings, "low", 50, 5);
+    const high = roulettePrize(settings, "high", 75, 3);
+    const extreme = roulettePrize(settings, "extreme", 100, 2);
+    const mega = roulettePrize(settings, "mega", 200, 1);
+    const totalSlots = vibrate.count + low.count + high.count + extreme.count + mega.count;
+    setInput(elements.rouletteCost, settings.roulette_cost ?? 100);
+    setInput(elements.rouletteSlots, totalSlots);
+    setInput(elements.rouletteVibrateCount, vibrate.count);
+    setInput(elements.rouletteLowCount, low.count);
+    setInput(elements.rouletteLowPercent, low.percent);
+    setInput(elements.rouletteHighCount, high.count);
+    setInput(elements.rouletteHighPercent, high.percent);
+    setInput(elements.rouletteExtremeCount, extreme.count);
+    setInput(elements.rouletteExtremePercent, extreme.percent);
+    setInput(elements.rouletteMegaCount, mega.count);
+    setInput(elements.rouletteMegaPercent, mega.percent);
   }
 
   function renderTelemetry(settings, runtime) {
@@ -466,6 +512,30 @@
     setMessage("Saving Marshy Zappy Zaps settings…");
 
     try {
+      const rouletteSlotCount = inputNumber(elements.rouletteSlots);
+      const roulettePrizes = [
+        { action: "vibrate", percent: null, count: inputNumber(elements.rouletteVibrateCount) },
+        { action: "low", percent: inputNumber(elements.rouletteLowPercent), count: inputNumber(elements.rouletteLowCount) },
+        { action: "high", percent: inputNumber(elements.rouletteHighPercent), count: inputNumber(elements.rouletteHighCount) },
+        { action: "extreme", percent: inputNumber(elements.rouletteExtremePercent), count: inputNumber(elements.rouletteExtremeCount) },
+        { action: "mega", percent: inputNumber(elements.rouletteMegaPercent), count: inputNumber(elements.rouletteMegaCount) }
+      ];
+      const rouletteCountTotal = roulettePrizes.reduce((total, prize) => total + prize.count, 0);
+
+      if (rouletteCountTotal !== rouletteSlotCount) {
+        throw new Error("Roulette prize counts must add up to the wheel size.");
+      }
+
+      const roulettePercents = roulettePrizes.slice(1).map((prize) => prize.percent);
+
+      if (rouletteSlotCount < 2
+        || rouletteSlotCount > 60
+        || roulettePercents.some((percent) => percent < 1 || percent > 200)
+        || roulettePercents.some((percent, index) => index > 0 && percent < roulettePercents[index - 1])
+      ) {
+        throw new Error("Roulette must have 2 to 60 slices and increasing strengths from 1% to 200%.");
+      }
+
       const settings = {
         controls_enabled: elements.enabled.checked,
         share_heart_rate: elements.shareHeartRate.checked,
@@ -493,11 +563,25 @@
         throw error;
       }
 
+      const { error: rouletteError } = await db.rpc("admin_update_marshy_roulette_settings", {
+        new_settings: {
+          cost: inputNumber(elements.rouletteCost),
+          slot_count: rouletteSlotCount,
+          prizes: roulettePrizes
+        }
+      });
+
+      if (rouletteError) {
+        throw rouletteError;
+      }
+
       formDirty = false;
       setMessage("Control settings saved.");
       await Promise.all([refreshState(), refreshAudit()]);
     } catch (error) {
-      setMessage(error.message?.startsWith("Every numeric") ? error.message : friendlyError(error), true);
+      const localValidation = error.message?.startsWith("Every numeric")
+        || error.message?.startsWith("Roulette");
+      setMessage(localValidation ? error.message : friendlyError(error), true);
     } finally {
       submitButton.disabled = false;
     }
