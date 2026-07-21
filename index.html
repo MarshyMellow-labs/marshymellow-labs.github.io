@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-YB9cDKSxb840/gdA8QgjnhixFXcMz3I6khUMs4Ge69c='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co https://images.unsplash.com; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src https://docs.google.com; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-oe0/Js1Bt0h9yQxi8BKksxVi2+q0WSoykXaaeCDn7/k='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co https://images.unsplash.com; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src https://docs.google.com; upgrade-insecure-requests">
   <script src="security.js"></script>
   <title>marshymellow</title>
   <link rel="icon" href="assets/marshy-logo.png">
@@ -1021,11 +1021,10 @@
       </div>
 
       <div class="gallery-search">
-        <label class="sr-only" for="gallery-user-search">Search pictures by VRChat user</label>
-        <input id="gallery-user-search" type="search" list="gallery-user-suggestions" placeholder="Search for users in instance when picture was taken" autocomplete="off">
-        <datalist id="gallery-user-suggestions"></datalist>
+        <label class="sr-only" for="gallery-search">Search pictures by title</label>
+        <input id="gallery-search" type="search" placeholder="Search pictures by title" autocomplete="off">
       </div>
-      <p class="gallery-empty" id="gallery-empty" hidden>No pictures found with that user.</p>
+      <p class="gallery-empty" id="gallery-empty" hidden>No pictures found with that title.</p>
       <div class="gallery" id="gallery"></div>
       <div class="gallery-controls" id="gallery-controls" hidden>
         <button class="button secondary" type="button" id="gallery-more-button">Show all pictures</button>
@@ -1108,8 +1107,7 @@
     const heroApprovalCount = document.querySelector("#hero-approval-count");
     const galleryControls = document.querySelector("#gallery-controls");
     const galleryMoreButton = document.querySelector("#gallery-more-button");
-    const galleryUserSearch = document.querySelector("#gallery-user-search");
-    const galleryUserSuggestions = document.querySelector("#gallery-user-suggestions");
+    const gallerySearch = document.querySelector("#gallery-search");
     const galleryEmpty = document.querySelector("#gallery-empty");
     let currentImageIndex = 0;
     let galleryImages = [];
@@ -1149,7 +1147,6 @@
 
     function renderImageViewerMetadata(image) {
       const record = image.galleryRecord;
-      const metadata = record?.vrchat_metadata;
       const title = document.createElement("h2");
       const details = document.createElement("dl");
       const addDetail = (label, value) => {
@@ -1170,32 +1167,36 @@
         imageViewerMeta.append(title);
       }
 
-      if (!metadata) {
+      const captureDate = galleryCaptureDate(record || {});
+      const worldName = record?.world_name?.trim() || "";
+      const userCount = Number.isInteger(record?.user_count)
+        ? Math.max(0, record.user_count)
+        : null;
+
+      if (!captureDate && !worldName && userCount === null) {
         const message = document.createElement("p");
         message.className = "image-viewer-empty";
-        message.textContent = "No metadata detected.";
+        message.textContent = "No additional picture details are available.";
         imageViewerMeta.append(message);
         return;
       }
 
-      addDetail("Date and time", formatImageDate(metadata.capturedAt));
-      addDetail("Author", metadata.author?.displayName);
-      addDetail("World", metadata.world?.name);
+      addDetail("Date and time", formatImageDate(captureDate));
+      addDetail("World", worldName);
       imageViewerMeta.append(details);
 
-      const users = Array.isArray(metadata.users) ? metadata.users.filter((user) => user?.displayName) : [];
       const userSection = document.createElement("section");
       const userHeading = document.createElement("h3");
-      const userNames = document.createElement("p");
+      const userCountText = document.createElement("p");
       const userNote = document.createElement("p");
       userSection.className = "image-viewer-users";
-      userHeading.textContent = `Users in the instance (${users.length})`;
-      userNames.textContent = users.length
-        ? users.map((user) => user.displayName).join(", ")
-        : "Instance users were not included in this photo's metadata.";
+      userHeading.textContent = "Users in the instance";
+      userCountText.textContent = userCount === null
+        ? "Count unavailable"
+        : formatCount(userCount, "user");
       userNote.className = "image-viewer-note";
-      userNote.textContent = "This list comes from VRCX metadata and may not always be accurate.";
-      userSection.append(userHeading, userNames, userNote);
+      userNote.textContent = "This count comes from the photo metadata and may not always be accurate.";
+      userSection.append(userHeading, userCountText, userNote);
       imageViewerMeta.append(userSection);
     }
 
@@ -1400,8 +1401,8 @@
     }
 
     function galleryCaptureDate(image) {
-      if (image.vrchat_metadata?.capturedAt) {
-        return image.vrchat_metadata.capturedAt;
+      if (image.captured_at) {
+        return image.captured_at;
       }
 
       const match = image.image_path?.match(/vrchat_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})(?:\.(\d{1,3}))?/i);
@@ -1434,52 +1435,17 @@
       return `${count} ${count === 1 ? singular : plural}`;
     }
 
-    function normalizeUserSearch(value) {
+    function normalizeGallerySearch(value) {
       return String(value || "").normalize("NFKC").toLocaleLowerCase().trim();
     }
 
-    function imageMatchesUser(image, query) {
-      const metadata = image.vrchat_metadata;
-      const users = Array.isArray(metadata?.users) ? metadata.users : [];
-      const names = users.map((user) => user?.displayName);
-
-      if (metadata?.author?.displayName) {
-        names.push(metadata.author.displayName);
-      }
-
-      return names.some((name) => normalizeUserSearch(name).includes(query));
-    }
-
-    function updateUserSuggestions(images) {
-      const knownUsers = new Map();
-
-      images.forEach((image) => {
-        const users = Array.isArray(image.vrchat_metadata?.users)
-          ? image.vrchat_metadata.users
-          : [];
-
-        users.forEach((user) => {
-          const displayName = user?.displayName?.trim();
-
-          if (displayName) {
-            knownUsers.set(normalizeUserSearch(displayName), displayName);
-          }
-        });
-      });
-
-      const options = Array.from(knownUsers.values())
-        .sort((first, second) => first.localeCompare(second, undefined, { sensitivity: "base" }))
-        .map((displayName) => {
-          const option = document.createElement("option");
-          option.value = displayName;
-          return option;
-        });
-      galleryUserSuggestions.replaceChildren(...options);
+    function imageMatchesTitle(image, query) {
+      return normalizeGallerySearch(image.title).includes(query);
     }
 
     function renderCurrentGallery() {
       const filteredImages = gallerySearchQuery
-        ? galleryImages.filter((image) => imageMatchesUser(image, gallerySearchQuery))
+        ? galleryImages.filter((image) => imageMatchesTitle(image, gallerySearchQuery))
         : galleryImages;
       renderUploadedImages(filteredImages, Boolean(gallerySearchQuery));
     }
@@ -1487,6 +1453,9 @@
     function renderUploadedImages(images, showAll = false) {
       gallery.querySelectorAll("[data-uploaded-image]").forEach((card) => card.remove());
       heroGalleryCount.textContent = formatCount(galleryImages.length, "picture");
+      galleryEmpty.textContent = gallerySearchQuery
+        ? "No pictures found with that title."
+        : "No pictures are available yet.";
       galleryEmpty.hidden = images.length > 0;
       const displayedImages = showAll ? images : images.slice(0, visibleGalleryCount);
 
@@ -1551,17 +1520,7 @@
 
       galleryLoading = true;
       try {
-        let { data, error } = await db
-          .from("gallery_images")
-          .select("title, image_path, thumbnail_path, created_at, vrchat_metadata")
-          .order("created_at", { ascending: false });
-
-        if (error && (error.code === "PGRST204" || error.code === "42703")) {
-          ({ data, error } = await db
-            .from("gallery_images")
-            .select("title, image_path, thumbnail_path, created_at")
-            .order("created_at", { ascending: false }));
-        }
+        const { data, error } = await db.rpc("get_public_gallery_images");
 
         if (!error) {
           galleryImages = (data || []).sort((first, second) => {
@@ -1569,10 +1528,12 @@
             const secondTime = new Date(galleryCaptureDate(second) || 0).getTime();
             return secondTime - firstTime;
           });
-          updateUserSuggestions(galleryImages);
           visibleGalleryCount = Math.min(visibleGalleryCount, Math.max(GALLERY_BATCH_SIZE, galleryImages.length));
           renderCurrentGallery();
           galleryLoaded = true;
+        } else if (!galleryLoaded) {
+          galleryEmpty.textContent = "The gallery is temporarily unavailable.";
+          galleryEmpty.hidden = false;
         }
       } finally {
         galleryLoading = false;
@@ -1580,11 +1541,10 @@
     }
 
     async function loadGalleryCount() {
-      const { count, error } = await db
-        .from("gallery_images")
-        .select("id", { count: "exact", head: true });
+      const { data, error } = await db.rpc("get_public_gallery_image_count");
+      const count = Number(data);
 
-      if (!error) {
+      if (!error && Number.isFinite(count)) {
         heroGalleryCount.textContent = formatCount(count, "picture");
       }
     }
@@ -1594,8 +1554,8 @@
       renderCurrentGallery();
     });
 
-    galleryUserSearch.addEventListener("input", () => {
-      gallerySearchQuery = normalizeUserSearch(galleryUserSearch.value);
+    gallerySearch.addEventListener("input", () => {
+      gallerySearchQuery = normalizeGallerySearch(gallerySearch.value);
       renderCurrentGallery();
     });
 
@@ -1608,21 +1568,6 @@
         heroApprovalCount.textContent = formatCount(count, "approval");
       }
     }
-
-    db
-      .channel("gallery-image-updates")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "gallery_images" },
-        () => {
-          loadGalleryCount();
-
-          if (galleryLoaded) {
-            loadGalleryImages();
-          }
-        }
-      )
-      .subscribe();
 
     db
       .channel("approval-count-updates")
