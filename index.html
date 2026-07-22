@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-oe0/Js1Bt0h9yQxi8BKksxVi2+q0WSoykXaaeCDn7/k='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co https://images.unsplash.com; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src https://docs.google.com; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-kGngJzJuG8cL/Dxv3XXiIMw63X0QqQ/H4su30LqQ6HY='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co https://images.unsplash.com; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src https://docs.google.com; upgrade-insecure-requests">
   <script src="security.js"></script>
   <title>marshymellow</title>
   <link rel="icon" href="assets/marshy-logo.png">
@@ -987,6 +987,10 @@
             <strong>Marshy's Valve Index</strong>
             <span>eye and face tracking contraption</span>
           </a>
+          <a class="hero-quick-card" href="control-marshy.html">
+            <strong>Marshy Zappy Zaps</strong>
+            <span>live controls, zaps, and roulette</span>
+          </a>
         </div>
       </div>
 
@@ -1002,8 +1006,8 @@
           <h2 id="about-title">
             <img class="section-title-image about-title-image" src="assets/about-title.png" alt="About" loading="lazy" decoding="async">
           </h2>
-          <p>This website was made for fun, for friends, and for keeping MarshyMellow things in one place. It is a home for pictures, the TOS, silly extras, and whatever else gets added later.</p>
-          <p>More pages, games, gallery bits, or other nonsense may appear in the future when the paperwork department feels motivated.</p>
+          <p>This is MarshyMellow's little corner of the internet: part VRChat scrapbook, part live status board, and part collection of increasingly questionable interactive experiments.</p>
+          <p>You can browse Marshy's pictures, see where Marshy is and how fast their heart is going, sign the TOS, play Snake or Dungeon, inspect the Valve Index eye-and-face-tracking setup, send live zaps through Marshy Zappy Zaps, or pay tribute to the paperwork department. New Marshy nonsense may appear whenever inspiration strikes.</p>
           <div class="about-contact" aria-label="Contact">
             <strong>Discord</strong>
             <span>marshymellow</span>
@@ -1169,9 +1173,12 @@
 
       const captureDate = galleryCaptureDate(record || {});
       const worldName = record?.world_name?.trim() || "";
+      const users = Array.isArray(record?.user_names)
+        ? record.user_names.filter((name) => typeof name === "string" && name.trim())
+        : [];
       const userCount = Number.isInteger(record?.user_count)
         ? Math.max(0, record.user_count)
-        : null;
+        : users.length || null;
 
       if (!captureDate && !worldName && userCount === null) {
         const message = document.createElement("p");
@@ -1187,16 +1194,20 @@
 
       const userSection = document.createElement("section");
       const userHeading = document.createElement("h3");
-      const userCountText = document.createElement("p");
+      const userNames = document.createElement("p");
       const userNote = document.createElement("p");
       userSection.className = "image-viewer-users";
-      userHeading.textContent = "Users in the instance";
-      userCountText.textContent = userCount === null
-        ? "Count unavailable"
-        : formatCount(userCount, "user");
+      userHeading.textContent = userCount === null
+        ? "Users in the instance"
+        : `Users in the instance (${userCount})`;
+      userNames.textContent = users.length
+        ? users.join(", ")
+        : userCount === null
+          ? "Instance users were not included in this photo's metadata."
+          : `${formatCount(userCount, "user")} recorded; display names unavailable.`;
       userNote.className = "image-viewer-note";
-      userNote.textContent = "This count comes from the photo metadata and may not always be accurate.";
-      userSection.append(userHeading, userCountText, userNote);
+      userNote.textContent = "This list comes from VRCX metadata and may not always be accurate.";
+      userSection.append(userHeading, userNames, userNote);
       imageViewerMeta.append(userSection);
     }
 
