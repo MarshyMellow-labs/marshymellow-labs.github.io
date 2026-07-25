@@ -3,6 +3,7 @@
 
   const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
   const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
+  const DISCORD_AUTH_PROVIDER = "custom:discord-no-email";
   const HEARTBEAT_INTERVAL_MS = 5000;
   const TOKEN_CAP = 300;
   const ROULETTE_LANDING_MS = 3600;
@@ -686,7 +687,7 @@
     setMessage("Opening Discord…");
 
     const { error } = await db.auth.signInWithOAuth({
-      provider: "discord",
+      provider: DISCORD_AUTH_PROVIDER,
       options: {
         redirectTo: redirectUrl()
       }

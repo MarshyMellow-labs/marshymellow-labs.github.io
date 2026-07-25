@@ -3,6 +3,7 @@
 
   const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
   const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
+  const DISCORD_AUTH_PROVIDER = "custom:discord-no-email";
   const REFRESH_INTERVAL_MS = 5000;
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -692,7 +693,7 @@
   async function signInWithDiscord() {
     elements.discordLogin.disabled = true;
     const { error } = await db.auth.signInWithOAuth({
-      provider: "discord",
+      provider: DISCORD_AUTH_PROVIDER,
       options: {
         redirectTo: redirectUrl()
       }
