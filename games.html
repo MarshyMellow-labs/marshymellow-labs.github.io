@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://hnqrptrfxxtuxhawyvge.supabase.co" crossorigin>
   <link rel="stylesheet" href="games.css?v=20260907-1">
   <link rel="stylesheet" href="theme.css?v=20260905-11">
+  <link rel="stylesheet" href="game-refresh.css?v=20260907-1">
   <script src="site-state.js?v=20260905-1"></script>
   <script src="theme.js?v=20260905-12"></script>
   <link rel="stylesheet" href="marshy-delights.css?v=20260905-14">
@@ -44,20 +45,22 @@
 
     <div class="game-tabs" role="tablist" aria-label="Choose a game">
       <button type="button" role="tab" id="snake-tab" aria-controls="snake-game-root" data-game-tab="snake">
-        <img src="assets/snake-title.png" alt="Snake">
+        <img src="assets/snake-title.png" alt="Snake"><span>Snack chase · quick reflexes</span>
       </button>
       <button type="button" role="tab" id="dungeon-tab" aria-controls="dungeon-game-root" data-game-tab="dungeon">
-        <img src="assets/dungeon-title.png" alt="Dungeon">
+        <img src="assets/dungeon-title.png" alt="Dungeon"><span>Dungeon · take your time</span>
       </button>
     </div>
 
 <section class="embedded-game game-shell" id="snake-game-root" data-game-root="snake" data-game-panel="snake" role="tabpanel" aria-labelledby="snake-tab">
-      <div class="game-copy">
-        <h1 id="snake-game-title">
-          <img class="snake-title-image" src="assets/snake-title.png" alt="Snake!" decoding="async">
-        </h1>
-        <p class="intro">A tiny candy-blue snack chase for anyone trapped on MarshyMellow's website.</p>
-      </div>
+      <aside class="game-copy arcade-guide">
+        <p class="arcade-kicker">01 / SNACK CHASE</p>
+        <h2 id="snake-game-title">One more snack.</h2>
+        <p>Steer the little candy snake. Eat the yellow snacks and see how long you can grow.</p>
+        <div class="mission"><span>Your goal</span><strong>Eat. Grow. Don’t bonk.</strong><p>Avoid the edges and your own tail. Each snack earns 1 point.</p></div>
+        <p class="control-hint"><kbd>↑ ↓ ← →</kbd> or <kbd>W A S D</kbd><br>Space to pause · swipe or use the arrows on touchscreens.</p>
+        <details><summary>A little help</summary><p>Turn before you reach an edge. You can’t reverse into yourself. Pause whenever you need a breather; changing games also pauses your run.</p></details>
+      </aside>
 
       <section class="game-panel" aria-label="Snake game">
         <div class="score-row">
@@ -76,13 +79,13 @@
         </div>
 
         <div class="board-wrap">
-          <canvas id="snake-snake-board" width="560" height="560" aria-label="Snake game board"></canvas>
+          <canvas id="snake-snake-board" width="560" height="560" tabindex="0" aria-label="Snake board. Arrow keys or WASD to steer, Space to pause."></canvas>
         </div>
 
         <div class="game-actions">
-          <button class="primary" type="button" id="snake-start-button">Start</button>
+          <button class="primary" type="button" id="snake-start-button">Play Snake</button>
           <button type="button" id="snake-pause-button">Pause</button>
-          <button type="button" id="snake-restart-button">Restart</button>
+          <button type="button" id="snake-restart-button">New game</button>
         </div>
 
         <div class="d-pad" aria-label="Movement controls">
@@ -105,25 +108,27 @@
       </section>
 
       <section class="leaderboard-panel" aria-labelledby="snake-leaderboard-title">
-        <h2 id="snake-leaderboard-title">Leaderboard</h2>
+        <h2 id="snake-leaderboard-title">Snack hall of fame</h2><p class="leaderboard-note">Community scores · just for fun</p>
         <ol class="leaderboard-list" id="snake-leaderboard-list"></ol>
         <p class="leaderboard-empty" id="snake-leaderboard-empty">No scores yet.</p>
       </section>
     </section>
 
 <section class="embedded-game dungeon-shell" id="dungeon-game-root" data-game-root="dungeon" data-game-panel="dungeon" role="tabpanel" aria-labelledby="dungeon-tab" hidden>
-      <div class="game-copy">
-        <h1 id="dungeon-game-title">
-          <img class="dungeon-title-image" src="assets/dungeon-title.png" alt="Marshy Dungeon" decoding="async">
-        </h1>
-        <p class="intro">A tiny pastel dungeon crawl. Collect snacks, bonk paperwork blobs, and reach the exit before Marshy's patience runs out.</p>
-        <div class="legend" aria-label="Game legend">
-          <span><strong>Pink</strong> is Marshy</span>
-          <span><strong>Yellow</strong> snacks score points</span>
-          <span><strong>Blue</strong> drinks heal patience</span>
-          <span><strong>Purple</strong> blobs are trouble</span>
-        </div>
-      </div>
+      <aside class="game-copy arcade-guide">
+        <p class="arcade-kicker">02 / TINY DUNGEON</p>
+        <h2 id="dungeon-game-title">Find the green exit.</h2>
+        <p>Move Marshy one square at a time. Reach <strong>EXIT</strong> to go down a floor. Snacks are optional.</p>
+        <div class="mission"><span>No timer. Think it through.</span><strong>You move, then the blobs move.</strong><p>Blobs move every second step. Touching one costs 1 heart. At zero hearts, your run ends.</p></div>
+        <ul class="tile-guide" aria-label="Dungeon tile guide">
+          <li><b class="tile-icon you">☺</b><span><strong>Marshy</strong>You are here</span></li>
+          <li><b class="tile-icon exit">↗</b><span><strong>Green EXIT</strong>Next floor · +25 points, +1 heart</span></li>
+          <li><b class="tile-icon snack">★</b><span><strong>Snack</strong>Optional · +10 points</span></li>
+          <li><b class="tile-icon drink">+</b><span><strong>Drink</strong>+1 heart (max 6), +4 points</span></li>
+          <li><b class="tile-icon blob">!</b><span><strong>Blob</strong>Avoid it · contact costs 1 heart</span></li>
+        </ul>
+        <details><summary>How to move &amp; use hints</summary><p>Use arrow keys, WASD, swipe the board, or tap the direction buttons. Walls block movement. “Show route” draws a path to the exit, but watch for moving blobs along the way.</p></details>
+      </aside>
 
       <section class="game-panel" aria-label="Marshy dungeon game">
         <div class="score-row">
@@ -140,18 +145,19 @@
             <strong id="dungeon-floor">1</strong>
           </div>
           <div class="score-box">
-            <span>Patience</span>
+            <span>Hearts</span>
             <strong id="dungeon-hp">5</strong>
           </div>
         </div>
 
+        <div class="turn-strip"><span id="dungeon-objective">Reach the green EXIT. Snacks are optional.</span><strong id="dungeon-turn">Your move</strong></div>
         <div class="board-wrap">
-          <canvas id="dungeon-dungeon-board" width="600" height="600" aria-label="Dungeon game board"></canvas>
+          <canvas id="dungeon-dungeon-board" width="600" height="600" tabindex="0" aria-label="Dungeon board. Arrow keys or WASD to move one square toward the green exit."></canvas>
         </div>
 
         <div class="game-actions">
           <button class="primary" type="button" id="dungeon-new-run-button">New run</button>
-          <button type="button" id="dungeon-new-floor-button">New floor</button>
+          <button type="button" id="dungeon-new-floor-button" aria-pressed="false">Show route</button>
         </div>
 
         <div class="d-pad" aria-label="Movement controls">
@@ -174,7 +180,7 @@
       </section>
 
       <section class="leaderboard-panel" aria-labelledby="dungeon-leaderboard-title">
-        <h2 id="dungeon-leaderboard-title">Dungeon leaderboard</h2>
+        <h2 id="dungeon-leaderboard-title">Brave little explorers</h2><p class="leaderboard-note">Community scores · just for fun</p>
         <ol class="leaderboard-list" id="dungeon-leaderboard-list"></ol>
         <p class="leaderboard-empty" id="dungeon-leaderboard-empty">No scores yet.</p>
       </section>
@@ -190,8 +196,8 @@
     <a href="index.html">Back home</a>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="snake-game.js?v=20260720-1"></script>
-  <script src="dungeon-game.js?v=20260720-1"></script>
-  <script src="games.js?v=20260720-2"></script>
+  <script src="snake-game.js?v=20260907-1"></script>
+  <script src="dungeon-game.js?v=20260907-1"></script>
+  <script src="games.js?v=20260907-1"></script>
 </body>
 </html>

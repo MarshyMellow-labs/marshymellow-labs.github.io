@@ -48,5 +48,22 @@
     selectGame(window.location.hash.slice(1), false);
   });
 
+  document.querySelectorAll(".embedded-game canvas").forEach(canvas => {
+    let start;
+    canvas.addEventListener("pointerdown", event => {
+      if (event.pointerType === "mouse") { canvas.focus(); return; }
+      start = { x: event.clientX, y: event.clientY, id: event.pointerId };
+      canvas.setPointerCapture(event.pointerId);
+    });
+    canvas.addEventListener("pointercancel", () => { start = null; });
+    canvas.addEventListener("pointerup", event => {
+      if (!start || event.pointerId !== start.id) return;
+      const dx = event.clientX - start.x, dy = event.clientY - start.y;
+      start = null;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) return;
+      const direction = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up");
+      canvas.dispatchEvent(new CustomEvent("arcade-swipe", { detail: direction }));
+    });
+  });
   selectGame(window.location.hash.slice(1), false);
 }());

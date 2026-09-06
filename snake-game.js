@@ -38,18 +38,19 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     let running = false;
     let paused = false;
     let lastScore = 0;
-    let bestScore = Number(localStorage.getItem("marshymellowSnakeBest")) || 0;
+    let ended = false;
+    let bestScore = Number((window.MarshyStorage || localStorage).getItem("marshymellowSnakeBest")) || 0;
 
     bestScoreElement.textContent = bestScore;
 
     function getScoreFingerprint() {
-      let fingerprint = localStorage.getItem(SCORE_FINGERPRINT_KEY);
+      let fingerprint = (window.MarshyStorage || localStorage).getItem(SCORE_FINGERPRINT_KEY);
 
       if (!fingerprint) {
         fingerprint = crypto.randomUUID
           ? crypto.randomUUID()
           : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-        localStorage.setItem(SCORE_FINGERPRINT_KEY, fingerprint);
+        (window.MarshyStorage || localStorage).setItem(SCORE_FINGERPRINT_KEY, fingerprint);
       }
 
       return fingerprint;
@@ -57,7 +58,14 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
 
     function setStatus(value) {
       statusLabel.textContent = value;
-      gameStatus.textContent = value;
+      gameStatus.textContent = value === "Playing" ? "Grab the yellow snacks. Avoid the edges and your tail."
+        : value === "Paused" ? "Take a breather. Resume when you’re ready."
+        : value === "Ready" ? "Press Play Snake, then steer with arrows, WASD or a swipe."
+        : `${value} · ${score} snacks collected. Play again or submit your score.`;
+      startButton.textContent = ended ? "Play again" : value === "Paused" ? "Resume" : "Play Snake";
+      startButton.disabled = value === "Playing";
+      pauseButton.disabled = !running || paused;
+      pauseButton.textContent = "Pause";
     }
 
     function setScore(value) {
@@ -67,7 +75,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       if (score > bestScore) {
         bestScore = score;
         bestScoreElement.textContent = bestScore;
-        localStorage.setItem("marshymellowSnakeBest", String(bestScore));
+        (window.MarshyStorage || localStorage).setItem("marshymellowSnakeBest", String(bestScore));
       }
     }
 
@@ -113,7 +121,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       finalScoreElement.textContent = value;
       scoreSubmit.hidden = false;
       submitStatus.textContent = "";
-      playerName.value = localStorage.getItem("marshymellowSnakeName") || "";
+      playerName.value = (window.MarshyStorage || localStorage).getItem("marshymellowSnakeName") || "";
     }
 
     function renderLeaderboard(scores) {
@@ -161,6 +169,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     }
 
     function randomFood() {
+      if (snake.length === cells * cells) return null;
       let position;
 
       do {
@@ -189,6 +198,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       resetSnakePosition();
       setScore(0);
       lastScore = 0;
+      ended = false;
       hideScoreSubmit();
       food = randomFood();
       running = false;
@@ -198,6 +208,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     }
 
     function startGame() {
+      if (ended) resetGame();
       if (running && !paused) {
         return;
       }
@@ -208,6 +219,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       setStatus("Playing");
       clearInterval(timer);
       timer = setInterval(step, speed);
+      draw();
     }
 
     function pauseGame() {
@@ -221,22 +233,21 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         clearInterval(timer);
         timer = null;
         setStatus("Paused");
+        draw();
         return;
       }
 
       startGame();
     }
 
-    function endGame() {
+    function endGame(won = false) {
       clearInterval(timer);
       timer = null;
       running = false;
       paused = false;
       lastScore = score;
-      resetSnakePosition();
-      setScore(0);
-      food = randomFood();
-      setStatus("Bonked");
+      ended = true;
+      setStatus(won ? "You won!" : "Bonked");
       showScoreSubmit(lastScore);
       draw();
     }
@@ -270,7 +281,8 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       };
 
       const hitWall = head.x < 0 || head.x >= cells || head.y < 0 || head.y >= cells;
-      const hitSelf = snake.some((part) => sameCell(part, head));
+      const growing = sameCell(head, food);
+      const hitSelf = (growing ? snake : snake.slice(0, -1)).some((part) => sameCell(part, head));
 
       if (hitWall || hitSelf) {
         endGame();
@@ -282,6 +294,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       if (sameCell(head, food)) {
         setScore(score + 1);
         food = randomFood();
+        if (!food) { endGame(true); return; }
       } else {
         snake.pop();
       }
@@ -323,6 +336,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     }
 
     function drawFood() {
+      if (!food) return;
       const centerX = food.x * cellSize + cellSize / 2;
       const centerY = food.y * cellSize + cellSize / 2;
 
@@ -350,6 +364,14 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         ctx.strokeStyle = "rgba(255, 255, 255, 0.74)";
         ctx.lineWidth = 2;
         ctx.stroke();
+        if (index === 0) {
+          ctx.fillStyle = "#283047";
+          const centerX = x + size / 2, centerY = y + size / 2;
+          const sideX = direction.y * 4, sideY = direction.x * 4;
+          for (const sign of [-1, 1]) {
+            ctx.beginPath(); ctx.arc(centerX + direction.x * 4 + sideX * sign, centerY + direction.y * 4 + sideY * sign, 2, 0, Math.PI * 2); ctx.fill();
+          }
+        }
       });
     }
 
@@ -381,7 +403,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       if (gameRoot.hidden) {
         return;
       }
-      if (event.target.matches("input, textarea")) {
+      if (event.target.matches("input, textarea, select") || event.target.closest("[role=tab]")) {
         return;
       }
 
@@ -402,11 +424,12 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
 
       if (keys[event.key]) {
         event.preventDefault();
+        if (ended) resetGame();
         setDirection(keys[event.key]);
         startGame();
       }
 
-      if (event.key === " ") {
+      if (event.key === " " && !event.target.matches("button")) {
         event.preventDefault();
         pauseGame();
       }
@@ -414,11 +437,19 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
 
     gameRoot.querySelectorAll("[data-direction]").forEach((button) => {
       button.addEventListener("click", () => {
+        if (ended) resetGame();
         setDirection(button.dataset.direction);
         startGame();
       });
     });
 
+    canvas.addEventListener("arcade-swipe", event => {
+      if (ended) resetGame();
+      setDirection(event.detail); startGame();
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && running && !paused) pauseGame();
+    });
     startButton.addEventListener("click", startGame);
     pauseButton.addEventListener("click", pauseGame);
     restartButton.addEventListener("click", () => {
@@ -462,7 +493,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         return;
       }
 
-      localStorage.setItem("marshymellowSnakeName", name);
+      (window.MarshyStorage || localStorage).setItem("marshymellowSnakeName", name);
       submitStatus.textContent = "Score submitted.";
       lastScore = 0;
       await loadLeaderboard();

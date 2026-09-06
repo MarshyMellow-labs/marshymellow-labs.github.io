@@ -1,0 +1,73 @@
+/* Candy arcade: the board is the focus, instructions stay alongside it. */
+.games-page { --arcade-blue: #57c9f3; --arcade-pink: #ff87bd; --arcade-border: #90cfe0; --arcade-surface: #f3fbff; --arcade-ink: #26394d; }
+html[data-theme="dark"] .games-page { --arcade-border: #35546b; --arcade-surface: #172738; --arcade-ink: #e5f5ff; }
+.games-page .games-heading { margin-bottom: 22px; }
+.games-page .game-tabs { max-width: 660px; margin: 0 auto 28px; gap: 14px; }
+.games-page .game-tabs button { flex-direction: column; gap: 4px; padding: 12px; border-radius: 20px; }
+.games-page .game-tabs img { height: 54px; }
+.games-page .game-tabs span { font-size: .85rem; }
+.games-page .embedded-game { display: grid; grid-template-columns: minmax(240px, .72fr) minmax(0, 1.3fr); gap: 24px; align-items: start; }
+.games-page .arcade-guide { padding: 22px 4px; color: var(--arcade-ink); }
+.games-page .arcade-guide h2 { font-size: clamp(1.8rem, 3vw, 2.7rem); line-height: 1.1; margin: 12px 0; letter-spacing: -.035em; }
+.games-page .arcade-guide p { line-height: 1.6; }
+.arcade-kicker { font-size: .75rem; letter-spacing: .16em; font-weight: 900; color: var(--arcade-blue); }
+.games-page .mission { background: var(--arcade-surface); border-left: 4px solid var(--arcade-blue); border-radius: 0 16px 16px 0; padding: 18px; margin: 24px 0; }
+.mission > span { display: block; font-size: .8rem; margin-bottom: 6px; }
+.mission > strong { font-size: 1.1rem; }
+.mission p { margin-bottom: 0; font-size: .95rem; }
+.control-hint { font-size: .9rem; }
+kbd { font: inherit; font-weight: 800; }
+.games-page details { margin: 18px 0; padding: 14px 0; border-top: 1px solid var(--arcade-border); }
+.games-page summary { cursor: pointer; font-weight: 800; }
+.games-page .game-panel { border: 1px solid var(--arcade-border); border-radius: 24px; background: var(--arcade-surface); padding: 16px; gap: 12px; box-shadow: 0 16px 42px #0002; }
+.games-page .score-row { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+.games-page #snake-game-root .score-row { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.games-page .score-box { background: transparent; border: 0; padding: 6px; min-width: 0; }
+.games-page .score-box strong { color: var(--arcade-ink); font-size: 1.2rem; overflow-wrap: anywhere; }
+.games-page .score-box span { color: var(--arcade-ink); opacity: .75; font-size: .7rem; }
+.games-page #dungeon-hp { color: var(--arcade-pink); letter-spacing: -2px; font-size: 1rem; }
+.games-page .board-wrap { border: 2px solid var(--arcade-border); border-radius: 16px; }
+.games-page canvas { touch-action: none; }
+.games-page canvas:focus-visible { outline: 3px solid var(--arcade-blue); outline-offset: -5px; }
+.games-page .game-actions { gap: 8px; }
+.games-page .game-actions button { border-radius: 12px; flex: 1; padding: 8px 12px; font-size: .9rem; }
+.games-page .game-actions button.primary { background: var(--arcade-blue); color: #102739; border-color: var(--arcade-blue); }
+.games-page button:disabled { opacity: .5; cursor: default; }
+.games-page .d-pad { grid-template-areas: ". up ." "left down right"; grid-template-columns: repeat(3,48px); gap: 5px; margin: 0; }
+.games-page .d-pad button { min-width: 44px; min-height: 44px; border-radius: 12px; border-color: var(--arcade-border); }
+.games-page .game-status { margin: 0; min-height: 2.8em; font-size: .9rem; color: var(--arcade-ink); text-align: center; }
+.turn-strip { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; font-size: .8rem; color: var(--arcade-ink); }
+.turn-strip strong { color: var(--arcade-pink); }
+.tile-guide { list-style: none; padding: 0; display: grid; gap: 12px; }
+.tile-guide li { display: flex; gap: 12px; align-items: center; font-size: .85rem; }
+.tile-guide strong { display: block; font-size: .95rem; }
+.tile-icon { flex: 0 0 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: #172333; font-size: 1.3rem; }
+.tile-icon.you { background: #ff87bd; }.tile-icon.exit { background: #75e1b2; }.tile-icon.snack { background: #ffe089; }.tile-icon.drink { background: #92defc; }.tile-icon.blob { background: #c5a3fc; }
+.games-page .leaderboard-panel { grid-column: 1 / -1; padding: 22px; border: 1px solid var(--arcade-border); border-radius: 20px; }
+.leaderboard-note { font-size: .85rem; color: var(--muted); }
+@media (max-width: 760px) {
+  .games-page .embedded-game { grid-template-columns: 1fr; gap: 16px; }
+  .games-page .arcade-guide { padding: 0; }
+  .games-page .arcade-guide h2 { font-size: 1.7rem; }
+  .games-page .mission { margin: 12px 0; padding: 12px; }
+  .games-page .tile-guide { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .games-page .game-panel { padding: 10px; border-radius: 18px; }
+  .games-page .games-shell { padding: 24px 12px 48px; }
+  .games-page .game-tabs img { height: 38px; }
+  .games-page .game-tabs span { font-size: .72rem; }
+}
+
+.games-page .games-heading { position: relative; }
+.games-page .games-heading > .hidden-marshmallow { position: absolute; right: 0; bottom: -12px; margin: 0; width: 40px; height: 44px; }
+.games-page .games-heading > .hidden-marshmallow .marshy-pet-sprite { width: 40px; }
+.games-page .leaderboard-panel h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); }
+html[data-theme="dark"] .games-page .score-box { background: transparent !important; }
+@media (max-width: 760px) {
+  .games-page .game-tabs { grid-template-columns: 1fr 1fr; }
+  .games-page .embedded-game > .game-panel { grid-row: 1; }
+  .games-page .embedded-game > .arcade-guide { grid-row: 2; }
+  .games-page .games-heading > p:last-of-type { font-size: .9rem; padding-right: 34px; }
+}
+
+/* Keep the hunt companion available without covering either playfield. */
+.games-page .marshy-companion { position: static; margin: 18px 24px; }

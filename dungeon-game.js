@@ -25,6 +25,10 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     const submitStatus = gameRoot.querySelector("#dungeon-submit-status");
     const leaderboardList = gameRoot.querySelector("#dungeon-leaderboard-list");
     const leaderboardEmpty = gameRoot.querySelector("#dungeon-leaderboard-empty");
+    const objective = gameRoot.querySelector("#dungeon-objective");
+    const turnLabel = gameRoot.querySelector("#dungeon-turn");
+    let turns = 0;
+    let showRoute = false;
     const cells = 12;
     const cellSize = canvas.width / cells;
     const directions = {
@@ -46,18 +50,18 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     let gameOver = false;
     let lastScore = 0;
     let lastFloor = 1;
-    let bestScore = Number(localStorage.getItem("marshymellowDungeonBest")) || 0;
+    let bestScore = Number((window.MarshyStorage || localStorage).getItem("marshymellowDungeonBest")) || 0;
 
     bestScoreElement.textContent = bestScore;
 
     function getScoreFingerprint() {
-      let fingerprint = localStorage.getItem(SCORE_FINGERPRINT_KEY);
+      let fingerprint = (window.MarshyStorage || localStorage).getItem(SCORE_FINGERPRINT_KEY);
 
       if (!fingerprint) {
         fingerprint = crypto.randomUUID
           ? crypto.randomUUID()
           : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-        localStorage.setItem(SCORE_FINGERPRINT_KEY, fingerprint);
+        (window.MarshyStorage || localStorage).setItem(SCORE_FINGERPRINT_KEY, fingerprint);
       }
 
       return fingerprint;
@@ -125,7 +129,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       finalScoreElement.textContent = value;
       scoreSubmit.hidden = false;
       submitStatus.textContent = "";
-      playerName.value = localStorage.getItem("marshymellowDungeonName") || "";
+      playerName.value = (window.MarshyStorage || localStorage).getItem("marshymellowDungeonName") || "";
     }
 
     function renderLeaderboard(scores) {
@@ -175,12 +179,15 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     function updateStats() {
       scoreElement.textContent = score;
       floorElement.textContent = floor;
-      hpElement.textContent = hp;
+      hpElement.textContent = "♥".repeat(hp) + "♡".repeat(6 - hp);
+      hpElement.setAttribute("aria-label", `${hp} of 6 hearts`);
+      turnLabel.textContent = gameOver ? "Run finished" : turns % 2 ? "Blobs move after this step" : "Your move · blobs wait";
+      objective.textContent = gameOver ? `Reached floor ${floor} · ${score} points` : `Floor ${floor} · reach the green EXIT`;
 
       if (score > bestScore) {
         bestScore = score;
         bestScoreElement.textContent = bestScore;
-        localStorage.setItem("marshymellowDungeonBest", String(bestScore));
+        (window.MarshyStorage || localStorage).setItem("marshymellowDungeonBest", String(bestScore));
       }
     }
 
@@ -201,13 +208,29 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         || enemies.some((item) => sameCell(item, cell));
     }
 
-    function findEmptyCell() {
-      let cell;
-      do {
-        cell = { x: 1 + randomInt(cells - 2), y: 1 + randomInt(cells - 2) };
-      } while (isOccupied(cell));
+    function routeFrom(start, goal) {
+      const queue = [[start]];
+      const seen = new Set([key(start)]);
+      while (queue.length) {
+        const path = queue.shift(), current = path[path.length - 1];
+        if (sameCell(current, goal)) return path;
+        for (const direction of Object.values(directions)) {
+          const next = { x: current.x + direction.x, y: current.y + direction.y };
+          if (inBounds(next) && !isWall(next) && !seen.has(key(next))) {
+            seen.add(key(next)); queue.push([...path, next]);
+          }
+        }
+      }
+      return [];
+    }
 
-      return cell;
+    function findEmptyCell() {
+      const candidates = [];
+      for (let y = 1; y < cells - 1; y++) for (let x = 1; x < cells - 1; x++) {
+        const cell = { x, y };
+        if (!isOccupied(cell) && Math.abs(x - 1) + Math.abs(y - 1) > 3 && routeFrom(player, cell).length) candidates.push(cell);
+      }
+      return candidates[randomInt(candidates.length)];
     }
 
     function canReachGoal(testWalls) {
@@ -247,7 +270,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         nextWalls.add(key({ x: cells - 1, y: i }));
       }
 
-      const wallGoal = Math.min(18 + floor * 2, 38);
+      const wallGoal = floor === 1 ? 8 : Math.min(12 + floor * 2, 30);
       let attempts = 0;
 
       while (nextWalls.size < wallGoal + cells * 4 - 4 && attempts < 300) {
@@ -269,7 +292,8 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       return nextWalls;
     }
 
-    function generateFloor(message = "Find the exit door.") {
+    function generateFloor(message = "Reach the green EXIT. Snacks are optional.") {
+      turns = 0;
       player = { x: 1, y: 1 };
       exit = { x: cells - 2, y: cells - 2 };
       walls = createWalls();
@@ -279,18 +303,21 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
 
       const snackCount = Math.min(4 + floor, 9);
       const drinkCount = floor % 2 === 0 ? 2 : 1;
-      const enemyCount = Math.min(2 + Math.floor(floor / 2), 7);
+      const enemyCount = Math.min(1 + Math.floor(floor / 2), 5);
 
       for (let i = 0; i < snackCount; i += 1) {
-        snacks.push(findEmptyCell());
+        const cell = findEmptyCell();
+        if (cell) snacks.push(cell);
       }
 
       for (let i = 0; i < drinkCount; i += 1) {
-        drinks.push(findEmptyCell());
+        const cell = findEmptyCell();
+        if (cell) drinks.push(cell);
       }
 
       for (let i = 0; i < enemyCount; i += 1) {
-        enemies.push(findEmptyCell());
+        const cell = findEmptyCell();
+        if (cell) enemies.push(cell);
       }
 
       gameOver = false;
@@ -306,14 +333,14 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       lastScore = 0;
       lastFloor = 1;
       hideScoreSubmit();
-      generateFloor("A suspiciously pastel dungeon appears.");
+      generateFloor("You’re the pink face at the top left. Move toward the green EXIT.");
     }
 
     function nextFloor() {
       floor += 1;
       score += 25;
       hp = Math.min(6, hp + 1);
-      generateFloor("Deeper into the snack paperwork zone.");
+      generateFloor(`Floor ${floor}! +25 points and +1 heart. Find the next green EXIT.`);
     }
 
     function losePatience(message) {
@@ -324,7 +351,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         gameOver = true;
         lastScore = score;
         lastFloor = floor;
-        setStatus(`${message} Marshy is out of patience.`);
+        setStatus(`${message} Run over — ${score} points on floor ${floor}. Start a new run below.`);
         showScoreSubmit(lastScore);
       } else {
         setStatus(message);
@@ -340,21 +367,24 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       }
 
       const direction = directions[directionName];
+      if (!direction) return;
       const next = { x: player.x + direction.x, y: player.y + direction.y };
 
       if (!inBounds(next) || isWall(next)) {
-        setStatus("Bonk. Wall.");
+        setStatus("That’s a wall. Try another direction — no turn or heart lost.");
         return;
       }
 
+      turns += 1;
+      setStatus("Keep heading for the green EXIT. Snacks are optional.");
       const enemyIndex = enemies.findIndex((enemy) => sameCell(enemy, next));
 
       if (enemyIndex >= 0) {
         enemies.splice(enemyIndex, 1);
         score += 5;
         player = next;
-        losePatience("Paperwork blob bonked.");
-        if (!gameOver) {
+        losePatience("Blob cleared: −1 heart, +5 points.");
+        if (!gameOver && turns % 2 === 0) {
           moveEnemies();
         }
         draw();
@@ -367,7 +397,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       if (snackIndex >= 0) {
         snacks.splice(snackIndex, 1);
         score += 10;
-        setStatus("Snack acquired.");
+        setStatus("Snack collected! +10 points. You can still head straight to the EXIT.");
       }
 
       const drinkIndex = drinks.findIndex((drink) => sameCell(drink, player));
@@ -375,7 +405,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         drinks.splice(drinkIndex, 1);
         hp = Math.min(6, hp + 1);
         score += 4;
-        setStatus("Patience restored.");
+        setStatus("Drink collected! +1 heart (up to 6) and +4 points.");
       }
 
       if (sameCell(player, exit)) {
@@ -383,7 +413,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         return;
       }
 
-      moveEnemies();
+      if (turns % 2 === 0) moveEnemies();
       updateStats();
       draw();
     }
@@ -393,7 +423,9 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         return;
       }
 
+      let damagedThisTurn = false;
       enemies.forEach((enemy, index) => {
+        if (gameOver) return;
         const options = Object.values(directions)
           .map((direction) => ({ x: enemy.x + direction.x, y: enemy.y + direction.y }))
           .filter((cell) => inBounds(cell) && !isWall(cell) && !sameCell(cell, exit))
@@ -413,7 +445,10 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         }
 
         if (sameCell(next, player)) {
-          losePatience("A paperwork blob caught Marshy.");
+          if (!damagedThisTurn) {
+            losePatience("A blob caught you: −1 heart. Move away or step onto it to clear it.");
+            damagedThisTurn = true;
+          }
           return;
         }
 
@@ -458,7 +493,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       ctx.strokeStyle = stroke;
       ctx.lineWidth = 4;
       ctx.stroke();
-      ctx.fillStyle = varColor("--ink");
+      ctx.fillStyle = "#243047";
       ctx.font = "900 18px 'gg sans', sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -500,9 +535,9 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       ctx.font = "900 46px 'gg sans', sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("Dungeon nap", canvas.width / 2, canvas.height / 2 - 12);
+      ctx.fillText("Out of hearts", canvas.width / 2, canvas.height / 2 - 12);
       ctx.font = "800 20px 'gg sans', sans-serif";
-      ctx.fillText("New run?", canvas.width / 2, canvas.height / 2 + 34);
+      ctx.fillText("Start a new run below", canvas.width / 2, canvas.height / 2 + 34);
     }
 
     function draw() {
@@ -513,22 +548,32 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         drawTile({ x, y }, "rgba(109, 90, 168, 0.42)", "rgba(55, 40, 64, 0.18)", 3, 7);
       });
 
-      drawTile(exit, "rgba(255, 111, 174, 0.22)", "rgba(255, 111, 174, 0.72)", 7, 12);
+      if (showRoute && !gameOver) {
+        ctx.strokeStyle = "#68dcb2"; ctx.lineWidth = 4; ctx.setLineDash([5, 7]); ctx.beginPath();
+        routeFrom(player, exit).forEach((cell, i) => {
+          const x = (cell.x + .5) * cellSize, y = (cell.y + .5) * cellSize;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke(); ctx.setLineDash([]);
+      }
+      drawTile(exit, "#75e1b2", "#ddfff0", 3, 8);
+      ctx.fillStyle = "#133f32"; ctx.font = "900 12px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("EXIT", (exit.x + .5) * cellSize, (exit.y + .5) * cellSize);
 
-      snacks.forEach((snack) => drawCircle(snack, "#fff2ad", "#ffb703", "S"));
-      drinks.forEach((drink) => drawCircle(drink, "#bfe9ff", "#4db8ed", "D"));
-      enemies.forEach((enemy) => drawCircle(enemy, "#d4b6ff", "#6d5aa8", "P"));
-      drawCircle(player, "#ff6fae", "#fff2ad", "M");
+      snacks.forEach((snack) => drawCircle(snack, "#fff2ad", "#ffb703", "★"));
+      drinks.forEach((drink) => drawCircle(drink, "#bfe9ff", "#4db8ed", "+"));
+      enemies.forEach((enemy) => drawCircle(enemy, "#d4b6ff", "#6d5aa8", "!"));
+      drawCircle(player, "#ff6fae", "#fff2ad", "☺");
       drawOverlay();
     }
 
     window.addEventListener("marshy-theme-change", draw);
 
     document.addEventListener("keydown", (event) => {
-      if (gameRoot.hidden) {
+      if (gameRoot.hidden || event.repeat) {
         return;
       }
-      if (event.target.matches("input, textarea, button")) {
+      if (event.target.matches("input, textarea, select") || event.target.closest("[role=tab]")) {
         return;
       }
 
@@ -560,7 +605,14 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     });
 
     newRunButton.addEventListener("click", newRun);
-    newFloorButton.addEventListener("click", () => generateFloor("The dungeon reshuffles itself."));
+    newFloorButton.addEventListener("click", () => {
+      showRoute = !showRoute;
+      newFloorButton.textContent = showRoute ? "Hide route" : "Show route";
+      newFloorButton.setAttribute("aria-pressed", String(showRoute));
+      setStatus(showRoute ? "Follow the dotted line to EXIT, but watch for moving blobs." : "Route hidden. Take your time.");
+      draw();
+    });
+    canvas.addEventListener("arcade-swipe", event => movePlayer(event.detail));
 
     scoreSubmit.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -598,7 +650,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         return;
       }
 
-      localStorage.setItem("marshymellowDungeonName", name);
+      (window.MarshyStorage || localStorage).setItem("marshymellowDungeonName", name);
       submitStatus.textContent = "Score submitted.";
       lastScore = 0;
       await loadLeaderboard();
