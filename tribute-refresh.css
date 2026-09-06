@@ -1,0 +1,111 @@
+html[data-theme][data-page="donate"] {
+  --tribute-surface: #f2faff;
+  --tribute-inset: #fff;
+  --tribute-border: #9edaf4;
+  --tribute-accent: #256082;
+}
+html[data-theme="dark"][data-page="donate"] {
+  --tribute-surface: #182b3c;
+  --tribute-inset: #142333;
+  --tribute-border: #376c89;
+  --tribute-accent: #8cdcff;
+}
+html[data-theme][data-page="donate"] main { padding: clamp(24px, 4vw, 52px) clamp(16px, 4vw, 48px) 72px; }
+html[data-theme][data-page="donate"] .donate-shell {
+  max-width: 1180px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas: "welcome welcome" "payment perks" "wallet wallet";
+  align-items: stretch;
+  gap: 28px;
+}
+.tribute-welcome {
+  grid-area: welcome;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(24px, 4vw, 44px);
+  padding: clamp(24px, 4vw, 44px);
+  background: var(--tribute-surface);
+  border: 1px solid var(--tribute-border);
+  border-radius: 28px;
+}
+.tribute-copy { min-width: 0; }
+html[data-theme][data-page="donate"] .tribute-eyebrow {
+  font-size: .875rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  color: var(--tribute-accent);
+  margin: 0 0 14px;
+}
+html[data-theme][data-page="donate"] .pay-tribute-title { width: 100%; max-width: 460px; }
+html[data-theme][data-page="donate"] .intro { font-size: 1.1rem; line-height: 1.65; margin-top: 20px; }
+html[data-theme][data-page="donate"] .support-card {
+  margin: 0;
+  border: 1px solid var(--tribute-border) !important;
+  border-radius: 22px;
+  transform: rotate(2deg);
+  box-shadow: 0 16px 32px #071d2b24;
+}
+html[data-theme][data-page="donate"] .support-card img { aspect-ratio: 4 / 3; object-fit: contain; background: var(--tribute-inset); }
+html[data-theme][data-page="donate"] .kofi-embed-card,
+html[data-theme][data-page="donate"] .tribute-benefits,
+html[data-theme][data-page="donate"] .litecoin-card {
+  background: var(--tribute-surface) !important;
+  border: 1px solid var(--tribute-border) !important;
+  border-radius: 26px;
+  padding: clamp(22px, 3vw, 32px);
+  min-width: 0;
+  box-shadow: 0 12px 32px #071d2b14;
+}
+html[data-theme][data-page="donate"] .kofi-embed-card { grid-area: payment; }
+html[data-theme][data-page="donate"] .tribute-benefits { grid-area: perks; }
+html[data-theme][data-page="donate"] .litecoin-card { grid-area: wallet; }
+html[data-theme][data-page="donate"] h2 { font-size: clamp(1.7rem, 3vw, 2.2rem); color: var(--tribute-accent) !important; line-height: 1.15; }
+html[data-theme][data-page="donate"] .kofi-frame { border-radius: 16px; color-scheme: only light; margin-top: 24px; }
+html[data-theme][data-page="donate"] .kofi-fallback { font-size: .95rem; line-height: 1.6; }
+html[data-theme][data-page="donate"] .kofi-fallback a { color: var(--tribute-accent); }
+html[data-theme][data-page="donate"] .benefit-list { grid-template-columns: 1fr; gap: 12px; }
+html[data-theme][data-page="donate"] .benefit-list li {
+  background: var(--tribute-inset) !important;
+  border: 1px solid var(--tribute-border) !important;
+  border-radius: 16px;
+  padding: 16px 18px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+html[data-theme][data-page="donate"] .benefit-list span { color: var(--tribute-accent); }
+html[data-theme][data-page="donate"] .fine-print { line-height: 1.6; font-size: .875rem; border-color: var(--tribute-border); }
+html[data-theme][data-page="donate"] .button.primary {
+  background: #bfe9ff !important;
+  border-color: #78bfe3 !important;
+  color: #173e54 !important;
+  box-shadow: 0 6px 18px #69cff829;
+}
+html[data-theme][data-page="donate"] .button.secondary {
+  background: var(--tribute-inset) !important;
+  border-color: var(--tribute-border) !important;
+  color: var(--ink) !important;
+}
+html[data-theme][data-page="donate"] .button:hover,
+html[data-theme][data-page="donate"] .button:focus-visible { box-shadow: 0 0 22px #69cff84d; }
+html[data-theme][data-page="donate"] .wallet-address-row { grid-template-columns: minmax(0, 1fr) auto auto; }
+html[data-theme][data-page="donate"] #litecoin-wallet-address { background: var(--tribute-inset) !important; border-color: var(--tribute-border); border-radius: 14px; }
+html[data-theme][data-page="donate"] .litecoin-kicker { color: var(--tribute-accent); }
+html[data-theme][data-page="donate"] .site-footer { background: var(--tribute-surface); color: var(--ink); border-top: 1px solid var(--tribute-border); }
+html[data-theme][data-page="donate"] .site-footer a,
+html[data-theme][data-page="donate"] .ai-credit { color: var(--muted); }
+@media (max-width: 900px) {
+  html[data-theme][data-page="donate"] .wallet-address-row { grid-template-columns: 1fr 1fr; }
+  html[data-theme][data-page="donate"] #litecoin-wallet-address { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  html[data-theme][data-page="donate"] .donate-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "welcome" "payment" "wallet" "perks";
+  }
+  .tribute-welcome { grid-template-columns: minmax(0, 1fr); }
+  html[data-theme][data-page="donate"] .support-card { transform: none; }
+}
+@media (max-width: 480px) {
+  html[data-theme][data-page="donate"] .wallet-address-row { grid-template-columns: minmax(0, 1fr); }
+}

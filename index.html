@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js 'sha256-kGngJzJuG8cL/Dxv3XXiIMw63X0QqQ/H4su30LqQ6HY='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co https://images.unsplash.com; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src https://docs.google.com; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co https://images.unsplash.com; connect-src 'self' https://hnqrptrfxxtuxhawyvge.supabase.co wss://hnqrptrfxxtuxhawyvge.supabase.co; frame-src https://docs.google.com; upgrade-insecure-requests">
   <script src="security.js"></script>
   <title>marshymellow</title>
   <link rel="icon" href="assets/marshy-logo.png">
@@ -327,7 +327,7 @@
       border-radius: 8px;
       border: 3px solid rgba(255, 255, 255, 0.82);
       box-shadow: var(--shadow);
-      max-height: 680px;
+      max-height: 820px;
       min-height: 360px;
       overflow: hidden;
       position: relative;
@@ -335,8 +335,10 @@
     }
 
     .hero-photo img {
+      display: block;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       width: 100%;
     }
 
@@ -928,8 +930,11 @@
       }
     }
   </style>
-  <script src="theme.js?v=20260721-2"></script>
-  <link rel="stylesheet" href="theme.css?v=20260721-2">
+  <script src="site-state.js?v=20260905-1"></script>
+  <script src="theme.js?v=20260905-12"></script>
+  <link rel="stylesheet" href="theme.css?v=20260905-11">
+  <link rel="stylesheet" href="marshy-delights.css?v=20260905-14">
+  <script src="marshy-delights.js?v=20260905-15" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -944,6 +949,8 @@
       <a href="approved.html">Approved</a>
       <a href="headset.html">Headset</a>
       <a href="games.html">Games</a>
+      <a href="control-marshy.html">Marshy Zappy Zaps</a>
+      <a href="projects.html">Projects</a>
       <a href="donate.html">Pay Tribute</a>
     </nav>
   </header>
@@ -951,19 +958,20 @@
   <main id="home">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <div class="hero-status" aria-label="Site status">
-          <span>gallery open</span>
-          <span>TOS signatures accepted</span>
-          <span>games ready</span>
-        </div>
+
         <p class="eyebrow">Soft, sweet, and a little dramatic</p>
         <img class="hero-logo" src="assets/marshy-logo.png" alt="MarshyMellow" decoding="async" data-fallback-action="hide">
         <h1 class="sr-only" id="hero-title">MarshyMellow</h1>
         <p class="tagline">
           Welcome to MarshyMellow's website you are now trapped here.
         </p>
+        <section class="home-marshy-status" data-state="unknown" aria-label="Where is Marshy?">
+          <p class="status-kicker">Where is Marshy?</p>
+          <h2 id="home-status-label" aria-live="polite">Looking for Marshy…</h2>
+          <p id="home-status-detail">Checking in with VRChat.</p>
+        </section>
         <div class="hero-actions">
-          <a class="button primary" href="index.html#pictures">See pictures</a>
+          <a class="button primary" href="index.html#pictures">Open the scrapbook</a>
           <a class="button secondary" href="index.html#tos">Read TOS</a>
         </div>
         <div class="hero-quick-grid" aria-label="Quick links">
@@ -995,7 +1003,7 @@
       </div>
 
       <div class="hero-photo">
-        <img src="assets/marshy-hero.jpg" alt="Two VRChat avatars close together" decoding="async" fetchpriority="high" data-fallback-src="https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&amp;fit=crop&amp;w=1200&amp;q=80">
+        <img src="assets/marshy-rainbow-portrait.jpg" alt="Marshy's VRChat avatar making a peace sign beneath a rainbow" width="1080" height="1920" decoding="async" fetchpriority="high">
         <span>freshly fluffed</span>
       </div>
     </section>
@@ -1021,15 +1029,21 @@
         <h2 id="pictures-title">
           <img class="section-title-image pictures-title-image" src="assets/pictures-title.png" alt="Pictures!" loading="lazy" decoding="async">
         </h2>
-        <p>Soft scenes, snack-table energy, and plenty of room for more marshymellow moments.</p>
+        <p>A little scrapbook of VRChat moments. Pick a picture to take a closer look.</p>
       </div>
 
+      <div class="scrapbook-toolbar">
       <div class="gallery-search">
         <label class="sr-only" for="gallery-search">Search pictures by title</label>
         <input id="gallery-search" type="search" placeholder="Search pictures by title" autocomplete="off">
       </div>
+      <div class="gallery-view-options" role="group" aria-label="Picture layout">
+        <button type="button" data-gallery-view="scrapbook" aria-pressed="true">Scrapbook</button>
+        <button type="button" data-gallery-view="grid" aria-pressed="false">Simple grid</button>
+      </div>
+      </div>
       <p class="gallery-empty" id="gallery-empty" hidden>No pictures found with that title.</p>
-      <div class="gallery" id="gallery"></div>
+      <div class="gallery" id="gallery" data-view="scrapbook"></div>
       <div class="gallery-controls" id="gallery-controls" hidden>
         <button class="button secondary" type="button" id="gallery-more-button">Show all pictures</button>
       </div>
@@ -1092,594 +1106,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script>
-    const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_anROZEas9WH0SKrywRbG9Q_1zywb3ia";
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const approvalForm = document.querySelector("#approval-form");
-    const approvalName = document.querySelector("#approval-name");
-    const approvalStatus = document.querySelector("#approval-status");
-    const gallery = document.querySelector("#gallery");
-    const sectionNavLinks = Array.from(document.querySelectorAll('.nav-links a[href^="index.html#"]'));
-    const imageViewer = document.querySelector("#image-viewer");
-    const imageViewerImg = document.querySelector("#image-viewer-img");
-    const imageViewerMeta = document.querySelector("#image-viewer-meta");
-    const imageViewerClose = document.querySelector("#image-viewer-close");
-    const imageViewerPrev = document.querySelector("#image-viewer-prev");
-    const imageViewerNext = document.querySelector("#image-viewer-next");
-    const heroGalleryCount = document.querySelector("#hero-gallery-count");
-    const heroApprovalCount = document.querySelector("#hero-approval-count");
-    const galleryControls = document.querySelector("#gallery-controls");
-    const galleryMoreButton = document.querySelector("#gallery-more-button");
-    const gallerySearch = document.querySelector("#gallery-search");
-    const galleryEmpty = document.querySelector("#gallery-empty");
-    let currentImageIndex = 0;
-    let galleryImages = [];
-    let galleryLoaded = false;
-    let galleryLoading = false;
-    let visibleGalleryCount = 8;
-    let gallerySearchQuery = "";
-    const GALLERY_BATCH_SIZE = 8;
-    const APPROVAL_RATE_KEY = "marshymellowApprovalRate";
-    const APPROVAL_SHORT_WINDOW_MS = 10 * 60 * 1000;
-    const APPROVAL_SHORT_LIMIT = 2;
-    const APPROVAL_LONG_WINDOW_MS = 60 * 60 * 1000;
-    const APPROVAL_LONG_LIMIT = 10;
-    const APPROVAL_PENALTY_MS = 2 * 60 * 60 * 1000;
-    const APPROVAL_FINGERPRINT_KEY = "marshymellowApprovalFingerprint";
-
-    function updateSectionNavigation() {
-      const currentHash = window.location.hash;
-
-      sectionNavLinks.forEach((link) => {
-        const linkHash = new URL(link.href).hash;
-
-        if (currentHash && linkHash === currentHash) {
-          link.setAttribute("aria-current", "location");
-        } else {
-          link.removeAttribute("aria-current");
-        }
-      });
-    }
-
-    window.addEventListener("hashchange", updateSectionNavigation);
-    updateSectionNavigation();
-
-    function getGalleryImages() {
-      return Array.from(gallery.querySelectorAll(".picture-card img"));
-    }
-
-    function renderImageViewerMetadata(image) {
-      const record = image.galleryRecord;
-      const title = document.createElement("h2");
-      const details = document.createElement("dl");
-      const addDetail = (label, value) => {
-        const row = document.createElement("div");
-        const term = document.createElement("dt");
-        const description = document.createElement("dd");
-        term.textContent = label;
-        description.textContent = value || "Not available";
-        row.append(term, description);
-        details.append(row);
-      };
-
-      imageViewerMeta.replaceChildren();
-      title.textContent = record?.title?.trim() || "";
-      details.className = "image-viewer-details";
-
-      if (title.textContent) {
-        imageViewerMeta.append(title);
-      }
-
-      const captureDate = galleryCaptureDate(record || {});
-      const worldName = record?.world_name?.trim() || "";
-      const users = Array.isArray(record?.user_names)
-        ? record.user_names.filter((name) => typeof name === "string" && name.trim())
-        : [];
-      const userCount = Number.isInteger(record?.user_count)
-        ? Math.max(0, record.user_count)
-        : users.length || null;
-
-      if (!captureDate && !worldName && userCount === null) {
-        const message = document.createElement("p");
-        message.className = "image-viewer-empty";
-        message.textContent = "No additional picture details are available.";
-        imageViewerMeta.append(message);
-        return;
-      }
-
-      addDetail("Date and time", formatImageDate(captureDate));
-      addDetail("World", worldName);
-      imageViewerMeta.append(details);
-
-      const userSection = document.createElement("section");
-      const userHeading = document.createElement("h3");
-      const userNames = document.createElement("p");
-      const userNote = document.createElement("p");
-      userSection.className = "image-viewer-users";
-      userHeading.textContent = userCount === null
-        ? "Users in the instance"
-        : `Users in the instance (${userCount})`;
-      userNames.textContent = users.length
-        ? users.join(", ")
-        : userCount === null
-          ? "Instance users were not included in this photo's metadata."
-          : `${formatCount(userCount, "user")} recorded; display names unavailable.`;
-      userNote.className = "image-viewer-note";
-      userNote.textContent = "This list comes from VRCX metadata and may not always be accurate.";
-      userSection.append(userHeading, userNames, userNote);
-      imageViewerMeta.append(userSection);
-    }
-
-    function showImageAt(index) {
-      const images = getGalleryImages();
-
-      if (!images.length) {
-        return;
-      }
-
-      currentImageIndex = (index + images.length) % images.length;
-      const image = images[currentImageIndex];
-      imageViewerImg.src = image.dataset.fullSrc || image.currentSrc || image.src;
-      imageViewerImg.alt = image.alt;
-      renderImageViewerMetadata(image);
-    }
-
-    function openImageViewer(image) {
-      const images = getGalleryImages();
-      const index = images.indexOf(image);
-
-      showImageAt(index >= 0 ? index : 0);
-      imageViewer.hidden = false;
-      imageViewerClose.focus();
-    }
-
-    function closeImageViewer() {
-      imageViewer.hidden = true;
-      imageViewerImg.removeAttribute("src");
-      imageViewerMeta.replaceChildren();
-    }
-
-    function showNextImage() {
-      showImageAt(currentImageIndex + 1);
-    }
-
-    function showPreviousImage() {
-      showImageAt(currentImageIndex - 1);
-    }
-
-    gallery.addEventListener("click", (event) => {
-      const image = event.target.closest(".picture-card img");
-
-      if (image) {
-        openImageViewer(image);
-      }
-    });
-
-    imageViewerClose.addEventListener("click", closeImageViewer);
-    imageViewerPrev.addEventListener("click", showPreviousImage);
-    imageViewerNext.addEventListener("click", showNextImage);
-
-    imageViewer.addEventListener("click", (event) => {
-      if (event.target === imageViewer) {
-        closeImageViewer();
-      }
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !imageViewer.hidden) {
-        closeImageViewer();
-      }
-
-      if (event.key === "ArrowLeft" && !imageViewer.hidden) {
-        showPreviousImage();
-      }
-
-      if (event.key === "ArrowRight" && !imageViewer.hidden) {
-        showNextImage();
-      }
-    });
-
-    function normalizeName(value) {
-      return value.trim().replace(/\s+/g, " ");
-    }
-
-    function getNameError(name) {
-      if (name.length < 2) {
-        return "Name must be at least 2 characters.";
-      }
-
-      if (name.length > 32) {
-        return "Name must be 32 characters or fewer.";
-      }
-
-      if (/https?:\/\/|www\.|\.com|\.gg|discord\.gg/i.test(name)) {
-        return "Links are not allowed in names.";
-      }
-
-      if (/[\u0000-\u001f\u007f]/.test(name)) {
-        return "Control characters are not allowed.";
-      }
-
-      if (/[<>()[\]{}|\\]/.test(name)) {
-        return "That name uses symbols that are not allowed.";
-      }
-
-      if (/(.)\1{5,}/iu.test(name.replace(/\s/g, ""))) {
-        return "Name has too many repeated characters.";
-      }
-
-      if (/admin|owner|moderator|support/i.test(name)) {
-        return "Please do not use staff-style names.";
-      }
-
-      return "";
-    }
-
-    function readApprovalRateState() {
-      try {
-        const state = JSON.parse(localStorage.getItem(APPROVAL_RATE_KEY)) || {};
-        return {
-          attempts: Array.isArray(state.attempts) ? state.attempts : [],
-          blockedUntil: Number(state.blockedUntil) || 0
-        };
-      } catch {
-        return { attempts: [], blockedUntil: 0 };
-      }
-    }
-
-    function saveApprovalRateState(state) {
-      localStorage.setItem(APPROVAL_RATE_KEY, JSON.stringify(state));
-    }
-
-    function formatWaitTime(milliseconds) {
-      const minutes = Math.ceil(milliseconds / 60000);
-
-      if (minutes >= 60) {
-        const hours = Math.floor(minutes / 60);
-        const remainingMinutes = minutes % 60;
-        return remainingMinutes ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
-      }
-
-      return `${minutes}m`;
-    }
-
-    function checkApprovalCooldown() {
-      const now = Date.now();
-      const state = readApprovalRateState();
-      state.attempts = state.attempts.filter((time) => now - time < APPROVAL_LONG_WINDOW_MS);
-
-      if (state.blockedUntil > now) {
-        saveApprovalRateState(state);
-        return `Too many TOS submissions. Try again in ${formatWaitTime(state.blockedUntil - now)}.`;
-      }
-
-      if (state.attempts.length >= APPROVAL_LONG_LIMIT) {
-        state.blockedUntil = now + APPROVAL_PENALTY_MS;
-        saveApprovalRateState(state);
-        return "Too many TOS submissions in one hour. Cooldown increased to 2 hours.";
-      }
-
-      const shortAttempts = state.attempts.filter((time) => now - time < APPROVAL_SHORT_WINDOW_MS);
-
-      if (shortAttempts.length >= APPROVAL_SHORT_LIMIT) {
-        const oldestShortAttempt = Math.min(...shortAttempts);
-        const waitTime = APPROVAL_SHORT_WINDOW_MS - (now - oldestShortAttempt);
-        saveApprovalRateState(state);
-        return `You can submit 2 TOS names every 10 minutes. Try again in ${formatWaitTime(waitTime)}.`;
-      }
-
-      saveApprovalRateState(state);
-      return "";
-    }
-
-    function recordApprovalAttempt() {
-      const now = Date.now();
-      const state = readApprovalRateState();
-      state.attempts = state.attempts
-        .filter((time) => now - time < APPROVAL_LONG_WINDOW_MS)
-        .concat(now);
-
-      if (state.attempts.length >= APPROVAL_LONG_LIMIT) {
-        state.blockedUntil = now + APPROVAL_PENALTY_MS;
-      }
-
-      saveApprovalRateState(state);
-    }
-
-    function getApprovalFingerprint() {
-      let fingerprint = localStorage.getItem(APPROVAL_FINGERPRINT_KEY);
-
-      if (!fingerprint) {
-        fingerprint = crypto.randomUUID
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-        localStorage.setItem(APPROVAL_FINGERPRINT_KEY, fingerprint);
-      }
-
-      return fingerprint;
-    }
-
-    function formatImageDate(value) {
-      if (!value) {
-        return "";
-      }
-
-      return new Intl.DateTimeFormat(undefined, {
-        dateStyle: "medium",
-        timeStyle: "short"
-      }).format(new Date(value));
-    }
-
-    function galleryCaptureDate(image) {
-      if (image.captured_at) {
-        return image.captured_at;
-      }
-
-      const match = image.image_path?.match(/vrchat_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})(?:\.(\d{1,3}))?/i);
-
-      if (match) {
-        const [, year, month, day, hour, minute, second, milliseconds = "0"] = match;
-        const date = new Date(
-          Number(year),
-          Number(month) - 1,
-          Number(day),
-          Number(hour),
-          Number(minute),
-          Number(second),
-          Number(milliseconds.padEnd(3, "0"))
-        );
-
-        if (!Number.isNaN(date.getTime())) {
-          return date.toISOString();
-        }
-      }
-
-      return image.created_at || null;
-    }
-
-    function formatCount(count, singular, plural = `${singular}s`) {
-      if (!Number.isFinite(count)) {
-        return plural;
-      }
-
-      return `${count} ${count === 1 ? singular : plural}`;
-    }
-
-    function normalizeGallerySearch(value) {
-      return String(value || "").normalize("NFKC").toLocaleLowerCase().trim();
-    }
-
-    function imageMatchesTitle(image, query) {
-      return normalizeGallerySearch(image.title).includes(query);
-    }
-
-    function renderCurrentGallery() {
-      const filteredImages = gallerySearchQuery
-        ? galleryImages.filter((image) => imageMatchesTitle(image, gallerySearchQuery))
-        : galleryImages;
-      renderUploadedImages(filteredImages, Boolean(gallerySearchQuery));
-    }
-
-    function renderUploadedImages(images, showAll = false) {
-      gallery.querySelectorAll("[data-uploaded-image]").forEach((card) => card.remove());
-      heroGalleryCount.textContent = formatCount(galleryImages.length, "picture");
-      galleryEmpty.textContent = gallerySearchQuery
-        ? "No pictures found with that title."
-        : "No pictures are available yet.";
-      galleryEmpty.hidden = images.length > 0;
-      const displayedImages = showAll ? images : images.slice(0, visibleGalleryCount);
-
-      displayedImages.forEach((image) => {
-        const article = document.createElement("article");
-        const img = document.createElement("img");
-        const caption = document.createElement("div");
-        const title = document.createElement("strong");
-        const capturedAt = document.createElement("time");
-        const captureDate = galleryCaptureDate(image);
-        const { data: fullImage } = db.storage.from("gallery").getPublicUrl(image.image_path);
-        const { data: thumbnail } = db.storage.from("gallery").getPublicUrl(image.thumbnail_path || image.image_path);
-
-        article.className = "picture-card";
-        article.dataset.uploadedImage = "true";
-        caption.className = "picture-caption";
-        title.className = "picture-title";
-        img.src = thumbnail.publicUrl;
-        img.dataset.fullSrc = fullImage.publicUrl;
-        img.dataset.triedFullImage = image.thumbnail_path ? "false" : "true";
-        img.alt = image.title || "VRChat gallery picture";
-        img.loading = "lazy";
-        img.decoding = "async";
-        img.fetchPriority = "low";
-        img.galleryRecord = image;
-        title.textContent = image.title || "";
-        capturedAt.dateTime = captureDate || "";
-        capturedAt.textContent = captureDate
-          ? `Taken ${formatImageDate(captureDate)}`
-          : "Capture time unavailable";
-        img.onerror = () => {
-          if (img.dataset.triedFullImage === "false") {
-            img.dataset.triedFullImage = "true";
-            img.src = fullImage.publicUrl;
-            return;
-          }
-
-          title.textContent = image.title
-            ? `${image.title} - image could not load`
-            : "Image could not load";
-        };
-
-        if (title.textContent) {
-          caption.append(title);
-        }
-
-        caption.append(capturedAt);
-
-        article.append(img, caption);
-        gallery.append(article);
-      });
-
-      const hasMoreImages = !showAll && images.length > visibleGalleryCount;
-      galleryControls.hidden = !hasMoreImages;
-      galleryMoreButton.textContent = "Show all pictures";
-    }
-
-    async function loadGalleryImages() {
-      if (galleryLoading) {
-        return;
-      }
-
-      galleryLoading = true;
-      try {
-        const { data, error } = await db.rpc("get_public_gallery_images");
-
-        if (!error) {
-          galleryImages = (data || []).sort((first, second) => {
-            const firstTime = new Date(galleryCaptureDate(first) || 0).getTime();
-            const secondTime = new Date(galleryCaptureDate(second) || 0).getTime();
-            return secondTime - firstTime;
-          });
-          visibleGalleryCount = Math.min(visibleGalleryCount, Math.max(GALLERY_BATCH_SIZE, galleryImages.length));
-          renderCurrentGallery();
-          galleryLoaded = true;
-        } else if (!galleryLoaded) {
-          galleryEmpty.textContent = "The gallery is temporarily unavailable.";
-          galleryEmpty.hidden = false;
-        }
-      } finally {
-        galleryLoading = false;
-      }
-    }
-
-    async function loadGalleryCount() {
-      const { data, error } = await db.rpc("get_public_gallery_image_count");
-      const count = Number(data);
-
-      if (!error && Number.isFinite(count)) {
-        heroGalleryCount.textContent = formatCount(count, "picture");
-      }
-    }
-
-    galleryMoreButton.addEventListener("click", () => {
-      visibleGalleryCount = galleryImages.length;
-      renderCurrentGallery();
-    });
-
-    gallerySearch.addEventListener("input", () => {
-      gallerySearchQuery = normalizeGallerySearch(gallerySearch.value);
-      renderCurrentGallery();
-    });
-
-    async function loadApprovalCount() {
-      const { count, error } = await db
-        .from("approvals")
-        .select("id", { count: "exact", head: true });
-
-      if (!error) {
-        heroApprovalCount.textContent = formatCount(count, "approval");
-      }
-    }
-
-    db
-      .channel("approval-count-updates")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "approvals" },
-        loadApprovalCount
-      )
-      .subscribe();
-
-    const gallerySection = document.querySelector("#pictures");
-    const galleryObserver = "IntersectionObserver" in window
-      ? new IntersectionObserver((entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            loadGalleryImages();
-            galleryObserver.disconnect();
-          }
-        }, { rootMargin: "700px 0px" })
-      : null;
-
-    if (galleryObserver) {
-      galleryObserver.observe(gallerySection);
-    } else {
-      loadGalleryImages();
-    }
-
-    loadGalleryCount();
-    loadApprovalCount();
-    setInterval(() => {
-      if (document.hidden) {
-        return;
-      }
-
-      loadGalleryCount();
-      loadApprovalCount();
-
-      if (galleryLoaded) {
-        loadGalleryImages();
-      }
-    }, 5 * 60 * 1000);
-
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) {
-        loadGalleryCount();
-        loadApprovalCount();
-
-        if (galleryLoaded) {
-          loadGalleryImages();
-        }
-      }
-    });
-
-    approvalForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      const name = normalizeName(approvalName.value);
-      const submitButton = approvalForm.querySelector("button");
-      const nameError = getNameError(name);
-
-      if (nameError) {
-        approvalStatus.textContent = nameError;
-        return;
-      }
-
-      const cooldownError = checkApprovalCooldown();
-
-      if (cooldownError) {
-        approvalStatus.textContent = cooldownError;
-        return;
-      }
-
-      recordApprovalAttempt();
-      submitButton.disabled = true;
-      approvalStatus.textContent = "Saving approval...";
-
-      const { error } = await db
-        .rpc("submit_tos_approval", {
-          approval_name: name,
-          visitor_fingerprint: getApprovalFingerprint()
-        });
-
-      submitButton.disabled = false;
-
-      if (error && error.code === "23505") {
-        approvalStatus.textContent = `${name} is already on the approved list.`;
-        approvalName.value = "";
-        window.location.href = "approved.html";
-        return;
-      }
-
-      if (error) {
-        approvalStatus.textContent = error.message.includes("too_many_approvals")
-          ? "Too many TOS submissions in one hour. Try again in 2 hours."
-          : "Could not save approval. Check the name and try again.";
-        return;
-      }
-
-      approvalStatus.textContent = `${name} approved the TOS.`;
-      approvalName.value = "";
-      window.location.href = "approved.html";
-    });
-  </script>
+  <script src="home.js?v=20260905-2"></script>
 </body>
 </html>

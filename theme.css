@@ -30,7 +30,7 @@ html[data-theme="dark"] .site-header {
 html[data-theme="dark"] .nav-links a,
 html[data-theme="dark"] .site-header .button,
 html[data-theme="dark"] .button.secondary,
-html[data-theme="dark"] button:not(.primary):not(.gallery-photo):not(.image-viewer-close):not(.image-viewer-nav):not(.viewer-close):not(.viewer-prev):not(.viewer-next) {
+html[data-theme="dark"] button:not(.primary):not(.theme-toggle):not(.gallery-photo):not(.image-viewer-close):not(.image-viewer-nav):not(.viewer-close):not(.viewer-prev):not(.viewer-next) {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(255, 121, 181, 0.34) !important;
   color: var(--ink) !important;
@@ -41,8 +41,8 @@ html[data-theme="dark"] .nav-links a:focus-visible,
 html[data-theme="dark"] .nav-links a[aria-current],
 html[data-theme="dark"] .button:hover,
 html[data-theme="dark"] .button:focus-visible,
-html[data-theme="dark"] button:not(.primary):hover,
-html[data-theme="dark"] button:not(.primary):focus-visible {
+html[data-theme="dark"] button:not(.primary):not(.theme-toggle):hover,
+html[data-theme="dark"] button:not(.primary):not(.theme-toggle):focus-visible {
   background: #f4d96f !important;
   border-color: #f4d96f !important;
   color: #372840 !important;
@@ -338,7 +338,8 @@ html[data-theme="dark"][data-page="404"] main {
 .site-header::after {
   animation: candy-header-shimmer 8s linear infinite;
   background: linear-gradient(90deg, #78d5fa, #ff79b5, #f5d96f, #78d5fa);
-  background-size: 220% 100%;
+  background-size: 600px 100%;
+  background-repeat: repeat-x;
   bottom: -1px;
   content: "";
   height: 3px;
@@ -559,7 +560,7 @@ html[data-page="index"] .hero-photo:hover img {
 
 @keyframes candy-header-shimmer {
   to {
-    background-position: 220% 0;
+    background-position: 600px 0;
   }
 }
 
@@ -573,7 +574,7 @@ html[data-page="index"] .hero-photo:hover img {
   }
 }
 
-@media (max-width: 1220px) {
+@media (max-width: 1600px) {
   html.nav-enhanced .site-header {
     align-items: center !important;
     flex-direction: row !important;
@@ -660,7 +661,7 @@ html[data-theme="dark"] .nav-menu-toggle {
   color: var(--ink);
 }
 
-@media (max-width: 1220px) {
+@media (max-width: 1600px) {
   html[data-theme="dark"].nav-enhanced .nav-links {
     background: rgba(20, 27, 43, 0.985) !important;
     border-color: rgba(255, 121, 181, 0.38);
@@ -904,4 +905,63 @@ html[data-theme="dark"][data-page="control-marshy"] .safety-note {
   html.nav-enhanced .site-header .brand > img {
     max-width: min(52vw, 190px) !important;
   }
+}
+
+/* Blue navigation colours; preserve the existing button layout. */
+html .site-header .nav-links a {
+  background: #bfe9ff !important;
+  border-color: #78bfe3 !important;
+  color: #173e54 !important;
+  box-shadow: 0 5px 14px rgba(35, 105, 145, .12);
+}
+html[data-theme="dark"] .site-header .nav-links a {
+  background: #183d52 !important;
+  border-color: #4388ae !important;
+  color: #eaf8ff !important;
+}
+html .site-header .nav-links a:hover,
+html .site-header .nav-links a:focus-visible,
+html[data-theme="dark"] .site-header .nav-links a:hover,
+html[data-theme="dark"] .site-header .nav-links a:focus-visible {
+  background: #9cddfa !important;
+  border-color: #69cff8 !important;
+  color: #173e54 !important;
+  box-shadow: 0 8px 18px rgba(65, 160, 210, .22);
+}
+html .site-header .nav-links a[aria-current],
+html[data-theme="dark"] .site-header .nav-links a[aria-current] {
+  background: #69cff8 !important;
+  border-color: #bfe9ff !important;
+  color: #12334a !important;
+  box-shadow: 0 6px 16px rgba(65, 160, 210, .22), inset 0 -3px 0 #3596c0;
+}
+
+.theme-toggle {
+  background: #bfe9ff !important;
+  border-color: #78bfe3 !important;
+  color: #173e54 !important;
+  box-shadow: 0 5px 14px rgba(35, 105, 145, .12);
+}
+html[data-theme="dark"] .theme-toggle {
+  background: #183d52 !important;
+  border-color: #4388ae !important;
+  color: #eaf8ff !important;
+}
+.theme-toggle:hover,
+.theme-toggle:focus-visible,
+html[data-theme="dark"] .theme-toggle:hover,
+html[data-theme="dark"] .theme-toggle:focus-visible {
+  background: #9cddfa !important;
+  border-color: #69cff8 !important;
+  color: #173e54 !important;
+  box-shadow: 0 8px 18px rgba(65, 160, 210, .22);
+  outline-color: #69cff8;
+}
+
+/* Keep the published document readable, even when the surrounding site is dark. */
+.tos-document,
+.tos-frame {
+  color-scheme: only light;
+  background: #ffffff !important;
+  color: #111111;
 }

@@ -3,7 +3,7 @@
   const root = document.documentElement;
   const pageName = (window.location.pathname.split("/").pop() || "index.html")
     .replace(/\.html$/i, "") || "index";
-  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const savedState = window.MarshyStorage;
 
   if (pageName === "snake" || pageName === "dungeon") {
     window.location.replace("games.html#" + pageName);
@@ -12,7 +12,7 @@
 
   function storedTheme() {
     try {
-      return window.localStorage.getItem(storageKey);
+      return savedState.getItem(storageKey);
     } catch (error) {
       return null;
     }
@@ -22,7 +22,7 @@
     const saved = storedTheme();
     return saved === "light" || saved === "dark"
       ? saved
-      : mediaQuery.matches ? "dark" : "light";
+      : "dark";
   }
 
   function updateButton(button, theme) {
@@ -38,7 +38,7 @@
 
     if (savePreference) {
       try {
-        window.localStorage.setItem(storageKey, theme);
+        savedState.setItem(storageKey, theme);
       } catch (error) {
         // The theme still works when storage is unavailable.
       }
@@ -91,49 +91,43 @@
   }
 
 
+  function synchronizeNavigation(nav) {
+    const destinations = [
+      ["index.html#about", "About"], ["index.html#pictures", "Pictures"],
+      ["index.html#tos", "Marshys TOS"], ["approved.html", "Approved"],
+      ["headset.html", "Headset"], ["games.html", "Games"],
+      ["control-marshy.html", "Marshy Zappy Zaps"], ["projects.html", "Projects"],
+      ["donate.html", "Pay Tribute"]
+    ];
+    function destinationKey(href) {
+      const url = new URL(href, window.location.href);
+      return url.origin + url.pathname + url.hash;
+    }
+    const legacy = ["snake.html", "dungeon.html"].map(destinationKey);
+    Array.from(nav.querySelectorAll("a")).forEach(link => {
+      if (legacy.includes(destinationKey(link.href))) link.remove();
+    });
+    destinations.forEach(([href, label]) => {
+      // Progress parameters and absolute URLs do not make a new destination.
+      const matches = Array.from(nav.querySelectorAll("a"))
+        .filter(item => destinationKey(item.href) === destinationKey(href));
+      const link = matches.shift() || document.createElement("a");
+      matches.forEach(duplicate => duplicate.remove());
+      if (!link.getAttribute("href")) link.href = href;
+      link.textContent = label;
+      if (!href.includes("#") && href === pageName + ".html") link.setAttribute("aria-current", "page");
+      nav.append(link);
+    });
+    const themeButton = nav.querySelector(".theme-toggle");
+    if (themeButton) nav.append(themeButton);
+  }
+
   function installNavigation() {
     const header = document.querySelector(".site-header");
     const nav = document.querySelector(".nav-links");
-
-    if (!header || !nav) {
-      return;
-    }
-
-    const legacyGameLinks = Array.from(
-      nav.querySelectorAll('a[href="snake.html"], a[href="dungeon.html"]')
-    );
-    let gamesLink = nav.querySelector('a[href="games.html"]');
-
-    if (!gamesLink) {
-      gamesLink = document.createElement("a");
-      gamesLink.href = "games.html";
-      gamesLink.textContent = "Games";
-      nav.insertBefore(
-        gamesLink,
-        nav.querySelector('a[href="control-marshy.html"]') || nav.querySelector('a[href="donate.html"]') || nav.firstChild
-      );
-    }
-
-    if (["games", "snake", "dungeon"].includes(pageName)) {
-      gamesLink.setAttribute("aria-current", "page");
-    }
-
-    legacyGameLinks.forEach(function (link) {
-      link.remove();
-    });
-
-    if (!nav.querySelector('a[href="control-marshy.html"]')) {
-      const controlLink = document.createElement("a");
-      const tributeLink = nav.querySelector('a[href="donate.html"]');
-      controlLink.href = "control-marshy.html";
-      controlLink.textContent = "Marshy Zappy Zaps";
-
-      if (tributeLink) {
-        nav.insertBefore(controlLink, tributeLink);
-      } else {
-        nav.append(controlLink);
-      }
-    }
+    if (!header || !nav) return;
+    synchronizeNavigation(nav);
+    if (header.querySelector(".nav-menu-toggle")) return;
 
     const button = document.createElement("button");
     const lines = document.createElement("span");
@@ -182,7 +176,7 @@
       }
     });
 
-    window.matchMedia("(min-width: 1221px)").addEventListener("change", function (event) {
+    window.matchMedia("(min-width: 1601px)").addEventListener("change", function (event) {
       if (event.matches) {
         setMenu(false);
       }
@@ -278,6 +272,7 @@
       const playerCount = Number.isInteger(reportedCount) && reportedCount >= 0
         ? reportedCount
         : null;
+      const showCount = (state === "public" || (state === "private" && Boolean(world))) && playerCount !== null;
       const labels = {
         public: world || "In VRChat",
         private: world || "Private world",
@@ -287,7 +282,26 @@
         unknown: "Location unavailable"
       };
       const label = labels[state] || labels.unknown;
-      const showCount = state === "public" && playerCount !== null;
+      const homeLabel = document.querySelector("#home-status-label");
+      const homeDetail = document.querySelector("#home-status-detail");
+      if (homeLabel && homeDetail) {
+        const homeLabels = {
+          public: world ? "Marshy is exploring " + world : "Marshy is exploring VRChat",
+          private: world ? "Marshy is exploring " + world : "Marshy is hiding",
+          traveling: "Marshy is hopping between worlds",
+          online: "Marshy is in VRChat",
+          offline: "Marshy has escaped VRChat",
+          unknown: "Nobody knows where Marshy is"
+        };
+        homeLabel.textContent = homeLabels[state] || homeLabels.unknown;
+        homeLabel.closest(".home-marshy-status").dataset.state = state;
+        homeDetail.textContent = showCount
+          ? `${playerCount} ${playerCount === 1 ? "player" : "players"} in this instance. Updated automatically.`
+          : state === "private" && !world ? "Tucked away somewhere cosy."
+          : state === "unknown" ? "No fresh status right now. Check back in a little while."
+          : (state === "public" || state === "private") ? "Player count unavailable. Waiting for the next update."
+          : "A little glimpse of what Marshy is up to.";
+      }
 
       location.dataset.state = state;
       locationLabel.textContent = label;
@@ -310,11 +324,15 @@
         return;
       }
 
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 10000);
       try {
         const response = await fetch(statusEndpoint, {
           method: "POST",
           headers: requestHeaders,
-          body: "{}"
+          body: "{}",
+          cache: "no-store",
+          signal: controller.signal
         });
 
         if (!response.ok) {
@@ -325,6 +343,8 @@
         renderLocation(Array.isArray(data) ? data[0] || null : data);
       } catch (error) {
         renderLocation(null);
+      } finally {
+        window.clearTimeout(timeout);
       }
     }
 
@@ -398,7 +418,10 @@
       return;
     }
 
-    const links = Array.from(document.querySelectorAll('.nav-links a[href*="index.html#"]'));
+    const links = Array.from(document.querySelectorAll('.nav-links a')).filter(link => {
+      const url = new URL(link.href, window.location.href);
+      return url.pathname === new URL("index.html", window.location.href).pathname && url.hash;
+    });
     const pairs = links.map(function (link) {
       const hash = new URL(link.href, window.location.href).hash;
       return {
@@ -460,10 +483,9 @@
     initializeUi();
   }
 
-  mediaQuery.addEventListener("change", function (event) {
-    if (!storedTheme()) {
-      applyTheme(event.matches ? "dark" : "light", false);
-    }
+  window.addEventListener("pageshow", () => applyTheme(preferredTheme(), false));
+  window.addEventListener("storage", event => {
+    if (event.key === storageKey || event.key === null) applyTheme(preferredTheme(), false);
   });
 
 }());
