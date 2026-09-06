@@ -29,6 +29,8 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     const turnLabel = gameRoot.querySelector("#dungeon-turn");
     let turns = 0;
     let showRoute = false;
+    let hitFeedback = null;
+    let hitFrame = 0;
     const cells = 12;
     const cellSize = canvas.width / cells;
     const directions = {
@@ -305,6 +307,8 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     }
 
     function generateFloor(message = "Reach the green EXIT. Snacks are optional.") {
+      cancelAnimationFrame(hitFrame);
+      hitFeedback = null;
       turns = 0;
       player = { x: 1, y: 1 };
       exit = { x: cells - 2, y: cells - 2 };
@@ -355,7 +359,10 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       generateFloor(`Floor ${floor}! +25 points and +1 heart. Find the next green EXIT.`);
     }
 
-    function losePatience(message) {
+    function losePatience(message, attacker) {
+      hitFeedback = { from: { ...attacker }, to: { ...player }, start: performance.now() };
+      cancelAnimationFrame(hitFrame);
+      hitFrame = requestAnimationFrame(animateHit);
       hp -= 1;
 
       if (hp <= 0) {
@@ -373,6 +380,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     }
 
     function movePlayer(directionName) {
+      if (hitFeedback) return;
       if (gameOver) {
         setStatus("Start a new run to continue.");
         return;
@@ -395,9 +403,9 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         enemies.splice(enemyIndex, 1);
         score += 5;
         player = next;
-        losePatience("Blob cleared: −1 heart, +5 points.");
+        losePatience("You bumped into a blob: −1 heart, +5 points. Blob cleared.", next);
         if (!gameOver && turns % 2 === 0) {
-          moveEnemies();
+          moveEnemies(true);
         }
         draw();
         return;
@@ -430,12 +438,11 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       draw();
     }
 
-    function moveEnemies() {
+    function moveEnemies(damagedThisTurn = false) {
       if (gameOver) {
         return;
       }
 
-      let damagedThisTurn = false;
       enemies.forEach((enemy, index) => {
         if (gameOver) return;
         const options = Object.values(directions)
@@ -458,7 +465,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
 
         if (sameCell(next, player)) {
           if (!damagedThisTurn) {
-            losePatience("A blob caught you: −1 heart. Move away or step onto it to clear it.");
+            losePatience("A neighbouring blob lunged into you: −1 heart. Move away to dodge its next attack.", enemy);
             damagedThisTurn = true;
           }
           return;
@@ -477,6 +484,13 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       ctx.arcTo(x, y + height, x, y, radius);
       ctx.arcTo(x, y, x + width, y, radius);
       ctx.closePath();
+    }
+
+    function animateHit(now) {
+      if (!hitFeedback) return;
+      if (now - hitFeedback.start >= 650) hitFeedback = null;
+      draw();
+      if (hitFeedback) hitFrame = requestAnimationFrame(animateHit);
     }
 
     function drawTile(cell, fill, stroke = "rgba(255, 255, 255, 0.72)", inset = 5, radius = 9) {
@@ -594,8 +608,29 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
 
       snacks.forEach((snack) => { if (!drawSprite(snack, "snack")) drawCircle(snack, "#fff2ad", "#ffb703", "★"); });
       drinks.forEach((drink) => { if (!drawSprite(drink, "drink")) drawCircle(drink, "#bfe9ff", "#4db8ed", "+"); });
-      enemies.forEach((enemy) => { if (!drawSprite(enemy, "blob")) drawCircle(enemy, "#d4b6ff", "#6d5aa8", "!"); });
+      enemies.forEach((enemy) => {
+        let position = enemy;
+        if (hitFeedback && sameCell(enemy, hitFeedback.from) && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          const progress = Math.min(1, (performance.now() - hitFeedback.start) / 650);
+          const lunge = Math.sin(progress * Math.PI);
+          position = { x: enemy.x + (hitFeedback.to.x - enemy.x) * lunge,
+            y: enemy.y + (hitFeedback.to.y - enemy.y) * lunge };
+        }
+        if (!drawSprite(position, "blob")) drawCircle(position, "#d4b6ff", "#6d5aa8", "!");
+      });
       if (!drawSprite(player, "marshy")) drawCircle(player, "#ff6fae", "#fff2ad", "☺");
+      if (hitFeedback) {
+        drawTile(hitFeedback.to, "rgba(255, 70, 110, 0.25)", "#ff527e", 2, 8);
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#881539";
+        ctx.lineWidth = 4;
+        ctx.font = "900 17px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const x = (hitFeedback.to.x + .5) * cellSize, y = hitFeedback.to.y * cellSize + 9;
+        ctx.strokeText("−1 ♥", x, y);
+        ctx.fillText("−1 ♥", x, y);
+      }
       drawOverlay();
     }
 

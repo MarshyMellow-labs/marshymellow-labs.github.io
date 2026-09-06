@@ -119,7 +119,7 @@
         <p class="arcade-kicker">02 / TINY DUNGEON</p>
         <h2 id="dungeon-game-title">Find the green exit.</h2>
         <p>Move Marshy one square at a time. Reach <strong>EXIT</strong> to go down a floor. Snacks are optional.</p>
-        <div class="mission"><span>No timer. Think it through.</span><strong>You move, then the blobs move.</strong><p>Blobs move every second step. Touching one costs 1 heart. At zero hearts, your run ends.</p></div>
+        <div class="mission"><span>No timer. Think it through.</span><strong>You move, then the blobs move.</strong><p>Blobs move every second step and can lunge into you from a neighbouring square. Keep a square between you to dodge. Each turn costs at most 1 heart; at zero, your run ends.</p></div>
         <ul class="tile-guide" aria-label="Dungeon tile guide">
           <li><span class="tile-pet marshy-pet-sprite" aria-hidden="true"></span><span><strong>Marshy</strong>You are here</span></li>
           <li><img class="dungeon-tile-art" src="assets/dungeon-exit.png" width="38" height="38" alt=""><span><strong>Green EXIT</strong>Next floor · +25 points, +1 heart</span></li>
@@ -197,7 +197,7 @@
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="snake-game.js?v=20260907-1"></script>
-  <script src="dungeon-game.js?v=20260907-2"></script>
+  <script src="dungeon-game.js?v=20260907-3"></script>
   <script src="games.js?v=20260907-1"></script>
 </body>
 </html>
