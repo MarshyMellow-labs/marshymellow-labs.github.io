@@ -71,3 +71,6 @@ html[data-theme="dark"] .games-page .score-box { background: transparent !import
 
 /* Keep the hunt companion available without covering either playfield. */
 .games-page .marshy-companion { position: static; margin: 18px 24px; }
+
+.dungeon-tile-art { width: 38px; height: 38px; flex: 0 0 38px; object-fit: contain; image-rendering: pixelated; }
+.tile-guide .tile-pet { width: 38px; flex: 0 0 38px; }

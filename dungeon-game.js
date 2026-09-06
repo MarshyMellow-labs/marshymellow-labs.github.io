@@ -52,6 +52,18 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
     let lastFloor = 1;
     let bestScore = Number((window.MarshyStorage || localStorage).getItem("marshymellowDungeonBest")) || 0;
 
+    const artwork = {};
+    for (const [name, source] of Object.entries({
+      exit: "assets/dungeon-exit.png", snack: "assets/dungeon-snack.png",
+      drink: "assets/dungeon-drink.png", blob: "assets/dungeon-blob.png",
+      marshy: "assets/codex-marshy-pet.webp"
+    })) {
+      const image = new Image();
+      image.onload = () => { if (walls && player) draw(); };
+      image.src = source;
+      artwork[name] = image;
+    }
+
     bestScoreElement.textContent = bestScore;
 
     function getScoreFingerprint() {
@@ -333,7 +345,7 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       lastScore = 0;
       lastFloor = 1;
       hideScoreSubmit();
-      generateFloor("You’re the pink face at the top left. Move toward the green EXIT.");
+      generateFloor("You’re pet Marshy at the top left. Move toward the green EXIT.");
     }
 
     function nextFloor() {
@@ -500,6 +512,23 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
       ctx.fillText(label, centerX, centerY + 1);
     }
 
+    function drawSprite(cell, name) {
+      const image = artwork[name];
+      if (!image.complete || !image.naturalWidth) return false;
+      ctx.save();
+      ctx.imageSmoothingEnabled = name === "marshy";
+      if (name === "marshy") {
+        // Reuse the pet sheet's first 192 x 208 idle frame without changing its art.
+        const height = cellSize, width = height * 192 / 208;
+        ctx.drawImage(image, 0, 0, 192, 208,
+          cell.x * cellSize + (cellSize - width) / 2, cell.y * cellSize, width, height);
+      } else {
+        ctx.drawImage(image, cell.x * cellSize + 1, cell.y * cellSize + 1, cellSize - 2, cellSize - 2);
+      }
+      ctx.restore();
+      return true;
+    }
+
     function drawBackground() {
       const darkMode = document.documentElement.dataset.theme === "dark";
       const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -556,14 +585,17 @@ const SUPABASE_URL = "https://hnqrptrfxxtuxhawyvge.supabase.co";
         });
         ctx.stroke(); ctx.setLineDash([]);
       }
-      drawTile(exit, "#75e1b2", "#ddfff0", 3, 8);
+      if (!drawSprite(exit, "exit")) drawTile(exit, "#75e1b2", "#ddfff0", 3, 8);
+      // Retain an explicit label so the doorway's purpose stays clear at tile size.
+      ctx.fillStyle = "#b7ffdc";
+      ctx.fillRect(exit.x * cellSize + 6, exit.y * cellSize + cellSize - 13, cellSize - 12, 12);
       ctx.fillStyle = "#133f32"; ctx.font = "900 12px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText("EXIT", (exit.x + .5) * cellSize, (exit.y + .5) * cellSize);
+      ctx.fillText("EXIT", (exit.x + .5) * cellSize, exit.y * cellSize + cellSize - 7);
 
-      snacks.forEach((snack) => drawCircle(snack, "#fff2ad", "#ffb703", "★"));
-      drinks.forEach((drink) => drawCircle(drink, "#bfe9ff", "#4db8ed", "+"));
-      enemies.forEach((enemy) => drawCircle(enemy, "#d4b6ff", "#6d5aa8", "!"));
-      drawCircle(player, "#ff6fae", "#fff2ad", "☺");
+      snacks.forEach((snack) => { if (!drawSprite(snack, "snack")) drawCircle(snack, "#fff2ad", "#ffb703", "★"); });
+      drinks.forEach((drink) => { if (!drawSprite(drink, "drink")) drawCircle(drink, "#bfe9ff", "#4db8ed", "+"); });
+      enemies.forEach((enemy) => { if (!drawSprite(enemy, "blob")) drawCircle(enemy, "#d4b6ff", "#6d5aa8", "!"); });
+      if (!drawSprite(player, "marshy")) drawCircle(player, "#ff6fae", "#fff2ad", "☺");
       drawOverlay();
     }
 

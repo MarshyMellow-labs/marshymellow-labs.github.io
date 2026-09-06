@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://hnqrptrfxxtuxhawyvge.supabase.co" crossorigin>
   <link rel="stylesheet" href="games.css?v=20260907-1">
   <link rel="stylesheet" href="theme.css?v=20260905-11">
-  <link rel="stylesheet" href="game-refresh.css?v=20260907-1">
+  <link rel="stylesheet" href="game-refresh.css?v=20260907-2">
   <script src="site-state.js?v=20260905-1"></script>
   <script src="theme.js?v=20260905-12"></script>
   <link rel="stylesheet" href="marshy-delights.css?v=20260905-14">
@@ -121,11 +121,11 @@
         <p>Move Marshy one square at a time. Reach <strong>EXIT</strong> to go down a floor. Snacks are optional.</p>
         <div class="mission"><span>No timer. Think it through.</span><strong>You move, then the blobs move.</strong><p>Blobs move every second step. Touching one costs 1 heart. At zero hearts, your run ends.</p></div>
         <ul class="tile-guide" aria-label="Dungeon tile guide">
-          <li><b class="tile-icon you">☺</b><span><strong>Marshy</strong>You are here</span></li>
-          <li><b class="tile-icon exit">↗</b><span><strong>Green EXIT</strong>Next floor · +25 points, +1 heart</span></li>
-          <li><b class="tile-icon snack">★</b><span><strong>Snack</strong>Optional · +10 points</span></li>
-          <li><b class="tile-icon drink">+</b><span><strong>Drink</strong>+1 heart (max 6), +4 points</span></li>
-          <li><b class="tile-icon blob">!</b><span><strong>Blob</strong>Avoid it · contact costs 1 heart</span></li>
+          <li><span class="tile-pet marshy-pet-sprite" aria-hidden="true"></span><span><strong>Marshy</strong>You are here</span></li>
+          <li><img class="dungeon-tile-art" src="assets/dungeon-exit.png" width="38" height="38" alt=""><span><strong>Green EXIT</strong>Next floor · +25 points, +1 heart</span></li>
+          <li><img class="dungeon-tile-art" src="assets/dungeon-snack.png" width="38" height="38" alt=""><span><strong>Snack</strong>Optional · +10 points</span></li>
+          <li><img class="dungeon-tile-art" src="assets/dungeon-drink.png" width="38" height="38" alt=""><span><strong>Drink</strong>+1 heart (max 6), +4 points</span></li>
+          <li><img class="dungeon-tile-art" src="assets/dungeon-blob.png" width="38" height="38" alt=""><span><strong>Blob</strong>Avoid it · contact costs 1 heart</span></li>
         </ul>
         <details><summary>How to move &amp; use hints</summary><p>Use arrow keys, WASD, swipe the board, or tap the direction buttons. Walls block movement. “Show route” draws a path to the exit, but watch for moving blobs along the way.</p></details>
       </aside>
@@ -197,7 +197,7 @@
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.7/dist/umd/supabase.min.js" integrity="sha384-BmlQlKlDvXvKoxkn5OQuUo/aJQCTXeB+Kls6EccBmG4Kf8AXvp89RtO9MtPxP/r5" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="snake-game.js?v=20260907-1"></script>
-  <script src="dungeon-game.js?v=20260907-1"></script>
+  <script src="dungeon-game.js?v=20260907-2"></script>
   <script src="games.js?v=20260907-1"></script>
 </body>
 </html>
