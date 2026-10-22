@@ -89,6 +89,10 @@ body:has(.image-viewer:not([hidden])) .marshy-companion { display: none; }
 .projects-shelf h2 { font-size: 2rem; margin: 12px 0; }
 .projects-pill { display: inline-block; background: var(--cream); color: var(--ink); padding: 7px 13px; border-radius: 40px; font-weight: 800; }
 .projects-note { color: var(--muted); }
+.projects-world { grid-template-columns: minmax(0, 1fr) minmax(180px, 320px); border-style: solid; }
+.projects-world .button { display: inline-block; }
+.projects-world-preview { display: block; width: 100%; height: auto; border-radius: 18px; }
+@media (max-width: 700px) { .projects-world { grid-template-columns: minmax(0, 1fr); } }
 html[data-theme="dark"] .gallery[data-view="scrapbook"] .picture-card { background: #242438 !important; }
 html[data-theme="dark"] .gallery[data-view="scrapbook"] .picture-card img { background: #191e2e; }
 @keyframes mascot-arrive { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
